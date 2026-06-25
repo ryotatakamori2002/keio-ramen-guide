@@ -22,16 +22,25 @@ const TOGGLE_FILTERS: ToggleFilterKey[] = [
 export default function FilterableShopList({
   shops,
   initialArea = null,
+  initialGenre = null,
+  initialScene = null,
+  initialBeginnerOnly = false,
 }: {
   shops: Shop[];
   initialArea?: string | null;
+  initialGenre?: string | null;
+  initialScene?: SceneTag | null;
+  initialBeginnerOnly?: boolean;
 }) {
   const [keyword, setKeyword] = useState("");
   const [area, setArea] = useState<string | null>(initialArea);
-  const [genre, setGenre] = useState<string | null>(null);
-  const [scene, setScene] = useState<SceneTag | null>(null);
+  const [genre, setGenre] = useState<string | null>(initialGenre);
+  const [scene, setScene] = useState<SceneTag | null>(initialScene);
+  const [showAdvanced, setShowAdvanced] = useState(
+    Boolean(initialGenre || initialScene || initialBeginnerOnly),
+  );
   const [toggles, setToggles] = useState<Record<ToggleFilterKey["key"], boolean>>({
-    beginnerOnly: false,
+    beginnerOnly: initialBeginnerOnly,
     soloOnly: false,
     lowQueueOnly: false,
     heavyVolumeOnly: false,
@@ -40,6 +49,9 @@ export default function FilterableShopList({
 
   const areas = useMemo(() => Array.from(new Set(shops.map((s) => s.area))), [shops]);
   const genres = useMemo(() => Array.from(new Set(shops.flatMap((s) => s.genres))), [shops]);
+
+  const activeAdvancedCount =
+    (genre ? 1 : 0) + (scene ? 1 : 0) + Object.values(toggles).filter(Boolean).length;
 
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
@@ -71,47 +83,57 @@ export default function FilterableShopList({
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
         placeholder="店名・駅名・ジャンルで検索"
-        className="w-full rounded-full border border-border bg-card px-4 py-2.5 text-sm placeholder:text-muted focus:border-accent focus:outline-none"
+        className="w-full border-b border-border bg-transparent py-2.5 text-base placeholder:text-muted focus:border-accent focus:outline-none"
       />
 
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        <FilterChip active={area === null} label="全エリア" onClick={() => setArea(null)} />
+      <div className="mt-4 flex gap-6 border-b border-border text-sm">
+        <TabButton active={area === null} label="すべて" onClick={() => setArea(null)} />
         {areas.map((a) => (
-          <FilterChip key={a} active={area === a} label={a} onClick={() => setArea(area === a ? null : a)} />
+          <TabButton key={a} active={area === a} label={a} onClick={() => setArea(area === a ? null : a)} />
         ))}
       </div>
 
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        <FilterChip active={genre === null} label="全ジャンル" onClick={() => setGenre(null)} />
-        {genres.map((g) => (
-          <FilterChip key={g} active={genre === g} label={g} onClick={() => setGenre(genre === g ? null : g)} />
-        ))}
-      </div>
+      <button
+        type="button"
+        onClick={() => setShowAdvanced((v) => !v)}
+        className="mt-4 text-sm text-muted underline decoration-border underline-offset-4 hover:text-foreground"
+      >
+        絞り込む{activeAdvancedCount > 0 ? `（${activeAdvancedCount}）` : ""} {showAdvanced ? "▲" : "▼"}
+      </button>
 
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        <FilterChip active={scene === null} label="全シーン" onClick={() => setScene(null)} />
-        {SCENE_OPTIONS.map((s) => (
-          <FilterChip
-            key={s.value}
-            active={scene === s.value}
-            label={s.label}
-            onClick={() => setScene(scene === s.value ? null : s.value)}
-          />
-        ))}
-      </div>
+      {showAdvanced && (
+        <div className="mt-3 flex flex-col gap-3 border-l border-border pl-4">
+          <FilterRow label="ジャンル">
+            <Chip active={genre === null} label="すべて" onClick={() => setGenre(null)} />
+            {genres.map((g) => (
+              <Chip key={g} active={genre === g} label={g} onClick={() => setGenre(genre === g ? null : g)} />
+            ))}
+          </FilterRow>
+          <FilterRow label="シーン">
+            <Chip active={scene === null} label="すべて" onClick={() => setScene(null)} />
+            {SCENE_OPTIONS.map((s) => (
+              <Chip
+                key={s.value}
+                active={scene === s.value}
+                label={s.label}
+                onClick={() => setScene(scene === s.value ? null : s.value)}
+              />
+            ))}
+          </FilterRow>
+          <FilterRow label="条件">
+            {TOGGLE_FILTERS.map((f) => (
+              <Chip key={f.key} active={toggles[f.key]} label={f.label} onClick={() => toggle(f.key)} />
+            ))}
+          </FilterRow>
+        </div>
+      )}
 
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        {TOGGLE_FILTERS.map((f) => (
-          <FilterChip key={f.key} active={toggles[f.key]} label={f.label} onClick={() => toggle(f.key)} />
-        ))}
-      </div>
+      <p className="mt-5 text-xs text-muted">{filtered.length}件</p>
 
-      <p className="mt-4 text-xs text-muted">{filtered.length}件見つかりました</p>
-
-      <div className="mt-2 flex flex-col gap-3">
+      <div>
         {filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center text-sm text-muted">
-            条件に合うお店が見つかりませんでした。フィルターを減らしてみてください。
+          <div className="border-t border-border py-10 text-center text-sm text-muted">
+            条件に合うお店が見つかりませんでした。絞り込みを減らしてみてください。
           </div>
         ) : (
           filtered.map((shop) => <ShopCard key={shop.id} shop={shop} />)
@@ -121,13 +143,36 @@ export default function FilterableShopList({
   );
 }
 
-function FilterChip({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+function TabButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-        active ? "border-accent bg-accent text-white" : "border-border bg-card text-foreground hover:border-accent"
+      className={`-mb-px border-b-2 py-2 transition-colors ${
+        active ? "border-accent font-semibold text-foreground" : "border-transparent text-muted hover:text-foreground"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 text-xs">
+      <span className="mr-1 w-12 shrink-0 text-muted">{label}</span>
+      {children}
+    </div>
+  );
+}
+
+function Chip({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full border px-2.5 py-1 transition-colors ${
+        active ? "border-accent bg-accent-soft text-accent" : "border-border text-muted hover:border-foreground hover:text-foreground"
       }`}
     >
       {label}

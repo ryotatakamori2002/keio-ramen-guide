@@ -1,16 +1,23 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import QuizForm from "@/components/QuizForm";
 
 export const metadata: Metadata = {
-  title: "気分診断 | Keio Ramen Guide",
+  title: "気分で選ぶ | Keio Ramen Guide",
 };
 
 export default function QuizPage() {
   return (
     <div>
-      <h1 className="text-lg font-bold text-foreground">気分診断</h1>
-      <p className="mt-1 text-sm text-muted">7つの質問に答えるだけ。30秒で今のあなたに合う一杯が見つかります。</p>
-      <div className="mt-5">
+      <p className="text-xs text-muted">
+        <Link href="/shops" className="underline underline-offset-4 hover:text-accent">
+          店舗を探す
+        </Link>{" "}
+        の代わりに、気分から選びたい時に。
+      </p>
+      <h1 className="mt-2 font-serif text-2xl text-foreground">気分で選ぶ</h1>
+      <p className="mt-2 text-sm text-muted">7つの質問、30秒。今の気分に合う一杯を絞り込みます。</p>
+      <div className="mt-8">
         <QuizForm />
       </div>
     </div>

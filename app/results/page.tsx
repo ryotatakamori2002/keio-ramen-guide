@@ -51,19 +51,16 @@ export default async function ResultsPage({
 
   return (
     <div>
-      <h1 className="text-lg font-bold text-foreground">診断結果</h1>
-      <p className="mt-1 text-sm text-muted">あなたの今の気分に合うお店はこちら。</p>
+      <h1 className="font-serif text-2xl text-foreground">気分に合う一杯</h1>
+      <p className="mt-2 text-sm text-muted">回答から、相性の良い順に並べています。</p>
 
-      <div className="mt-4 flex flex-col gap-3">
+      <div>
         {results.map((result, i) => (
           <ResultCard key={result.shop.id} result={result} rank={i + 1} />
         ))}
       </div>
 
-      <Link
-        href="/quiz"
-        className="mt-5 block rounded-full border border-border bg-card py-3 text-center text-sm font-bold text-foreground transition-colors hover:border-accent hover:text-accent"
-      >
+      <Link href="/quiz" className="mt-6 inline-block text-sm text-muted underline underline-offset-4 hover:text-accent">
         もう一度診断する
       </Link>
     </div>

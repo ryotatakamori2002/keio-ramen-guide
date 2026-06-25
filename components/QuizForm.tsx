@@ -41,11 +41,11 @@ export default function QuizForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-7">
       {QUESTIONS.map((question) => (
         <fieldset key={question.key}>
-          <legend className="mb-2 text-sm font-bold text-foreground">{question.title}</legend>
-          <div className="flex flex-wrap gap-2">
+          <legend className="mb-2 text-sm text-foreground">{question.title}</legend>
+          <div className="flex flex-wrap gap-1.5">
             {question.options.map((option) => {
               const active = answers[question.key] === option.value;
               return (
@@ -54,10 +54,10 @@ export default function QuizForm() {
                   type="button"
                   onClick={() => setAnswers((prev) => ({ ...prev, [question.key]: option.value }))}
                   aria-pressed={active}
-                  className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                     active
-                      ? "border-accent bg-accent text-white"
-                      : "border-border bg-card text-foreground hover:border-accent"
+                      ? "border-accent bg-accent-soft text-accent"
+                      : "border-border text-muted hover:border-foreground hover:text-foreground"
                   }`}
                 >
                   {option.label}
@@ -70,9 +70,9 @@ export default function QuizForm() {
 
       <button
         type="submit"
-        className="mt-2 rounded-full bg-accent px-6 py-3 text-base font-bold text-white shadow-sm transition-colors hover:bg-accent-dark"
+        className="mt-2 bg-accent px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
       >
-        診断結果を見る
+        結果を見る
       </button>
     </form>
   );

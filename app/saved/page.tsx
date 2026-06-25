@@ -19,17 +19,17 @@ export default function SavedPage() {
   );
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-12">
       <div>
-        <h1 className="text-lg font-bold text-foreground">保存リスト</h1>
-        <p className="mt-1 text-sm text-muted">「行きたい」「行った」をつけたお店がここに集まります。</p>
+        <h1 className="font-serif text-2xl text-foreground">保存リスト</h1>
+        <p className="mt-2 text-sm text-muted">「行きたい」「行った」をつけたお店がここに集まります。</p>
       </div>
 
       <section>
-        <h2 className="text-sm font-bold text-foreground">行きたい（{wantShops.length}）</h2>
-        <div className="mt-2 flex flex-col gap-3">
+        <h2 className="border-b border-border pb-2 text-sm text-muted">行きたい（{wantShops.length}）</h2>
+        <div>
           {wantShops.length === 0 ? (
-            <EmptyState message="まだ「行きたい」店がありません。店舗一覧でお店を探してみましょう。" />
+            <EmptyState message="まだ「行きたい」店がありません。" />
           ) : (
             wantShops.map((shop) => <ShopCard key={shop.id} shop={shop} />)
           )}
@@ -37,10 +37,10 @@ export default function SavedPage() {
       </section>
 
       <section>
-        <h2 className="text-sm font-bold text-foreground">行った（{visitedShops.length}）</h2>
-        <div className="mt-2 flex flex-col gap-3">
+        <h2 className="border-b border-border pb-2 text-sm text-muted">行った（{visitedShops.length}）</h2>
+        <div>
           {visitedShops.length === 0 ? (
-            <EmptyState message="まだ「行った」店がありません。行ったお店があれば記録してみましょう。" />
+            <EmptyState message="まだ「行った」店がありません。" />
           ) : (
             visitedShops.map((shop) => <ShopCard key={shop.id} shop={shop} />)
           )}
@@ -52,10 +52,10 @@ export default function SavedPage() {
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center text-sm text-muted">
+    <div className="border-t border-border py-10 text-center text-sm text-muted">
       <p>{message}</p>
-      <Link href="/shops" className="mt-2 inline-block text-sm font-semibold text-accent">
-        店舗一覧を見る →
+      <Link href="/shops" className="mt-2 inline-block text-accent underline underline-offset-4">
+        店舗を探す →
       </Link>
     </div>
   );

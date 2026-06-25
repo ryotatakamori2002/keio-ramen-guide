@@ -1,26 +1,16 @@
 import Link from "next/link";
-
-const NAV_ITEMS = [
-  { href: "/shops", label: "店舗一覧" },
-  { href: "/quiz", label: "気分診断" },
-  { href: "/saved", label: "保存" },
-];
+import HeaderNav from "./HeaderNav";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
-      <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="text-base font-bold tracking-tight text-foreground sm:text-lg">
-          🍜 Keio Ramen Guide
+    <header className="border-b border-border">
+      <div className="mx-auto flex max-w-3xl items-baseline justify-between px-5 py-4 sm:px-8">
+        <Link href="/" className="font-serif text-lg tracking-wide text-foreground sm:text-xl">
+          Keio Ramen Guide
         </Link>
-        <nav className="hidden gap-5 text-sm font-medium sm:flex">
-          {NAV_ITEMS.map((item) => (
-            <Link key={item.href} href={item.href} className="text-muted transition-colors hover:text-accent">
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <p className="hidden text-xs text-muted sm:block">日吉・三田・横浜のラーメン案内</p>
       </div>
+      <HeaderNav />
     </header>
   );
 }
