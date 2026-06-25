@@ -54,7 +54,7 @@ export default async function ResultsPage({
       <h1 className="font-serif text-2xl text-foreground">気分に合う一杯</h1>
       <p className="mt-2 text-sm text-muted">回答から、相性の良い順に並べています。</p>
 
-      <div>
+      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {results.map((result, i) => (
           <ResultCard key={result.shop.id} result={result} rank={i + 1} />
         ))}

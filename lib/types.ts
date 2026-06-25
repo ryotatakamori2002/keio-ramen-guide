@@ -12,6 +12,12 @@ export type SceneTag =
   | "hearty"
   | "no_fail";
 
+// ビジュアルの色味。写真がない店のプレースホルダーの配色とアイコン形状を決める。
+export type VisualTone = "iekei" | "jiro" | "tanrei" | "mazesoba" | "tsukemen" | "miso" | "other";
+
+// 価格情報の確からしさ。"approximate" の場合はUIに「目安」と明記する。
+export type PriceConfidence = "exact" | "approximate" | "unknown";
+
 export interface Shop {
   id: string;
   name: string;
@@ -26,6 +32,20 @@ export interface Shop {
   sceneTags: SceneTag[];
   budgetMin: number;
   budgetMax: number;
+  /** 看板メニュー名（例: "ラーメン並＋ライス"） */
+  signatureOrderName: string;
+  /** 看板メニューの目安価格（円）。ライス等を含む現実的な一食の値段 */
+  signatureOrderPrice: number;
+  /** 学生視点の予算メモ（例: "ライス無料でこの値段は強い"） */
+  studentBudgetNote: string;
+  priceConfidence: PriceConfidence;
+  /** 自前 or 許諾済みの料理写真URL。未設定ならプレースホルダーを表示 */
+  imageUrl?: string;
+  imageAlt?: string;
+  /** 写真の出典・撮影者クレジット */
+  imageCredit?: string;
+  /** プレースホルダーの色味とアイコン形状 */
+  visualTone: VisualTone;
   /** こってり度 */
   richness: Level;
   /** あっさり度 */

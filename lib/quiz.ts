@@ -50,6 +50,11 @@ export const SCENE_OPTIONS: QuizOption<SceneAnswer>[] = [
   { value: "no_fail", label: "失敗したくない" },
 ];
 
+// シーンタグ → 表示ラベルの早見表。カードや詳細でシーンを日本語表示するのに使う。
+export const SCENE_LABEL = Object.fromEntries(
+  SCENE_OPTIONS.map((o) => [o.value, o.label]),
+) as Record<SceneTag, string>;
+
 export const TASTE_OPTIONS: QuizOption<TasteAnswer>[] = [
   { value: "iekei", label: "家系" },
   { value: "jiro", label: "二郎系" },

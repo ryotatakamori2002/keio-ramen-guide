@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShopById, SHOPS } from "@/lib/shops";
-import type { SceneTag } from "@/lib/types";
-import StatBar from "@/components/StatBar";
+import ShopHero from "@/components/ShopHero";
+import MetricBar from "@/components/MetricBar";
+import PriceNote from "@/components/PriceNote";
+import ScenePills from "@/components/ScenePills";
 import SaveButtons from "@/components/SaveButtons";
 
 export function generateStaticParams() {
@@ -20,17 +22,6 @@ export async function generateMetadata({
   return { title: shop ? `${shop.name} | Keio Ramen Guide` : "店舗が見つかりません" };
 }
 
-const SCENE_LABELS: Record<SceneTag, string> = {
-  after_class: "授業後",
-  gap_time: "空きコマ",
-  solo: "一人飯",
-  with_friends: "友達と",
-  after_club: "サークル後",
-  after_drinking: "飲み後",
-  hearty: "がっつり",
-  no_fail: "失敗したくない時",
-};
-
 export default async function ShopDetailPage({
   params,
 }: {
@@ -41,48 +32,60 @@ export default async function ShopDetailPage({
   if (!shop) notFound();
 
   return (
-    <div className="flex flex-col gap-10 pb-10">
-      <div>
+    <div className="flex flex-col gap-9 pb-10">
+      <div className="flex flex-col gap-4">
         <Link href="/shops" className="text-xs text-muted hover:text-accent">
           ← 店舗を探す
         </Link>
+        <ShopHero shop={shop} />
+        <div>
+          <h1 className="font-serif text-2xl text-foreground sm:text-3xl">{shop.name}</h1>
+          <p className="mt-2 text-sm text-muted">
+            {shop.area} ・ {shop.station} ・ {shop.genres.join(" / ")}
+          </p>
+          <p className="mt-1 text-xs text-muted">{shop.accessNote}</p>
+        </div>
 
-        <h1 className="mt-3 font-serif text-2xl text-foreground sm:text-3xl">{shop.name}</h1>
-        <p className="mt-2 text-sm text-muted">
-          {shop.area} ・ {shop.station} ・ {shop.genres.join(" / ")} ・ ¥{shop.budgetMin}〜{shop.budgetMax}
-        </p>
-        <a
-          href={shop.googleMapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-sm text-accent underline underline-offset-4"
-        >
-          Google Mapsで見る
-        </a>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3 border-y border-border py-4">
+          <SaveButtons shopId={shop.id} />
+          <a
+            href={shop.googleMapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-accent underline underline-offset-4"
+          >
+            Google Mapsで見る
+          </a>
+        </div>
       </div>
 
-      <p className="border-y border-border py-5 font-serif text-lg leading-relaxed text-foreground">
-        {shop.whyThisShop}
-      </p>
+      <Section title="おすすめ注文">
+        <PriceNote
+          name={shop.signatureOrderName}
+          price={shop.signatureOrderPrice}
+          confidence={shop.priceConfidence}
+        />
+        <p className="mt-1 text-sm text-muted">{shop.studentBudgetNote}</p>
+        <p className="mt-2">{shop.recommendedMenu}</p>
+      </Section>
+
+      <Section title="この店を選ぶ理由">
+        <p className="font-serif text-lg leading-relaxed text-foreground">{shop.whyThisShop}</p>
+      </Section>
 
       <Section title="慶應生向けコメント">
         <p>{shop.keioNotes}</p>
-        <p className="mt-2 text-xs text-muted">{shop.accessNote}</p>
-      </Section>
-
-      <Section title="おすすめ注文">
-        <p>{shop.recommendedMenu}</p>
       </Section>
 
       <Section title="味・量・並び・入りやすさ">
         <p>{shop.tasteNotes}</p>
         <p className="mt-2">{shop.atmosphereNotes}</p>
         <div className="mt-4 flex flex-col gap-2.5">
-          <StatBar level={shop.richness} label="こってり度" />
-          <StatBar level={shop.volume} label="量" />
-          <StatBar level={shop.queueLevel} label="並びやすさ" />
-          <StatBar level={shop.soloFriendly} label="一人向け" />
-          <StatBar level={shop.friendFriendly} label="友達向け" />
+          <MetricBar level={shop.richness} label="こってり度" />
+          <MetricBar level={shop.volume} label="量" />
+          <MetricBar level={shop.queueLevel} label="並び" />
+          <MetricBar level={shop.soloFriendly} label="一人で入れる" />
+          <MetricBar level={shop.friendFriendly} label="友達向け" />
         </div>
       </Section>
 
@@ -95,14 +98,7 @@ export default async function ShopDetailPage({
       </Section>
 
       <Section title="どんな時に向いているか">
-        <div className="flex flex-wrap gap-x-2 gap-y-1 text-sm text-muted">
-          {shop.sceneTags.map((tag, i) => (
-            <span key={tag}>
-              {SCENE_LABELS[tag]}
-              {i < shop.sceneTags.length - 1 && " ・"}
-            </span>
-          ))}
-        </div>
+        <ScenePills tags={shop.sceneTags} max={shop.sceneTags.length} />
         <ul className="mt-3 flex flex-col gap-1">
           {shop.recommendedFor.map((item) => (
             <li key={item}>・{item}</li>

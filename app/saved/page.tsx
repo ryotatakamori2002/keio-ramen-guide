@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useSavedShops } from "@/hooks/useSavedShops";
 import { getShopById } from "@/lib/shops";
-import ShopCard from "@/components/ShopCard";
+import VisualShopCard from "@/components/VisualShopCard";
 
 export default function SavedPage() {
   const { wantIds, visitedIds } = useSavedShops();
@@ -27,24 +27,28 @@ export default function SavedPage() {
 
       <section>
         <h2 className="border-b border-border pb-2 text-sm text-muted">行きたい（{wantShops.length}）</h2>
-        <div>
-          {wantShops.length === 0 ? (
-            <EmptyState message="まだ「行きたい」店がありません。" />
-          ) : (
-            wantShops.map((shop) => <ShopCard key={shop.id} shop={shop} />)
-          )}
-        </div>
+        {wantShops.length === 0 ? (
+          <EmptyState message="まだ「行きたい」店がありません。" />
+        ) : (
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {wantShops.map((shop) => (
+              <VisualShopCard key={shop.id} shop={shop} />
+            ))}
+          </div>
+        )}
       </section>
 
       <section>
         <h2 className="border-b border-border pb-2 text-sm text-muted">行った（{visitedShops.length}）</h2>
-        <div>
-          {visitedShops.length === 0 ? (
-            <EmptyState message="まだ「行った」店がありません。" />
-          ) : (
-            visitedShops.map((shop) => <ShopCard key={shop.id} shop={shop} />)
-          )}
-        </div>
+        {visitedShops.length === 0 ? (
+          <EmptyState message="まだ「行った」店がありません。" />
+        ) : (
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {visitedShops.map((shop) => (
+              <VisualShopCard key={shop.id} shop={shop} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

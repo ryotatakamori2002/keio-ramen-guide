@@ -1,79 +1,68 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { SceneTag, Shop } from "@/lib/types";
-import { SCENE_OPTIONS } from "@/lib/quiz";
-import ShopCard from "./ShopCard";
+import type { Shop } from "@/lib/types";
+import VisualShopCard from "./VisualShopCard";
+import QuickFilterBar, { type QuickFilterItem } from "./QuickFilterBar";
 
-interface ToggleFilterKey {
-  key: "beginnerOnly" | "soloOnly" | "lowQueueOnly" | "heavyVolumeOnly" | "lateNightOnly";
-  label: string;
+interface QuickCondition extends QuickFilterItem {
   test: (shop: Shop) => boolean;
 }
 
-const TOGGLE_FILTERS: ToggleFilterKey[] = [
-  { key: "beginnerOnly", label: "初心者向け", test: (s) => s.beginnerFriendly >= 4 },
-  { key: "soloOnly", label: "一人向け", test: (s) => s.soloFriendly >= 4 },
-  { key: "lowQueueOnly", label: "並び少なめ", test: (s) => s.queueLevel <= 2 },
-  { key: "heavyVolumeOnly", label: "腹パン", test: (s) => s.volume >= 4 },
-  { key: "lateNightOnly", label: "深夜営業", test: (s) => s.lateNight },
+const QUICK_CONDITIONS: QuickCondition[] = [
+  { key: "near", label: "近い", test: (s) => s.campusWalkMin <= 10 },
+  { key: "solo", label: "一人で入りやすい", test: (s) => s.soloFriendly >= 4 },
+  { key: "lowQueue", label: "並び少なめ", test: (s) => s.queueLevel <= 2 },
+  { key: "hearty", label: "腹パン", test: (s) => s.volume >= 4 },
+  { key: "beginner", label: "初心者向け", test: (s) => s.beginnerFriendly >= 4 },
+  { key: "drinking", label: "飲み後", test: (s) => s.sceneTags.includes("after_drinking") },
 ];
 
 export default function FilterableShopList({
   shops,
   initialArea = null,
   initialGenre = null,
-  initialScene = null,
-  initialBeginnerOnly = false,
+  initialQuick = [],
 }: {
   shops: Shop[];
   initialArea?: string | null;
   initialGenre?: string | null;
-  initialScene?: SceneTag | null;
-  initialBeginnerOnly?: boolean;
+  initialQuick?: string[];
 }) {
   const [keyword, setKeyword] = useState("");
   const [area, setArea] = useState<string | null>(initialArea);
   const [genre, setGenre] = useState<string | null>(initialGenre);
-  const [scene, setScene] = useState<SceneTag | null>(initialScene);
-  const [showAdvanced, setShowAdvanced] = useState(
-    Boolean(initialGenre || initialScene || initialBeginnerOnly),
-  );
-  const [toggles, setToggles] = useState<Record<ToggleFilterKey["key"], boolean>>({
-    beginnerOnly: initialBeginnerOnly,
-    soloOnly: false,
-    lowQueueOnly: false,
-    heavyVolumeOnly: false,
-    lateNightOnly: false,
-  });
+  const [quick, setQuick] = useState<Set<string>>(new Set(initialQuick));
 
   const areas = useMemo(() => Array.from(new Set(shops.map((s) => s.area))), [shops]);
   const genres = useMemo(() => Array.from(new Set(shops.flatMap((s) => s.genres))), [shops]);
 
-  const activeAdvancedCount =
-    (genre ? 1 : 0) + (scene ? 1 : 0) + Object.values(toggles).filter(Boolean).length;
-
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
+    const activeTests = QUICK_CONDITIONS.filter((c) => quick.has(c.key));
     return shops.filter((shop) => {
       if (area && shop.area !== area) return false;
       if (genre && !shop.genres.includes(genre)) return false;
-      if (scene && !shop.sceneTags.includes(scene)) return false;
-      for (const filter of TOGGLE_FILTERS) {
-        if (toggles[filter.key] && !filter.test(shop)) return false;
+      for (const c of activeTests) {
+        if (!c.test(shop)) return false;
       }
       if (kw) {
-        const haystack = [shop.name, shop.station, shop.area, ...shop.genres, shop.recommendedMenu]
+        const haystack = [shop.name, shop.station, shop.area, ...shop.genres, shop.signatureOrderName]
           .join(" ")
           .toLowerCase();
         if (!haystack.includes(kw)) return false;
       }
       return true;
     });
-  }, [shops, keyword, area, genre, scene, toggles]);
+  }, [shops, keyword, area, genre, quick]);
 
-  function toggle(key: ToggleFilterKey["key"]) {
-    setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
+  function toggleQuick(key: string) {
+    setQuick((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   }
 
   return (
@@ -83,72 +72,52 @@ export default function FilterableShopList({
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
         placeholder="店名・駅名・ジャンルで検索"
-        className="w-full border-b border-border bg-transparent py-2.5 text-base placeholder:text-muted focus:border-accent focus:outline-none"
+        className="w-full rounded-lg border border-border bg-card px-4 py-3 text-base placeholder:text-muted focus:border-accent focus:outline-none"
       />
 
       <div className="mt-4 flex gap-6 border-b border-border text-sm">
-        <TabButton active={area === null} label="すべて" onClick={() => setArea(null)} />
+        <Tab active={area === null} label="すべて" onClick={() => setArea(null)} />
         {areas.map((a) => (
-          <TabButton key={a} active={area === a} label={a} onClick={() => setArea(area === a ? null : a)} />
+          <Tab key={a} active={area === a} label={a} onClick={() => setArea(area === a ? null : a)} />
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setShowAdvanced((v) => !v)}
-        className="mt-4 text-sm text-muted underline decoration-border underline-offset-4 hover:text-foreground"
-      >
-        絞り込む{activeAdvancedCount > 0 ? `（${activeAdvancedCount}）` : ""} {showAdvanced ? "▲" : "▼"}
-      </button>
+      <div className="mt-4">
+        <QuickFilterBar items={QUICK_CONDITIONS} isActive={(k) => quick.has(k)} onToggle={toggleQuick} />
+      </div>
 
-      {showAdvanced && (
-        <div className="mt-3 flex flex-col gap-3 border-l border-border pl-4">
-          <FilterRow label="ジャンル">
-            <Chip active={genre === null} label="すべて" onClick={() => setGenre(null)} />
-            {genres.map((g) => (
-              <Chip key={g} active={genre === g} label={g} onClick={() => setGenre(genre === g ? null : g)} />
-            ))}
-          </FilterRow>
-          <FilterRow label="シーン">
-            <Chip active={scene === null} label="すべて" onClick={() => setScene(null)} />
-            {SCENE_OPTIONS.map((s) => (
-              <Chip
-                key={s.value}
-                active={scene === s.value}
-                label={s.label}
-                onClick={() => setScene(scene === s.value ? null : s.value)}
-              />
-            ))}
-          </FilterRow>
-          <FilterRow label="条件">
-            {TOGGLE_FILTERS.map((f) => (
-              <Chip key={f.key} active={toggles[f.key]} label={f.label} onClick={() => toggle(f.key)} />
-            ))}
-          </FilterRow>
+      <div className="mt-3 -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+        <div className="flex gap-1.5 sm:flex-wrap">
+          <GenreChip active={genre === null} label="全ジャンル" onClick={() => setGenre(null)} />
+          {genres.map((g) => (
+            <GenreChip key={g} active={genre === g} label={g} onClick={() => setGenre(genre === g ? null : g)} />
+          ))}
         </div>
-      )}
+      </div>
 
       <p className="mt-5 text-xs text-muted">{filtered.length}件</p>
 
-      <div>
-        {filtered.length === 0 ? (
-          <div className="border-t border-border py-10 text-center text-sm text-muted">
-            条件に合うお店が見つかりませんでした。絞り込みを減らしてみてください。
-          </div>
-        ) : (
-          filtered.map((shop) => <ShopCard key={shop.id} shop={shop} />)
-        )}
-      </div>
+      {filtered.length === 0 ? (
+        <div className="mt-2 rounded-lg border border-dashed border-border py-12 text-center text-sm text-muted">
+          条件に合うお店が見つかりませんでした。条件を減らしてみてください。
+        </div>
+      ) : (
+        <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {filtered.map((shop, i) => (
+            <VisualShopCard key={shop.id} shop={shop} priority={i < 2} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function TabButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+function Tab({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`-mb-px border-b-2 py-2 transition-colors ${
+      className={`-mb-px shrink-0 border-b-2 py-2 transition-colors ${
         active ? "border-accent font-semibold text-foreground" : "border-transparent text-muted hover:text-foreground"
       }`}
     >
@@ -157,21 +126,12 @@ function TabButton({ active, label, onClick }: { active: boolean; label: string;
   );
 }
 
-function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5 text-xs">
-      <span className="mr-1 w-12 shrink-0 text-muted">{label}</span>
-      {children}
-    </div>
-  );
-}
-
-function Chip({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+function GenreChip({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full border px-2.5 py-1 transition-colors ${
+      className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1 text-xs transition-colors ${
         active ? "border-accent bg-accent-soft text-accent" : "border-border text-muted hover:border-foreground hover:text-foreground"
       }`}
     >
