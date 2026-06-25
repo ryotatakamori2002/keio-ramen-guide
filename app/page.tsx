@@ -1,65 +1,76 @@
-import Image from "next/image";
+import Link from "next/link";
+import { SHOPS } from "@/lib/shops";
+import ShopCard from "@/components/ShopCard";
+
+const AREAS = ["日吉", "三田", "横浜"];
 
 export default function Home() {
+  const featured = [...SHOPS].sort((a, b) => b.keioStudentScore - a.keioStudentScore).slice(0, 3);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex flex-col gap-10">
+      <section className="text-center">
+        <p className="text-sm font-semibold text-accent">慶應生向けミニラーメンガイド</p>
+        <h1 className="mt-2 text-2xl font-bold leading-snug text-foreground sm:text-3xl">
+          授業終わりに、
+          <br />
+          外さない一杯を。
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          日吉・三田・横浜。空きコマ、一人飯、友達と、サークル後、飲み後。
+          <br />
+          生活シーンに合わせて、今行くべきラーメン屋がすぐ見つかる。
+        </p>
+        <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:justify-center">
+          <Link
+            href="/shops"
+            className="rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-accent-dark"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            店舗一覧を見る
+          </Link>
+          <Link
+            href="/quiz"
+            className="rounded-full border border-border bg-card px-6 py-3 text-sm font-bold text-foreground transition-colors hover:border-accent hover:text-accent"
           >
-            Documentation
-          </a>
+            30秒で気分診断する
+          </Link>
         </div>
-      </main>
+      </section>
+
+      <section>
+        <h2 className="text-sm font-bold text-foreground">エリアから探す</h2>
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {AREAS.map((area) => (
+            <Link
+              key={area}
+              href={`/shops?area=${encodeURIComponent(area)}`}
+              className="rounded-2xl border border-border bg-card py-4 text-center text-sm font-bold text-foreground transition-colors hover:border-accent hover:text-accent"
+            >
+              {area}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-sm font-bold text-foreground">慶應生に人気の3軒</h2>
+          <Link href="/shops" className="text-xs font-medium text-accent">
+            一覧を見る →
+          </Link>
+        </div>
+        <div className="mt-2 flex flex-col gap-3">
+          {featured.map((shop) => (
+            <ShopCard key={shop.id} shop={shop} />
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-border bg-card p-4 text-center">
+        <p className="text-sm text-muted">
+          広告なし・口コミ件数勝負なし。慶應生の生活導線に合わせて選べる、軽量なラーメン案内です。
+        </p>
+      </section>
     </div>
   );
 }
