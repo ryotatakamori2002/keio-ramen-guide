@@ -2,15 +2,16 @@
 
 import { useMemo, useState } from "react";
 import type { Shop } from "@/lib/types";
-import VisualShopCard from "./VisualShopCard";
-import QuickFilterBar, { type QuickFilterItem } from "./QuickFilterBar";
+import ShopCard from "./ShopCard";
 
-interface QuickCondition extends QuickFilterItem {
+interface QuickCondition {
+  key: string;
+  label: string;
   test: (shop: Shop) => boolean;
 }
 
 const QUICK_CONDITIONS: QuickCondition[] = [
-  { key: "near", label: "近い", test: (s) => s.campusWalkMin <= 10 },
+  { key: "near", label: "近い", test: (s) => s.nearness >= 4 },
   { key: "solo", label: "一人で入りやすい", test: (s) => s.soloFriendly >= 4 },
   { key: "lowQueue", label: "並び少なめ", test: (s) => s.queueLevel <= 2 },
   { key: "hearty", label: "腹パン", test: (s) => s.volume >= 4 },
@@ -43,9 +44,7 @@ export default function FilterableShopList({
     return shops.filter((shop) => {
       if (area && shop.area !== area) return false;
       if (genre && !shop.genres.includes(genre)) return false;
-      for (const c of activeTests) {
-        if (!c.test(shop)) return false;
-      }
+      for (const c of activeTests) if (!c.test(shop)) return false;
       if (kw) {
         const haystack = [shop.name, shop.station, shop.area, ...shop.genres, shop.signatureOrderName]
           .join(" ")
@@ -66,73 +65,76 @@ export default function FilterableShopList({
   }
 
   return (
-    <div>
-      <input
-        type="text"
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        placeholder="店名・駅名・ジャンルで検索"
-        className="w-full rounded-lg border border-border bg-card px-4 py-3 text-base placeholder:text-muted focus:border-accent focus:outline-none"
-      />
+    <div className="lg:grid lg:grid-cols-[230px_1fr] lg:gap-8">
+      <aside className="lg:sticky lg:top-20 lg:self-start">
+        <input
+          type="text"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          placeholder="店名・駅・ジャンルで検索"
+          className="w-full rounded-md border border-border bg-card px-3.5 py-2.5 text-sm placeholder:text-muted focus:border-accent focus:outline-none"
+        />
 
-      <div className="mt-4 flex gap-6 border-b border-border text-sm">
-        <Tab active={area === null} label="すべて" onClick={() => setArea(null)} />
-        {areas.map((a) => (
-          <Tab key={a} active={area === a} label={a} onClick={() => setArea(area === a ? null : a)} />
-        ))}
-      </div>
+        <FilterGroup label="エリア">
+          <Chip active={area === null} label="すべて" onClick={() => setArea(null)} />
+          {areas.map((a) => (
+            <Chip key={a} active={area === a} label={a} onClick={() => setArea(area === a ? null : a)} />
+          ))}
+        </FilterGroup>
 
-      <div className="mt-4">
-        <QuickFilterBar items={QUICK_CONDITIONS} isActive={(k) => quick.has(k)} onToggle={toggleQuick} />
-      </div>
+        <FilterGroup label="条件">
+          {QUICK_CONDITIONS.map((c) => (
+            <Chip key={c.key} active={quick.has(c.key)} label={c.label} onClick={() => toggleQuick(c.key)} />
+          ))}
+        </FilterGroup>
 
-      <div className="mt-3 -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
-        <div className="flex gap-1.5 sm:flex-wrap">
-          <GenreChip active={genre === null} label="全ジャンル" onClick={() => setGenre(null)} />
+        <FilterGroup label="ジャンル">
+          <Chip active={genre === null} label="すべて" onClick={() => setGenre(null)} />
           {genres.map((g) => (
-            <GenreChip key={g} active={genre === g} label={g} onClick={() => setGenre(genre === g ? null : g)} />
+            <Chip key={g} active={genre === g} label={g} onClick={() => setGenre(genre === g ? null : g)} />
           ))}
-        </div>
+        </FilterGroup>
+      </aside>
+
+      <div className="mt-6 lg:mt-0">
+        <p className="mb-3 text-xs text-muted">{filtered.length}件</p>
+        {filtered.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border py-12 text-center text-sm text-muted">
+            条件に合うお店が見つかりませんでした。条件を減らしてみてください。
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {filtered.map((shop) => (
+              <ShopCard key={shop.id} shop={shop} />
+            ))}
+          </div>
+        )}
       </div>
-
-      <p className="mt-5 text-xs text-muted">{filtered.length}件</p>
-
-      {filtered.length === 0 ? (
-        <div className="mt-2 rounded-lg border border-dashed border-border py-12 text-center text-sm text-muted">
-          条件に合うお店が見つかりませんでした。条件を減らしてみてください。
-        </div>
-      ) : (
-        <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {filtered.map((shop, i) => (
-            <VisualShopCard key={shop.id} shop={shop} priority={i < 2} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
 
-function Tab({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`-mb-px shrink-0 border-b-2 py-2 transition-colors ${
-        active ? "border-accent font-semibold text-foreground" : "border-transparent text-muted hover:text-foreground"
-      }`}
-    >
-      {label}
-    </button>
+    <div className="mt-4">
+      <p className="mb-1.5 text-xs font-semibold text-muted">{label}</p>
+      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 lg:flex-wrap lg:overflow-visible">
+        {children}
+      </div>
+    </div>
   );
 }
 
-function GenreChip({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+function Chip({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1 text-xs transition-colors ${
-        active ? "border-accent bg-accent-soft text-accent" : "border-border text-muted hover:border-foreground hover:text-foreground"
+      aria-pressed={active}
+      className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-sm transition-colors ${
+        active
+          ? "border-accent bg-accent text-white"
+          : "border-border text-foreground hover:border-foreground"
       }`}
     >
       {label}

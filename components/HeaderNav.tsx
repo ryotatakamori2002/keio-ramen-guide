@@ -13,20 +13,17 @@ export default function HeaderNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="mx-auto max-w-3xl px-5 sm:px-8">
-      <ul className="flex gap-5 text-sm sm:gap-7">
-        {NAV_ITEMS.map((item, i) => {
+    <nav className="shrink-0">
+      <ul className="flex items-center gap-0.5 text-xs sm:gap-2 sm:text-sm">
+        {NAV_ITEMS.map((item) => {
           const active = pathname.startsWith(item.href);
-          const primary = i === 0;
           return (
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`inline-block border-b-2 py-2.5 transition-colors ${
-                  active
-                    ? "border-accent text-foreground"
-                    : "border-transparent text-muted hover:text-foreground"
-                } ${primary ? "font-semibold" : ""}`}
+                className={`block whitespace-nowrap rounded-md px-2 py-1.5 transition-colors sm:px-3 ${
+                  active ? "bg-foreground text-white" : "text-muted hover:text-foreground"
+                }`}
               >
                 {item.label}
               </Link>

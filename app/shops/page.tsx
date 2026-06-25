@@ -28,7 +28,7 @@ export default async function ShopsPage({
 
   return (
     <div>
-      <h1 className="font-serif text-2xl text-foreground sm:text-3xl">今日の一杯を探す</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">今日の一杯を探す</h1>
       <p className="mt-2 text-sm text-muted">
         日吉・三田・横浜。授業後、空きコマ、飲み後に使えるラーメン案内。
       </p>

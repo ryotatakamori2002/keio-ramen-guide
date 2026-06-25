@@ -3,14 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
-  BEGINNER_OPTIONS,
   DEFAULT_QUIZ_ANSWERS,
   LOCATION_OPTIONS,
   QUEUE_OPTIONS,
   RICHNESS_OPTIONS,
   SCENE_OPTIONS,
   TASTE_OPTIONS,
-  VOLUME_OPTIONS,
   type QuizAnswers,
 } from "@/lib/quiz";
 
@@ -21,13 +19,11 @@ interface QuestionConfig<K extends keyof QuizAnswers> {
 }
 
 const QUESTIONS: QuestionConfig<keyof QuizAnswers>[] = [
-  { key: "location", title: "今いる場所は？", options: LOCATION_OPTIONS },
-  { key: "scene", title: "今のシーンは？", options: SCENE_OPTIONS },
-  { key: "taste", title: "味の好みは？", options: TASTE_OPTIONS },
-  { key: "richness", title: "重さは？", options: RICHNESS_OPTIONS },
-  { key: "volume", title: "量は？", options: VOLUME_OPTIONS },
-  { key: "beginner", title: "初心者向け度は？", options: BEGINNER_OPTIONS },
-  { key: "queue", title: "並びは平気？", options: QUEUE_OPTIONS },
+  { key: "location", title: "どこにいる？", options: LOCATION_OPTIONS },
+  { key: "scene", title: "今日はどんな気分？", options: SCENE_OPTIONS },
+  { key: "taste", title: "何系の気分？", options: TASTE_OPTIONS },
+  { key: "richness", title: "どれくらい重い？", options: RICHNESS_OPTIONS },
+  { key: "queue", title: "並べる？", options: QUEUE_OPTIONS },
 ];
 
 export default function QuizForm() {
@@ -41,11 +37,14 @@ export default function QuizForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-7">
-      {QUESTIONS.map((question) => (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+      {QUESTIONS.map((question, i) => (
         <fieldset key={question.key}>
-          <legend className="mb-2 text-sm text-foreground">{question.title}</legend>
-          <div className="flex flex-wrap gap-1.5">
+          <legend className="mb-2.5 text-sm font-medium text-foreground">
+            <span className="mr-1.5 text-muted">{i + 1}.</span>
+            {question.title}
+          </legend>
+          <div className="flex flex-wrap gap-2">
             {question.options.map((option) => {
               const active = answers[question.key] === option.value;
               return (
@@ -54,10 +53,10 @@ export default function QuizForm() {
                   type="button"
                   onClick={() => setAnswers((prev) => ({ ...prev, [question.key]: option.value }))}
                   aria-pressed={active}
-                  className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                  className={`rounded-md border px-3.5 py-2 text-sm transition-colors ${
                     active
-                      ? "border-accent bg-accent-soft text-accent"
-                      : "border-border text-muted hover:border-foreground hover:text-foreground"
+                      ? "border-accent bg-accent text-white"
+                      : "border-border text-foreground hover:border-foreground"
                   }`}
                 >
                   {option.label}
@@ -70,9 +69,9 @@ export default function QuizForm() {
 
       <button
         type="submit"
-        className="mt-2 bg-accent px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        className="mt-1 w-full rounded-md bg-foreground px-6 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto sm:self-start sm:px-10"
       >
-        結果を見る
+        結果を見る →
       </button>
     </form>
   );

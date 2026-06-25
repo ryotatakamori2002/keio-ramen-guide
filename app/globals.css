@@ -1,13 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf7f1;
-  --foreground: #201a16;
+  --background: #fafaf8;
+  --foreground: #111111;
   --card: #ffffff;
-  --muted: #6f655c;
-  --border: #e6ddd0;
-  --accent: #8a2f1f;
-  --accent-soft: #f2e4de;
+  --muted: #666666;
+  --border: #e7e2da;
+  --accent: #e3362d;
+  --accent-dark: #c6281f;
+  /* 差し色のごく薄いティント（アクティブなフィルタ等に最小限だけ使う） */
+  --accent-soft: #fdeceb;
 }
 
 @theme inline {
@@ -17,9 +19,9 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
   --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-geist-sans);
-  --font-serif: var(--font-shippori-mincho);
 }
 
 body {

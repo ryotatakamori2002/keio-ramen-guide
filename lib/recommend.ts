@@ -40,11 +40,8 @@ function scoreShop(shop: Shop, answers: QuizAnswers): { score: number; reasons: 
   // シーン別の重み付け
   switch (answers.scene) {
     case "after_class": {
-      const proximity = Math.max(0, 20 - shop.campusWalkMin);
-      score += proximity;
-      if (shop.campusWalkMin <= 8) {
-        pushReason(reasons, `キャンパスから徒歩${shop.campusWalkMin}分で授業後にちょうどいい`);
-      }
+      score += shop.nearness * 5;
+      if (shop.nearness >= 4) pushReason(reasons, "駅近で授業後にすぐ行ける");
       break;
     }
     case "gap_time": {
@@ -92,26 +89,11 @@ function scoreShop(shop: Shop, answers: QuizAnswers): { score: number; reasons: 
     extreme: 5,
   };
   const richnessDiff = Math.abs(richnessTarget[answers.richness] - shop.richness);
-  score += Math.max(0, 10 - richnessDiff * 3);
-
-  // 量（軽め〜腹パン）
-  const volumeTarget: Record<QuizAnswers["volume"], number> = {
-    light: 2,
-    normal: 3,
-    hearty: 5,
-  };
-  const volumeDiff = Math.abs(volumeTarget[answers.volume] - shop.volume);
-  score += Math.max(0, 10 - volumeDiff * 3);
-  if (answers.volume === "hearty" && shop.volume >= 4) {
-    pushReason(reasons, "腹パンになれる量");
-  }
-
-  // 初心者向け度
-  if (answers.beginner === "beginner") {
-    score += shop.beginnerFriendly * 4;
-    if (shop.beginnerFriendly >= 4) pushReason(reasons, "初心者でも注文しやすい");
-  } else if (answers.beginner === "expert_ok") {
-    score += (6 - shop.beginnerFriendly) * 2;
+  score += Math.max(0, 12 - richnessDiff * 3);
+  if (answers.richness === "extreme" && shop.richness >= 4) {
+    pushReason(reasons, "重ためで満足感が高い");
+  } else if (answers.richness === "light" && shop.lightness >= 4) {
+    pushReason(reasons, "あっさりで食べやすい");
   }
 
   // 並び

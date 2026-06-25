@@ -13,17 +13,14 @@ export type TasteAnswer =
   | "tsukemen"
   | "unknown";
 export type RichnessAnswer = "light" | "normal" | "rich" | "extreme";
-export type VolumeAnswer = "light" | "normal" | "hearty";
-export type BeginnerAnswer = "beginner" | "quirks_ok" | "expert_ok";
 export type QueueAnswer = "avoid" | "fifteen_ok" | "can_queue";
 
+// 診断は5問: どこ / 気分(scene) / 何系(taste) / 重さ(richness) / 並べる(queue)
 export interface QuizAnswers {
   location: LocationAnswer;
   scene: SceneAnswer;
   taste: TasteAnswer;
   richness: RichnessAnswer;
-  volume: VolumeAnswer;
-  beginner: BeginnerAnswer;
   queue: QueueAnswer;
 }
 
@@ -74,18 +71,6 @@ export const RICHNESS_OPTIONS: QuizOption<RichnessAnswer>[] = [
   { value: "extreme", label: "限界まで重い" },
 ];
 
-export const VOLUME_OPTIONS: QuizOption<VolumeAnswer>[] = [
-  { value: "light", label: "軽め" },
-  { value: "normal", label: "普通" },
-  { value: "hearty", label: "腹パン" },
-];
-
-export const BEGINNER_OPTIONS: QuizOption<BeginnerAnswer>[] = [
-  { value: "beginner", label: "初心者向け" },
-  { value: "quirks_ok", label: "クセありOK" },
-  { value: "expert_ok", label: "玄人向けOK" },
-];
-
 export const QUEUE_OPTIONS: QuizOption<QueueAnswer>[] = [
   { value: "avoid", label: "並びたくない" },
   { value: "fifteen_ok", label: "15分OK" },
@@ -110,7 +95,5 @@ export const DEFAULT_QUIZ_ANSWERS: QuizAnswers = {
   scene: "no_fail",
   taste: "unknown",
   richness: "normal",
-  volume: "normal",
-  beginner: "beginner",
   queue: "fifteen_ok",
 };

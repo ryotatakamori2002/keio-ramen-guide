@@ -8,15 +8,15 @@ export const metadata: Metadata = {
 
 export default function QuizPage() {
   return (
-    <div>
+    <div className="mx-auto max-w-xl">
       <p className="text-xs text-muted">
-        <Link href="/shops" className="underline underline-offset-4 hover:text-accent">
+        <Link href="/shops" className="font-medium text-foreground hover:text-accent">
           店舗を探す
         </Link>{" "}
         の代わりに、気分から選びたい時に。
       </p>
-      <h1 className="mt-2 font-serif text-2xl text-foreground">気分で選ぶ</h1>
-      <p className="mt-2 text-sm text-muted">7つの質問、30秒。今の気分に合う一杯を絞り込みます。</p>
+      <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground">気分で選ぶ</h1>
+      <p className="mt-2 text-sm text-muted">5つの質問、30秒。今の気分に合う一杯を絞り込みます。</p>
       <div className="mt-8">
         <QuizForm />
       </div>

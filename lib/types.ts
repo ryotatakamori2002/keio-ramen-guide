@@ -61,9 +61,9 @@ export interface Shop {
   speedLevel: Level;
   lateNight: boolean;
   keioStudentScore: Level;
-  /** レコメンドスコアリング用の内部値。キャンパスからの実際の徒歩分（横浜エリアなど徒歩圏外の店は大きい値を入れ、UIには出さない） */
-  campusWalkMin: number;
-  /** UIに表示する正直なアクセス情報（徒歩圏外なら電車移動である旨を書く） */
+  /** そのエリアでのアクセスの良さ（最寄駅からの近さ）。高いほど駅近・行きやすい。カードの「近さ」指標に使う */
+  nearness: Level;
+  /** UIに表示する正直なアクセス情報（キャンパスから電車移動が必要ならその旨を書く） */
   accessNote: string;
   /** この店を選ぶ理由。詳細ページの最上部で見せる一言 */
   whyThisShop: string;

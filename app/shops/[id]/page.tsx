@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShopById, SHOPS } from "@/lib/shops";
-import ShopHero from "@/components/ShopHero";
-import MetricBar from "@/components/MetricBar";
+import ShopThumb from "@/components/ShopThumb";
 import PriceNote from "@/components/PriceNote";
 import ScenePills from "@/components/ScenePills";
 import SaveButtons from "@/components/SaveButtons";
@@ -22,6 +21,14 @@ export async function generateMetadata({
   return { title: shop ? `${shop.name} | Keio Ramen Guide` : "店舗が見つかりません" };
 }
 
+const METRICS: { label: string; key: "nearness" | "queueLevel" | "soloFriendly" | "volume" | "beginnerFriendly" }[] = [
+  { label: "近さ", key: "nearness" },
+  { label: "並び", key: "queueLevel" },
+  { label: "一人", key: "soloFriendly" },
+  { label: "量", key: "volume" },
+  { label: "初心者", key: "beginnerFriendly" },
+];
+
 export default async function ShopDetailPage({
   params,
 }: {
@@ -32,61 +39,74 @@ export default async function ShopDetailPage({
   if (!shop) notFound();
 
   return (
-    <div className="flex flex-col gap-9 pb-10">
-      <div className="flex flex-col gap-4">
-        <Link href="/shops" className="text-xs text-muted hover:text-accent">
-          ← 店舗を探す
-        </Link>
-        <ShopHero shop={shop} />
-        <div>
-          <h1 className="font-serif text-2xl text-foreground sm:text-3xl">{shop.name}</h1>
-          <p className="mt-2 text-sm text-muted">
-            {shop.area} ・ {shop.station} ・ {shop.genres.join(" / ")}
-          </p>
-          <p className="mt-1 text-xs text-muted">{shop.accessNote}</p>
-        </div>
+    <div className="mx-auto max-w-2xl">
+      <Link href="/shops" className="text-xs text-muted hover:text-accent">
+        ← 店舗を探す
+      </Link>
 
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-3 border-y border-border py-4">
-          <SaveButtons shopId={shop.id} />
-          <a
-            href={shop.googleMapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-accent underline underline-offset-4"
-          >
-            Google Mapsで見る
-          </a>
+      {/* 上部: 識別ビジュアル + 基本情報 + 価格 + アクション */}
+      <div className="mt-4 flex gap-4">
+        <ShopThumb
+          genre={shop.genres[0]}
+          tone={shop.visualTone}
+          imageUrl={shop.imageUrl}
+          imageAlt={shop.imageAlt}
+          className="h-24 w-24 shrink-0 sm:h-28 sm:w-28"
+          sizes="112px"
+        />
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold leading-tight text-foreground sm:text-2xl">{shop.name}</h1>
+          <p className="mt-1 text-sm text-muted">
+            {shop.area} ・ {shop.station} ・ {shop.genres.join("/")}
+          </p>
+          <PriceNote
+            className="mt-2"
+            name={shop.signatureOrderName}
+            price={shop.signatureOrderPrice}
+            confidence={shop.priceConfidence}
+          />
         </div>
       </div>
 
-      <Section title="おすすめ注文">
-        <PriceNote
-          name={shop.signatureOrderName}
-          price={shop.signatureOrderPrice}
-          confidence={shop.priceConfidence}
-        />
-        <p className="mt-1 text-sm text-muted">{shop.studentBudgetNote}</p>
-        <p className="mt-2">{shop.recommendedMenu}</p>
-      </Section>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <SaveButtons shopId={shop.id} size="md" />
+        <a
+          href={shop.googleMapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-accent hover:text-accent"
+        >
+          Google Maps
+        </a>
+      </div>
+
+      {/* 指標カード */}
+      <div className="mt-6 grid grid-cols-5 gap-2 rounded-lg border border-border bg-card p-3 text-center">
+        {METRICS.map((m) => (
+          <div key={m.key}>
+            <div className="text-lg font-bold text-foreground">{shop[m.key]}</div>
+            <div className="mt-0.5 text-[11px] text-muted">{m.label}</div>
+          </div>
+        ))}
+      </div>
 
       <Section title="この店を選ぶ理由">
-        <p className="font-serif text-lg leading-relaxed text-foreground">{shop.whyThisShop}</p>
+        <p className="text-base leading-relaxed text-foreground">{shop.whyThisShop}</p>
+      </Section>
+
+      <Section title="おすすめ注文">
+        <p>{shop.recommendedMenu}</p>
+        <p className="mt-1 text-sm text-muted">学生の一食目安：¥{shop.budgetMin.toLocaleString()}〜{shop.budgetMax.toLocaleString()}（{shop.studentBudgetNote}）</p>
       </Section>
 
       <Section title="慶應生向けコメント">
         <p>{shop.keioNotes}</p>
+        <p className="mt-1.5 text-sm text-muted">{shop.accessNote}</p>
       </Section>
 
-      <Section title="味・量・並び・入りやすさ">
+      <Section title="味の特徴・雰囲気">
         <p>{shop.tasteNotes}</p>
         <p className="mt-2">{shop.atmosphereNotes}</p>
-        <div className="mt-4 flex flex-col gap-2.5">
-          <MetricBar level={shop.richness} label="こってり度" />
-          <MetricBar level={shop.volume} label="量" />
-          <MetricBar level={shop.queueLevel} label="並び" />
-          <MetricBar level={shop.soloFriendly} label="一人で入れる" />
-          <MetricBar level={shop.friendFriendly} label="友達向け" />
-        </div>
       </Section>
 
       <Section title="初心者向け情報">
@@ -97,7 +117,7 @@ export default async function ShopDetailPage({
         <p>{shop.rulesNotes}</p>
       </Section>
 
-      <Section title="どんな時に向いているか">
+      <Section title="どんな日に向いているか">
         <ScenePills tags={shop.sceneTags} max={shop.sceneTags.length} />
         <ul className="mt-3 flex flex-col gap-1">
           {shop.recommendedFor.map((item) => (
@@ -106,8 +126,12 @@ export default async function ShopDetailPage({
         </ul>
       </Section>
 
-      <div className="border-t border-border pt-6">
-        <SaveButtons shopId={shop.id} />
+      <p className="mt-8 border-t border-border pt-4 text-xs text-muted">
+        価格・営業時間・サービス内容は変動する可能性があります。訪問前に各店の最新情報をご確認ください。
+      </p>
+
+      <div className="mt-5">
+        <SaveButtons shopId={shop.id} size="md" />
       </div>
     </div>
   );
@@ -115,7 +139,7 @@ export default async function ShopDetailPage({
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section>
+    <section className="mt-7">
       <h2 className="mb-2 text-xs font-semibold tracking-wide text-muted">{title}</h2>
       <div className="text-[15px] leading-relaxed text-foreground/90">{children}</div>
     </section>

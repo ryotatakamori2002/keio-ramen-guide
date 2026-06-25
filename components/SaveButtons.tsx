@@ -2,15 +2,15 @@
 
 import { useSavedShops } from "@/hooks/useSavedShops";
 
-export default function SaveButtons({ shopId, size = "md" }: { shopId: string; size?: "sm" | "md" }) {
+export default function SaveButtons({ shopId, size = "sm" }: { shopId: string; size?: "sm" | "md" }) {
   const { isWant, isVisited, toggleWant, toggleGone } = useSavedShops();
 
   const want = isWant(shopId);
   const visited = isVisited(shopId);
-  const textSize = size === "sm" ? "text-xs" : "text-sm";
+  const pad = size === "md" ? "px-4 py-2 text-sm" : "px-3 py-1.5 text-xs";
 
   return (
-    <div className={`flex items-center gap-4 ${textSize}`}>
+    <div className="flex items-center gap-2">
       <button
         type="button"
         onClick={(e) => {
@@ -18,8 +18,10 @@ export default function SaveButtons({ shopId, size = "md" }: { shopId: string; s
           toggleWant(shopId);
         }}
         aria-pressed={want}
-        className={`border-b transition-colors ${
-          want ? "border-accent text-accent" : "border-transparent text-muted hover:text-foreground"
+        className={`rounded-md border font-medium transition-colors ${pad} ${
+          want
+            ? "border-accent bg-accent text-white"
+            : "border-border text-foreground hover:border-accent hover:text-accent"
         }`}
       >
         {want ? "✓ 行きたい" : "行きたい"}
@@ -31,8 +33,10 @@ export default function SaveButtons({ shopId, size = "md" }: { shopId: string; s
           toggleGone(shopId);
         }}
         aria-pressed={visited}
-        className={`border-b transition-colors ${
-          visited ? "border-accent text-accent" : "border-transparent text-muted hover:text-foreground"
+        className={`rounded-md border font-medium transition-colors ${pad} ${
+          visited
+            ? "border-foreground bg-foreground text-white"
+            : "border-border text-muted hover:border-foreground hover:text-foreground"
         }`}
       >
         {visited ? "✓ 行った" : "行った"}
