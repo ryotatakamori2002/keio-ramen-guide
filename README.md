@@ -10,7 +10,38 @@
 
 慶應生が「今いる場所」と「今日の気分・生活シーン」から、**今日行くラーメン屋を早く・失敗せず決められる**ことだけに集中したミニサイト。全国網羅・点数・ランキングでは勝負しない。広告なし・軽量・スマホファースト・生活シーン特化で、ラーメンDBやGoogle Mapsとは違う「局所的な使いやすさ」で勝つ。
 
+さらに、**慶應生の実食ログ（写真・価格・一言）で育つ**設計。固定データだけでなく、食べた人の投稿で店舗ページに「人が食べた感」を足していく。
+
 対象エリア：日吉 / 三田・田町 / 横浜駅周辺。
+
+## 投稿機能（実食ログ）
+
+- `/post`：ログインなしで投稿（ニックネーム任意・画像1枚・メニュー名・金額・一言・シーン）。投稿は **`pending` で保存**され、すぐには公開されない。
+- `/admin`：`ADMIN_PASSWORD` による簡易認証の承認画面。承認すると `approved`、却下で `rejected`。`approved` の投稿だけが店舗詳細・トップ・/shops に表示される（荒らし防止）。
+- 投稿の編集・削除は管理者のみ。いいね/フォロー/コメントはMVPでは作らない。
+- **Supabase が未設定でもローカル開発・build は壊れない。** 投稿系の読み取りは空配列を返し、`/post` は「Supabase設定後に投稿機能が有効になります」と表示する。
+
+### Supabase セットアップ手順
+
+1. [Supabase](https://supabase.com) でプロジェクトを作成。
+2. **スキーマ適用**：ダッシュボードの「SQL Editor」で [`supabase/schema.sql`](supabase/schema.sql) を貼り付けて Run（`ramen_shops` / `ramen_posts` テーブル、RLS、`ramen-post-images` バケットを作成）。
+3. **Storage バケット**：schema.sql でバケット作成・公開読み取りポリシーまで設定される。手動で作る場合は Storage で `ramen-post-images`（public）を作成。画像は `posts/{uuid}.jpg` に保存される。
+4. **環境変数**：`.env.example` をコピーして `.env.local` を作り、以下を設定。
+   - `NEXT_PUBLIC_SUPABASE_URL` … プロジェクト URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` … anon キー
+   - `SUPABASE_SERVICE_ROLE_KEY` … service role キー（サーバー専用・絶対に公開しない）
+   - `ADMIN_PASSWORD` … `/admin` に入る共有パスワード
+5. `npm run dev` で `/post` から投稿 → `/admin` でログイン → 承認 → 店舗詳細に表示、を確認。
+
+### 投稿承認フロー
+
+`/post` で投稿（`pending`）→ `/admin` でパスワードログイン → 写真・店・メニュー・価格・コメントを確認 → 「承認」で `approved`（公開）／「却下」で `rejected`（非公開）。承認済みは最大60秒（ISR）で各ページに反映。
+
+### 写真の権利ルール
+
+- 掲載してよいのは **自分で撮った写真**、または **本人/店舗の掲載許可を得た写真** だけ。
+- 他サイト・SNSの写真の無断転載は禁止。投稿時にもこの旨を明示している。
+- 画像は service role 経由でのみアップロードされ、バケットは公開読み取り（URLは推測困難なUUID）。却下した投稿の画像は手動で削除すること。
 
 ## Deep Researchから得た学び
 
@@ -162,4 +193,19 @@ vercel        # プレビュー
 vercel --prod # 本番（検証URL）
 ```
 
-または Vercel ダッシュボードで GitHub リポジトリを Import すれば、Next.js は自動検出される（追加設定不要）。公開前に `PhotoCallout` の連絡先（`ramen-guide@example.com`）と `app/layout.tsx` の `metadataBase` を実URLに差し替えること。
+または Vercel ダッシュボードで GitHub リポジトリを Import すれば、Next.js は自動検出される。
+
+**Vercel の環境変数設定**（Project > Settings > Environment Variables）：`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` / `ADMIN_PASSWORD` を登録して再デプロイ。これらを入れるまで投稿機能は無効（サイトは表示される）。
+
+公開前に、`app/layout.tsx` の `metadataBase` を実URLに、`components/PhotoCallout.tsx` の連絡先（`ramen-guide@example.com`）を実アドレス/SNSハンドルに差し替える。
+
+### 公開URLを友達に共有する方法
+
+- 各店舗ページは `/(検証URL)/shops/<shop-id>` で個別に共有できる（例：吉村家 → `/shops/yokohama-yoshimuraya`）。
+- トップ（検証URL）を LINE に貼ると、OGP（タイトル「授業終わり、どこ啜る？」＋説明）が表示される。共有用の文面は [docs/test-message.md](docs/test-message.md)。
+
+### スマホでの検証方法
+
+- ローカル同一Wi-Fiでスマホ実機確認：`npm run dev -- -H 0.0.0.0` で起動し、スマホから `http://<PCのローカルIP>:3000` を開く。
+- もっとも本番に近いのは Vercel のプレビューURLをスマホで開く方法（投稿・画像アップロードまで含めて確認できる）。
+- 投稿フォームの写真入力は `accept="image/*"` のためスマホのカメラ/カメラロールから直接選べる。

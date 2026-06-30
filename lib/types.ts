@@ -30,6 +30,30 @@ export type PublishStatus = "ready" | "needs_review" | "candidate";
 // 編集上の優先度。棚やトップで前に出す強さ。
 export type EditorialPriority = "must" | "should" | "could";
 
+// 慶應生の実食投稿。承認制（pending → approved/rejected）。
+export type PostStatus = "pending" | "approved" | "rejected";
+
+export interface RamenPost {
+  id: string;
+  shopId: string;
+  nickname: string | null;
+  menuName: string;
+  priceYen: number | null;
+  body: string | null;
+  sceneTags: SceneTag[];
+  imageUrl: string | null;
+  imagePath: string | null;
+  status: PostStatus;
+  createdAt: string;
+  approvedAt: string | null;
+}
+
+// /shops カードに出す、店ごとの投稿サマリ。
+export interface PostMeta {
+  count: number;
+  latestImageUrl?: string;
+}
+
 // 写真の状態。無断転載はしないため、許諾の取れた写真だけを provided/owned/official_permission にする。
 export type PhotoStatus = "none" | "placeholder" | "provided" | "owned" | "official_permission";
 

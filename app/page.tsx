@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { resolveShelves } from "@/lib/shelves";
+import { getRecentApprovedPosts } from "@/lib/posts";
+import { getShopById } from "@/lib/shops";
 import ShelfRow from "@/components/ShelfRow";
+import PostList from "@/components/PostList";
 import PhotoCallout from "@/components/PhotoCallout";
+
+// 最近の実食ログを反映するため ISR
+export const revalidate = 60;
 
 const QUICK_LINKS: { label: string; href: string }[] = [
   { label: "日吉", href: "/shops?area=日吉" },
@@ -17,8 +23,9 @@ const QUICK_LINKS: { label: string; href: string }[] = [
 // トップに出す代表的な棚（残りは /shops で）
 const HOME_SHELF_IDS = ["hiyoshi-after-class", "solo", "first-iekei", "after-drinking"];
 
-export default function Home() {
+export default async function Home() {
   const homeShelves = resolveShelves(HOME_SHELF_IDS, 5);
+  const recentPosts = await getRecentApprovedPosts(4);
 
   return (
     <div className="flex flex-col gap-12 py-4">
@@ -30,7 +37,7 @@ export default function Home() {
           どこ啜る？
         </h1>
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted sm:text-base">
-          日吉・三田・横浜。慶應生が今日の一杯を外さないためのラーメン案内。
+          日吉・三田・横浜。慶應生の実食ログで育つラーメンガイド。価格も、量も、雰囲気も、食べた人の一言でわかる。
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <Link
@@ -44,6 +51,9 @@ export default function Home() {
             className="rounded-md border border-border px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-foreground"
           >
             気分で選ぶ
+          </Link>
+          <Link href="/post" className="text-sm font-medium text-accent hover:underline">
+            食べたら投稿する →
           </Link>
         </div>
 
@@ -74,6 +84,33 @@ export default function Home() {
           <ShelfRow key={shelf.id} shelf={shelf} />
         ))}
       </div>
+
+      {recentPosts.length > 0 && (
+        <section>
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-lg font-bold text-foreground">最近の実食ログ</h2>
+            <Link href="/post" className="text-xs text-muted hover:text-accent">
+              投稿する →
+            </Link>
+          </div>
+          <p className="mt-1 text-xs text-muted">慶應生が食べた一杯。タップで店舗の詳細へ。</p>
+          <div className="mt-4">
+            <PostList posts={recentPosts} />
+          </div>
+          <ul className="mt-2 text-xs text-muted">
+            {recentPosts.map((p) => {
+              const s = getShopById(p.shopId);
+              return s ? (
+                <li key={p.id} className="inline">
+                  <Link href={`/shops/${s.id}`} className="mr-3 hover:text-accent">
+                    {s.name} →
+                  </Link>
+                </li>
+              ) : null;
+            })}
+          </ul>
+        </section>
+      )}
 
       <section className="rounded-lg border border-border bg-card p-6">
         <h2 className="text-base font-bold text-foreground">ランキングではなく、今いる場所と生活シーンで選ぶ</h2>

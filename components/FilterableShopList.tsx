@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Shop } from "@/lib/types";
+import type { PostMeta, Shop } from "@/lib/types";
 import type { ResolvedShelf } from "@/lib/shelves";
 import ShopCard from "./ShopCard";
 import ShelfRow from "./ShelfRow";
@@ -27,6 +27,7 @@ export default function FilterableShopList({
   initialGenre = null,
   initialQuick = [],
   shelves = [],
+  postMeta = {},
 }: {
   shops: Shop[];
   initialArea?: string | null;
@@ -34,6 +35,8 @@ export default function FilterableShopList({
   initialQuick?: string[];
   /** 絞り込みが無い時だけ上部に出す用途別ベスト棚（解決済みのシリアライズ可能な形） */
   shelves?: ResolvedShelf[];
+  /** 店ごとの投稿サマリ（shopId -> 件数・最新写真） */
+  postMeta?: Record<string, PostMeta>;
 }) {
   const [keyword, setKeyword] = useState("");
   const [area, setArea] = useState<string | null>(initialArea);
@@ -145,7 +148,7 @@ export default function FilterableShopList({
           ) : (
             <div className="flex flex-col gap-3">
               {filtered.map((shop) => (
-                <ShopCard key={shop.id} shop={shop} />
+                <ShopCard key={shop.id} shop={shop} postMeta={postMeta[shop.id]} />
               ))}
             </div>
           )}

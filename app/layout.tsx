@@ -15,19 +15,20 @@ export const metadata: Metadata = {
     template: "%s",
   },
   description:
-    "日吉・三田・横浜。慶應生のためのラーメン案内。今いる場所と気分から、今日行く一杯を選べる。",
+    "日吉・三田・横浜。慶應生の実食ログで育つラーメンガイド。価格・量・並び・一人で入れるかが、食べた人の一言でわかる。",
   applicationName: "Keio Ramen Guide",
   openGraph: {
     type: "website",
     siteName: "Keio Ramen Guide",
     title: "Keio Ramen Guide | 授業終わり、どこ啜る？",
-    description: "日吉・三田・横浜。慶應生が今日の一杯を外さないためのラーメン案内。",
+    description:
+      "日吉・三田・横浜。慶應生の実食ログで育つラーメンガイド。今日行く一杯を、食べた人の写真と一言で選ぶ。",
     locale: "ja_JP",
   },
   twitter: {
     card: "summary",
     title: "Keio Ramen Guide | 授業終わり、どこ啜る？",
-    description: "日吉・三田・横浜。慶應生が今日の一杯を外さないためのラーメン案内。",
+    description: "日吉・三田・横浜。慶應生の実食ログで育つラーメンガイド。今日行く一杯を選ぶ。",
   },
 };
 

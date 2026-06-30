@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SHOPS, getAllAreas, getAllGenres } from "@/lib/shops";
 import { resolveShelves } from "@/lib/shelves";
+import { getApprovedPostMeta } from "@/lib/posts";
 import FilterableShopList from "@/components/FilterableShopList";
 import PhotoCallout from "@/components/PhotoCallout";
 
@@ -31,6 +32,7 @@ export default async function ShopsPage({
   const initialQuick = quickFromParams(scene, beginner);
 
   const shelves = resolveShelves(SHELF_IDS, 5);
+  const postMeta = await getApprovedPostMeta();
 
   return (
     <div>
@@ -46,6 +48,7 @@ export default async function ShopsPage({
           initialGenre={initialGenre}
           initialQuick={initialQuick}
           shelves={shelves}
+          postMeta={postMeta}
         />
       </div>
 

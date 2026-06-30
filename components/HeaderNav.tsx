@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { href: "/shops", label: "店舗を探す" },
-  { href: "/quiz", label: "気分で選ぶ" },
+  { href: "/shops", label: "探す" },
+  { href: "/post", label: "投稿" },
+  { href: "/quiz", label: "診断" },
   { href: "/saved", label: "保存" },
 ];
 

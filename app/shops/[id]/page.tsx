@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShopById, SHOPS } from "@/lib/shops";
+import { getApprovedPostsByShop } from "@/lib/posts";
 import type { DataConfidence, Shop } from "@/lib/types";
 import ShopThumb from "@/components/ShopThumb";
 import PriceNote from "@/components/PriceNote";
 import ScenePills from "@/components/ScenePills";
 import SaveButtons from "@/components/SaveButtons";
-import PhotoCallout from "@/components/PhotoCallout";
+import PostList from "@/components/PostList";
+
+// 承認された実食投稿を反映するため ISR（最大60秒で更新）
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return SHOPS.map((shop) => ({ id: shop.id }));
@@ -50,6 +54,7 @@ export default async function ShopDetailPage({
   const shop = getShopById(id);
   if (!shop) notFound();
 
+  const posts = await getApprovedPostsByShop(id);
   const needsReview = shop.dataConfidence === "low" || shop.publishStatus === "needs_review";
 
   return (
@@ -88,7 +93,6 @@ export default async function ShopDetailPage({
             confidence={shop.priceConfidence}
           />
           <p className="mt-1 text-xs text-muted">{shop.expectedSpendNote}</p>
-          {!shop.primaryImageUrl && <PhotoCallout shopName={shop.name} variant="compact" />}
         </div>
       </div>
 
@@ -113,6 +117,34 @@ export default async function ShopDetailPage({
           </div>
         ))}
       </div>
+
+      {/* 慶應生の実食ログ */}
+      <section className="mt-8">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-sm font-bold text-foreground">
+            慶應生の実食ログ {posts.length > 0 && <span className="text-muted">（{posts.length}）</span>}
+          </h2>
+          <Link
+            href={`/post?shop=${shop.id}`}
+            className="text-xs font-medium text-accent hover:underline"
+          >
+            投稿する →
+          </Link>
+        </div>
+        {posts.length > 0 ? (
+          <PostList posts={posts} />
+        ) : (
+          <div className="rounded-lg border border-dashed border-border p-5 text-center text-sm text-muted">
+            <p>この店の写真・実食ログを募集中。</p>
+            <Link
+              href={`/post?shop=${shop.id}`}
+              className="mt-2 inline-block font-medium text-accent hover:underline"
+            >
+              食べた一杯を投稿する →
+            </Link>
+          </div>
+        )}
+      </section>
 
       <Section title="この店を選ぶ理由">
         <p className="text-base leading-relaxed text-foreground">{shop.selectionReason}</p>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Shop } from "@/lib/types";
+import type { PostMeta, Shop } from "@/lib/types";
 import { needsReviewFlag } from "@/lib/shops";
 import ShopThumb from "./ShopThumb";
 import PriceNote from "./PriceNote";
@@ -8,7 +8,19 @@ import MetricStrip from "./MetricStrip";
 import SaveButtons from "./SaveButtons";
 
 // 写真ではなく「今日行く判断材料」を主役にした横長の情報カード。
-export default function ShopCard({ shop, header }: { shop: Shop; header?: React.ReactNode }) {
+// 実食投稿があれば、最新写真をサムネに使い件数を出して「人が食べた感」を出す。
+export default function ShopCard({
+  shop,
+  header,
+  postMeta,
+}: {
+  shop: Shop;
+  header?: React.ReactNode;
+  postMeta?: PostMeta;
+}) {
+  const thumbImage = postMeta?.latestImageUrl ?? shop.primaryImageUrl;
+  const postCount = postMeta?.count ?? 0;
+
   return (
     <article className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-foreground/30">
       {header}
@@ -18,7 +30,7 @@ export default function ShopCard({ shop, header }: { shop: Shop; header?: React.
           <ShopThumb
             genre={shop.genres[0]}
             tone={shop.visualTone}
-            primaryImageUrl={shop.primaryImageUrl}
+            primaryImageUrl={thumbImage}
             imageAlt={shop.images[0]?.alt}
             photoStatus={shop.photoStatus}
             photoNeeded={shop.photoNeeded}
@@ -47,6 +59,9 @@ export default function ShopCard({ shop, header }: { shop: Shop; header?: React.
             price={shop.firstVisitPrice}
             confidence={shop.priceConfidence}
           />
+          <p className="mt-1 text-xs text-muted">
+            {postCount > 0 ? `実食ログ ${postCount}件` : "実食ログ募集中"}
+          </p>
         </div>
       </div>
 
@@ -63,6 +78,9 @@ export default function ShopCard({ shop, header }: { shop: Shop; header?: React.
       <div className="mt-3 flex items-center justify-between gap-3">
         <SaveButtons shopId={shop.id} size="sm" />
         <div className="flex items-center gap-3 text-sm">
+          <Link href={`/post?shop=${shop.id}`} className="font-medium text-accent hover:underline">
+            投稿
+          </Link>
           <Link href={`/shops/${shop.id}`} className="font-medium text-foreground hover:text-accent">
             詳細
           </Link>
