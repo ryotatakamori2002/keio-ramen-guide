@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShopById, SHOPS } from "@/lib/shops";
+import type { DataConfidence, Shop } from "@/lib/types";
 import ShopThumb from "@/components/ShopThumb";
 import PriceNote from "@/components/PriceNote";
 import ScenePills from "@/components/ScenePills";
@@ -18,16 +19,26 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const shop = getShopById(id);
-  return { title: shop ? `${shop.name} | Keio Ramen Guide` : "店舗が見つかりません" };
+  if (!shop) return { title: "店舗が見つかりません" };
+  return {
+    title: `${shop.name} | Keio Ramen Guide`,
+    description: shop.selectionReason,
+  };
 }
 
-const METRICS: { label: string; key: "nearness" | "queueLevel" | "soloFriendly" | "volume" | "beginnerFriendly" }[] = [
+const METRICS: { label: string; key: keyof Pick<Shop, "nearness" | "queueLevel" | "soloFriendly" | "volume" | "beginnerFriendly"> }[] = [
   { label: "近さ", key: "nearness" },
   { label: "並び", key: "queueLevel" },
   { label: "一人", key: "soloFriendly" },
   { label: "量", key: "volume" },
   { label: "初心者", key: "beginnerFriendly" },
 ];
+
+const CONFIDENCE_LABEL: Record<DataConfidence, string> = {
+  high: "高",
+  medium: "中",
+  low: "低（要確認）",
+};
 
 export default async function ShopDetailPage({
   params,
@@ -49,10 +60,12 @@ export default async function ShopDetailPage({
         <ShopThumb
           genre={shop.genres[0]}
           tone={shop.visualTone}
-          imageUrl={shop.imageUrl}
-          imageAlt={shop.imageAlt}
-          className="h-24 w-24 shrink-0 sm:h-28 sm:w-28"
-          sizes="112px"
+          primaryImageUrl={shop.primaryImageUrl}
+          imageAlt={shop.images[0]?.alt}
+          photoStatus={shop.photoStatus}
+          photoNeeded={shop.photoNeeded}
+          className="h-28 w-28 shrink-0 sm:h-32 sm:w-32"
+          sizes="128px"
         />
         <div className="min-w-0">
           <h1 className="text-xl font-bold leading-tight text-foreground sm:text-2xl">{shop.name}</h1>
@@ -61,10 +74,11 @@ export default async function ShopDetailPage({
           </p>
           <PriceNote
             className="mt-2"
-            name={shop.signatureOrderName}
-            price={shop.signatureOrderPrice}
+            name={shop.firstVisitOrder}
+            price={shop.firstVisitPrice}
             confidence={shop.priceConfidence}
           />
+          <p className="mt-1 text-xs text-muted">{shop.expectedSpendNote}</p>
         </div>
       </div>
 
@@ -91,16 +105,20 @@ export default async function ShopDetailPage({
       </div>
 
       <Section title="この店を選ぶ理由">
-        <p className="text-base leading-relaxed text-foreground">{shop.whyThisShop}</p>
+        <p className="text-base leading-relaxed text-foreground">{shop.selectionReason}</p>
       </Section>
 
-      <Section title="おすすめ注文">
-        <p>{shop.recommendedMenu}</p>
-        <p className="mt-1 text-sm text-muted">学生の一食目安：¥{shop.budgetMin.toLocaleString()}〜{shop.budgetMax.toLocaleString()}（{shop.studentBudgetNote}）</p>
+      <Section title="逆に、こんな日は避ける">
+        <p>{shop.avoidIf}</p>
       </Section>
 
-      <Section title="慶應生向けコメント">
-        <p>{shop.keioNotes}</p>
+      <Section title="初回のおすすめ注文">
+        <p className="font-medium text-foreground">{shop.firstVisitOrder}</p>
+        <p className="mt-1 text-sm text-muted">学生の一食目安：{shop.expectedSpendNote}</p>
+      </Section>
+
+      <Section title="慶應生向けの使い方">
+        <p>{shop.keioUseCase}</p>
         <p className="mt-1.5 text-sm text-muted">{shop.accessNote}</p>
       </Section>
 
@@ -109,8 +127,21 @@ export default async function ShopDetailPage({
         <p className="mt-2">{shop.atmosphereNotes}</p>
       </Section>
 
-      <Section title="初心者向け情報">
-        <p>{shop.beginnerNotes}</p>
+      <Section title="並び・一人・初心者のアドバイス">
+        <ul className="flex flex-col gap-1.5">
+          <li>
+            <span className="text-muted">並び：</span>
+            {shop.queueAdvice}
+          </li>
+          <li>
+            <span className="text-muted">一人：</span>
+            {shop.soloAdvice}
+          </li>
+          <li>
+            <span className="text-muted">初心者：</span>
+            {shop.beginnerAdvice}
+          </li>
+        </ul>
       </Section>
 
       <Section title="注文ルール・暗黙知">
@@ -126,9 +157,15 @@ export default async function ShopDetailPage({
         </ul>
       </Section>
 
-      <p className="mt-8 border-t border-border pt-4 text-xs text-muted">
-        価格・営業時間・サービス内容は変動する可能性があります。訪問前に各店の最新情報をご確認ください。
-      </p>
+      {/* データ信頼性 */}
+      <div className="mt-8 rounded-lg border border-border bg-card p-4 text-xs text-muted">
+        <div className="flex flex-wrap gap-x-5 gap-y-1">
+          <span>最終確認：{shop.dataLastChecked}</span>
+          <span>情報の信頼度：{CONFIDENCE_LABEL[shop.dataConfidence]}</span>
+          {shop.photoNeeded && <span>写真：募集中</span>}
+        </div>
+        <p className="mt-2">{shop.dataNote}</p>
+      </div>
 
       <div className="mt-5">
         <SaveButtons shopId={shop.id} size="md" />

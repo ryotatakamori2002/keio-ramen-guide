@@ -7,6 +7,7 @@ export default function MetricStrip({ shop }: { shop: Shop }) {
     { label: "並び", value: shop.queueLevel },
     { label: "一人", value: shop.soloFriendly },
     { label: "量", value: shop.volume },
+    { label: "初心者", value: shop.beginnerFriendly },
   ];
   return (
     <dl className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">

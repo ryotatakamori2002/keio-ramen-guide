@@ -9,9 +9,26 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Keio Ramen Guide | 授業終わり、どこ啜る？",
+  metadataBase: new URL("https://keio-ramen-guide.example.com"),
+  title: {
+    default: "Keio Ramen Guide | 授業終わり、どこ啜る？",
+    template: "%s",
+  },
   description:
     "日吉・三田・横浜。慶應生のためのラーメン案内。今いる場所と気分から、今日行く一杯を選べる。",
+  applicationName: "Keio Ramen Guide",
+  openGraph: {
+    type: "website",
+    siteName: "Keio Ramen Guide",
+    title: "Keio Ramen Guide | 授業終わり、どこ啜る？",
+    description: "日吉・三田・横浜。慶應生が今日の一杯を外さないためのラーメン案内。",
+    locale: "ja_JP",
+  },
+  twitter: {
+    card: "summary",
+    title: "Keio Ramen Guide | 授業終わり、どこ啜る？",
+    description: "日吉・三田・横浜。慶應生が今日の一杯を外さないためのラーメン案内。",
+  },
 };
 
 export default function RootLayout({

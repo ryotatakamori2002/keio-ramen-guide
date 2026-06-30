@@ -1,36 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Keio Ramen Guide
+
+授業終わり、どこ啜る？ — 日吉・三田・横浜の、慶應生が今日の一杯を外さないためのラーメン案内。
+
+## サービスの目的
+
+慶應生が「今いる場所」と「今日の気分・生活シーン」から、**今日行くラーメン屋を早く・失敗せず決められる**ことだけに集中したミニサイト。全国網羅・点数・ランキングでは勝負しない。広告なし・軽量・スマホファースト・生活シーン特化で、ラーメンDBやGoogle Mapsとは違う「局所的な使いやすさ」で勝つ。
+
+対象エリア：日吉 / 三田・田町 / 横浜駅周辺。
+
+## Deep Researchから得た学び
+
+- ユーザーが本当に求めているのは綺麗なUIではなく、**失敗しない店選び**：初回注文・価格目安・並び・一人で入れるか・初心者でも怖くないか・営業情報の信頼性・行った/行きたいの記録。
+- 既存サービスへの不満：広告が多い、UIが古くごちゃつく、スマホで使いづらい、点数の信頼性が不明、写真や営業情報が古い、自分の生活シーンに合うか分からない、初回の注文ルールが分からない。
+- 勝ち筋は全国網羅ではなく「生活シーン別の店選び」：日吉で授業後 / 三田で昼休み / 横浜で帰り道 / 空きコマ / 一人飯 / 飲み後 / 腹パン / 初めての家系 / 二郎系初心者 / 並びたくない日。
+- だから本サイトは「店舗一覧」ではなく、**今日の一杯を決める意思決定ツール**として作る。
+
+## MVPのMust機能
+
+- 店舗一覧（`/shops`）と店舗詳細（`/shops/[id]`）。一覧は「決める画面」として、カードだけで判断材料が揃う。
+- 写真対応のデータ構造（`images` / `primaryImageUrl` / `photoStatus` / `photoNeeded`）と、**写真がない時のUI（巨大な偽イラストを出さず「写真募集中」と明示）**。
+- 初回おすすめ注文（`firstVisitOrder`）＋価格目安（`firstVisitPrice` / `expectedSpendNote`、すべて「目安」）。
+- 用途別ベスト棚（`lib/shelves.ts`、編集された棚）。
+- エリア / ジャンル / シーン別検索、一人飯・飲み後・腹パン・初心者・並び少なめの絞り込み。
+- 行きたい / 行った保存（localStorage）。
+- Google Mapsリンク。
+- データ信頼性表示（最終確認日・信頼度・注意書き）。
+- 5問の気分診断（サブ導線）。
+
+技術：Next.js (App Router) / TypeScript / Tailwind CSS。DB・認証・投稿・スクレイピング・AIレコメンドなし。
+
+## 写真運用ルール（重要）
+
+無断転載は禁止。掲載してよいのは次のいずれかで、**必ず `permissionConfirmed: true` と `credit` を記録**する。
+
+1. **自分で撮った写真のみOK**（`sourceType: "owned"`）。
+2. **友達提供写真**は、本人の掲載許可を得た場合のみOK（`sourceType: "friend_provided"`、許可を記録）。
+3. **店舗公式写真**は、店舗の許諾を得た場合のみOK（`sourceType: "official_permission"`）。
+4. 他サイト・SNSの写真の無断使用は禁止。レビュー文・紹介文のコピーも禁止。
+
+写真がない店は `photoStatus: "none"` / `photoNeeded: true` のままにし、UIでは「写真募集中」と小さく表示する。許諾済み写真ができたら `images` に追加し `primaryImageUrl` を設定すると、一覧・詳細・棚に自動反映される。
+
+### 友達に写真提供を依頼する文面（例）
+
+> ラーメンの写真を慶應生向けのミニサイトに載せたくて、もしお店で撮った写真があれば貸してくれない？ サイトに「撮影：〇〇」とクレジットを入れます。載せてOKな写真だけ送ってくれたら助かる！
+
+### 店舗に写真使用許可を取る文面（例）
+
+> 突然のご連絡失礼します。慶應生向けに日吉・三田・横浜のラーメン店を紹介する非営利のサイトを作っています。広告なし・店舗情報は事実ベースで掲載しています。差し支えなければ、貴店のメニュー写真を出典明記の上で掲載させていただけないでしょうか。掲載イメージは事前に共有します。
+
+## データ更新ルール
+
+- 事実情報（店名・最寄駅・ジャンル・地図リンク・公式URL・価格の目安・深夜営業の有無・アクセス）のみ公開情報から利用する。
+- レビュー文・口コミ・紹介文・写真はコピーしない。コメント類（`selectionReason` / `avoidIf` / `keioUseCase` / 各 advice / `tasteNotes` など）はすべて自分の言葉で書く。
+- 価格は断定しない。`firstVisitPrice` は目安、`priceConfidence: "approximate"`、UIに「目安／前後」を出す。
+- 営業時間・定休日・閉店は断定しない。閉店情報が出た店は載せない（例：天下一品 田町店は閉店のため不掲載）。
+- 各店に `dataLastChecked`（最終確認年月）と `dataConfidence`（high/medium/low）と `dataNote` を持たせる。実在・営業状況・価格が不確かな店は `low` にし、強く推さない。
+- 横浜駅から遠い店は「横浜駅周辺」と断定しない。含める場合は別途「横浜エリア拡張候補」として扱う。
+
+## 店舗情報の注意点
+
+- 掲載は MVP 時点の調査ベース。価格・営業時間・並び・学生サービス（大盛無料など）は変動する。
+- `dataConfidence: "low"` の店は実在・営業・詳細が未確認の項目を含む。訪問前に Google Maps や公式で確認すること。
+- 写真は現状すべて未掲載（プレースホルダー＝写真募集中）。
+
+## 公開前チェックリスト
+
+- [ ] `npm run lint` / `npm run build` が通る
+- [ ] 主要ページ（/ /shops /shops/[id] /quiz /results /saved）が表示される
+- [ ] 全店の詳細ページが開ける
+- [ ] localStorage の行きたい/行った保存が動く
+- [ ] スマホ幅・PC幅で崩れない
+- [ ] 各店の価格・営業の断定表現がない（「目安」明記）
+- [ ] `dataConfidence: low` の店を強く推していない
+- [ ] 無断転載の写真・コピー文章がない
+- [ ] favicon / OGP が設定されている
+
+## 慶應生10人へのヒアリング質問
+
+1. 普段、ラーメン屋はどうやって決めている？（アプリ / 口コミ / なんとなく）
+2. 日吉・三田・横浜で「今日どこ行く」を決める時に一番困ることは？
+3. このサイトのトップを見て、3秒で何のサイトか分かった？
+4. 店舗カードだけで「今日行くか」を判断できた？ 足りない情報は？
+5. 初めての店で不安なこと（注文方法 / 並び / 一人で入れるか）は解消された？
+6. 価格の「目安」表示は信頼できる？ 数字は欲しい？ 範囲で十分？
+7. 用途別ベスト棚（一人飯・腹パン等）は使いたいと思った？
+8. 写真がない店の「写真募集中」表示はどう感じた？
+9. このサイトを友達にLINEで送る？ 送るなら誰に・どの店？
+10. 次に行きたい店が決まった？ 決まらなかったとしたら理由は？
+
+## 30日KPI
+
+- 友達への共有数（LINE等で送られた回数）
+- 訪問ユーザーのうち「行きたい」を1件以上保存した割合
+- 1セッションあたりの店舗詳細閲覧数
+- 診断 → 結果 → 詳細の到達率
+- 再訪率（同一ブラウザの7日以内再訪）
+- ヒアリングで「次に行く店が決まった」と答えた割合
+
+## 継続 / 撤退判断基準
+
+- **継続**：30日でヒアリング対象の半数以上が「次に行く店が決まる」「友達に送れる」と答え、保存や再訪が一定数生まれる。
+- **方向転換**：使われるがエリア/シーンの形が想定と違う → 棚や対象エリアを組み替える。
+- **撤退**：共有も保存もほとんど起きず、ヒアリングでも「ラーメンDBやGoogle Mapsで十分」が大勢 → MVPを畳む。
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000) を開く。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npm run build
+```

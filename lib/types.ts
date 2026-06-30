@@ -12,11 +12,28 @@ export type SceneTag =
   | "hearty"
   | "no_fail";
 
-// ビジュアルの色味。写真がない店のプレースホルダーの配色とアイコン形状を決める。
+// 写真がない店のプレースホルダーの色味（ごく薄いティント）を決める。
 export type VisualTone = "iekei" | "jiro" | "tanrei" | "mazesoba" | "tsukemen" | "miso" | "other";
 
 // 価格情報の確からしさ。"approximate" の場合はUIに「目安」と明記する。
 export type PriceConfidence = "exact" | "approximate" | "unknown";
+
+// 店舗情報全体の信頼度。実在・営業状況・価格などの確かさ。
+export type DataConfidence = "high" | "medium" | "low";
+
+// 写真の状態。無断転載はしないため、許諾の取れた写真だけを provided/owned/official_permission にする。
+export type PhotoStatus = "none" | "placeholder" | "provided" | "owned" | "official_permission";
+
+// 1枚の写真。掲載は permissionConfirmed が true のものだけ。
+export interface ShopImage {
+  url: string;
+  alt: string;
+  /** 撮影者・出典のクレジット */
+  credit: string;
+  sourceType: "owned" | "friend_provided" | "official_permission";
+  /** 掲載許可が取れているか。false の写真は表示しない */
+  permissionConfirmed: boolean;
+}
 
 export interface Shop {
   id: string;
@@ -30,22 +47,31 @@ export interface Shop {
   targetUniversities: string[];
   genres: string[];
   sceneTags: SceneTag[];
+
+  // --- 写真（無断転載しない設計） ---
+  images: ShopImage[];
+  /** 表示に使うメイン写真URL。permissionConfirmed な写真がある時だけ設定 */
+  primaryImageUrl?: string;
+  photoStatus: PhotoStatus;
+  /** まだ掲載できる写真がなく、募集・撮影が必要か */
+  photoNeeded: boolean;
+  /** 写真をどう集めるかのメモ（自分で撮る / 友達に依頼 / 店に許諾依頼 など） */
+  photoRequestNote?: string;
+
+  // --- 価格・初回注文 ---
   budgetMin: number;
   budgetMax: number;
-  /** 看板メニュー名（例: "ラーメン並＋ライス"） */
-  signatureOrderName: string;
-  /** 看板メニューの目安価格（円）。ライス等を含む現実的な一食の値段 */
-  signatureOrderPrice: number;
-  /** 学生視点の予算メモ（例: "ライス無料でこの値段は強い"） */
-  studentBudgetNote: string;
+  /** 初めて行くなら頼むべき一杯（例: "ラーメン＋ライス"） */
+  firstVisitOrder: string;
+  /** firstVisitOrder の目安価格（円） */
+  firstVisitPrice: number;
+  /** 学生の一食としての予算感 */
+  expectedSpendNote: string;
   priceConfidence: PriceConfidence;
-  /** 自前 or 許諾済みの料理写真URL。未設定ならプレースホルダーを表示 */
-  imageUrl?: string;
-  imageAlt?: string;
-  /** 写真の出典・撮影者クレジット */
-  imageCredit?: string;
-  /** プレースホルダーの色味とアイコン形状 */
+
   visualTone: VisualTone;
+
+  // --- 指標（1〜5） ---
   /** こってり度 */
   richness: Level;
   /** あっさり度 */
@@ -61,19 +87,32 @@ export interface Shop {
   speedLevel: Level;
   lateNight: boolean;
   keioStudentScore: Level;
-  /** そのエリアでのアクセスの良さ（最寄駅からの近さ）。高いほど駅近・行きやすい。カードの「近さ」指標に使う */
+  /** そのエリアでのアクセスの良さ（最寄駅からの近さ）。高いほど駅近・行きやすい */
   nearness: Level;
-  /** UIに表示する正直なアクセス情報（キャンパスから電車移動が必要ならその旨を書く） */
-  accessNote: string;
-  /** この店を選ぶ理由。詳細ページの最上部で見せる一言 */
-  whyThisShop: string;
-  recommendedMenu: string;
+
+  // --- 編集コメント（選ぶ意思決定を助ける） ---
+  /** この店を選ぶ理由（カードと詳細で主役にする1〜2文） */
+  selectionReason: string;
+  /** 逆にこういう日には向かない、という正直な但し書き */
+  avoidIf: string;
+  keioUseCase: string;
+  queueAdvice: string;
+  soloAdvice: string;
+  beginnerAdvice: string;
   tasteNotes: string;
   atmosphereNotes: string;
-  beginnerNotes: string;
   rulesNotes: string;
-  keioNotes: string;
   recommendedFor: string[];
+  accessNote: string;
+
+  // --- リンク ---
   googleMapsUrl: string;
   officialUrl?: string;
+
+  // --- データ信頼性 ---
+  /** 最終確認の年月（例: "2026-06"） */
+  dataLastChecked: string;
+  dataConfidence: DataConfidence;
+  /** 価格・営業時間などの変動に関する注意書き */
+  dataNote: string;
 }

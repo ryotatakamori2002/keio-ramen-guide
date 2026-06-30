@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import type { Shop } from "@/lib/types";
+import type { ResolvedShelf } from "@/lib/shelves";
 import ShopCard from "./ShopCard";
+import ShelfRow from "./ShelfRow";
 
 interface QuickCondition {
   key: string;
@@ -24,11 +26,14 @@ export default function FilterableShopList({
   initialArea = null,
   initialGenre = null,
   initialQuick = [],
+  shelves = [],
 }: {
   shops: Shop[];
   initialArea?: string | null;
   initialGenre?: string | null;
   initialQuick?: string[];
+  /** 絞り込みが無い時だけ上部に出す用途別ベスト棚（解決済みのシリアライズ可能な形） */
+  shelves?: ResolvedShelf[];
 }) {
   const [keyword, setKeyword] = useState("");
   const [area, setArea] = useState<string | null>(initialArea);
@@ -38,6 +43,8 @@ export default function FilterableShopList({
   const areas = useMemo(() => Array.from(new Set(shops.map((s) => s.area))), [shops]);
   const genres = useMemo(() => Array.from(new Set(shops.flatMap((s) => s.genres))), [shops]);
 
+  const hasActiveFilter = Boolean(area || genre || quick.size || keyword.trim());
+
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
     const activeTests = QUICK_CONDITIONS.filter((c) => quick.has(c.key));
@@ -46,7 +53,7 @@ export default function FilterableShopList({
       if (genre && !shop.genres.includes(genre)) return false;
       for (const c of activeTests) if (!c.test(shop)) return false;
       if (kw) {
-        const haystack = [shop.name, shop.station, shop.area, ...shop.genres, shop.signatureOrderName]
+        const haystack = [shop.name, shop.station, shop.area, ...shop.genres, shop.firstVisitOrder]
           .join(" ")
           .toLowerCase();
         if (!haystack.includes(kw)) return false;
@@ -65,8 +72,17 @@ export default function FilterableShopList({
   }
 
   return (
-    <div className="lg:grid lg:grid-cols-[230px_1fr] lg:gap-8">
-      <aside className="lg:sticky lg:top-20 lg:self-start">
+    <div>
+      {shelves.length > 0 && !hasActiveFilter && (
+        <div className="mb-9 flex flex-col gap-9 border-b border-border pb-9">
+          {shelves.map((shelf) => (
+            <ShelfRow key={shelf.id} shelf={shelf} />
+          ))}
+        </div>
+      )}
+
+      <div className="lg:grid lg:grid-cols-[230px_1fr] lg:gap-8">
+        <aside className="lg:sticky lg:top-20 lg:self-start">
         <input
           type="text"
           value={keyword}
@@ -96,19 +112,20 @@ export default function FilterableShopList({
         </FilterGroup>
       </aside>
 
-      <div className="mt-6 lg:mt-0">
-        <p className="mb-3 text-xs text-muted">{filtered.length}件</p>
-        {filtered.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border py-12 text-center text-sm text-muted">
-            条件に合うお店が見つかりませんでした。条件を減らしてみてください。
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {filtered.map((shop) => (
-              <ShopCard key={shop.id} shop={shop} />
-            ))}
-          </div>
-        )}
+        <div className="mt-6 lg:mt-0">
+          <p className="mb-3 text-xs text-muted">{filtered.length}件</p>
+          {filtered.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-border py-12 text-center text-sm text-muted">
+              条件に合うお店が見つかりませんでした。条件を減らしてみてください。
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {filtered.map((shop) => (
+                <ShopCard key={shop.id} shop={shop} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

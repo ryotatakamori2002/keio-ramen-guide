@@ -17,10 +17,12 @@ export default function ShopCard({ shop, header }: { shop: Shop; header?: React.
           <ShopThumb
             genre={shop.genres[0]}
             tone={shop.visualTone}
-            imageUrl={shop.imageUrl}
-            imageAlt={shop.imageAlt}
-            className="h-[76px] w-[76px]"
-            sizes="76px"
+            primaryImageUrl={shop.primaryImageUrl}
+            imageAlt={shop.images[0]?.alt}
+            photoStatus={shop.photoStatus}
+            photoNeeded={shop.photoNeeded}
+            className="h-[84px] w-[84px]"
+            sizes="84px"
           />
         </Link>
 
@@ -33,14 +35,14 @@ export default function ShopCard({ shop, header }: { shop: Shop; header?: React.
           </Link>
           <PriceNote
             className="mt-1.5"
-            name={shop.signatureOrderName}
-            price={shop.signatureOrderPrice}
+            name={shop.firstVisitOrder}
+            price={shop.firstVisitPrice}
             confidence={shop.priceConfidence}
           />
         </div>
       </div>
 
-      <p className="mt-3 text-sm leading-relaxed text-foreground/90">{shop.whyThisShop}</p>
+      <p className="mt-3 text-sm leading-relaxed text-foreground/90">{shop.selectionReason}</p>
 
       <div className="mt-2.5">
         <ScenePills tags={shop.sceneTags} max={3} />
