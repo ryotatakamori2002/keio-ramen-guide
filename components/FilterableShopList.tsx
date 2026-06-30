@@ -39,9 +39,19 @@ export default function FilterableShopList({
   const [area, setArea] = useState<string | null>(initialArea);
   const [genre, setGenre] = useState<string | null>(initialGenre);
   const [quick, setQuick] = useState<Set<string>>(new Set(initialQuick));
+  const [includeCandidates, setIncludeCandidates] = useState(false);
 
   const areas = useMemo(() => Array.from(new Set(shops.map((s) => s.area))), [shops]);
-  const genres = useMemo(() => Array.from(new Set(shops.flatMap((s) => s.genres))), [shops]);
+  // ジャンル選択肢は調査候補を除いた初期表示対象から作る
+  const genres = useMemo(
+    () => Array.from(new Set(shops.filter((s) => s.publishStatus !== "candidate").flatMap((s) => s.genres))),
+    [shops],
+  );
+
+  const candidateCount = useMemo(
+    () => shops.filter((s) => s.publishStatus === "candidate").length,
+    [shops],
+  );
 
   const hasActiveFilter = Boolean(area || genre || quick.size || keyword.trim());
 
@@ -49,6 +59,8 @@ export default function FilterableShopList({
     const kw = keyword.trim().toLowerCase();
     const activeTests = QUICK_CONDITIONS.filter((c) => quick.has(c.key));
     return shops.filter((shop) => {
+      // 調査候補（candidate）はトグルONの時だけ表示
+      if (shop.publishStatus === "candidate" && !includeCandidates) return false;
       if (area && shop.area !== area) return false;
       if (genre && !shop.genres.includes(genre)) return false;
       for (const c of activeTests) if (!c.test(shop)) return false;
@@ -60,7 +72,7 @@ export default function FilterableShopList({
       }
       return true;
     });
-  }, [shops, keyword, area, genre, quick]);
+  }, [shops, keyword, area, genre, quick, includeCandidates]);
 
   function toggleQuick(key: string) {
     setQuick((prev) => {
@@ -110,6 +122,18 @@ export default function FilterableShopList({
             <Chip key={g} active={genre === g} label={g} onClick={() => setGenre(genre === g ? null : g)} />
           ))}
         </FilterGroup>
+
+        {candidateCount > 0 && (
+          <label className="mt-5 flex cursor-pointer items-center gap-2 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={includeCandidates}
+              onChange={(e) => setIncludeCandidates(e.target.checked)}
+              className="h-3.5 w-3.5 accent-accent"
+            />
+            調査候補も含める（{candidateCount}件・未確認）
+          </label>
+        )}
       </aside>
 
         <div className="mt-6 lg:mt-0">

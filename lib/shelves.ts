@@ -15,6 +15,17 @@ export interface Shelf {
 
 const CONFIDENCE_RANK: Record<Shop["dataConfidence"], number> = { high: 2, medium: 1, low: 0 };
 
+// 棚に出してよい店の品質ゲート。ready かつ high/medium かつ must/should、
+// さらに選ぶ理由・初回注文・予算メモ・Maps が揃っている店だけ。
+function shelfEligible(shop: Shop): boolean {
+  return (
+    shop.publishStatus === "ready" &&
+    shop.dataConfidence !== "low" &&
+    shop.editorialPriority !== "could" &&
+    Boolean(shop.selectionReason && shop.firstVisitOrder && shop.expectedSpendNote && shop.googleMapsUrl)
+  );
+}
+
 export const SHELVES: Shelf[] = [
   {
     id: "hiyoshi-after-class",
@@ -89,7 +100,7 @@ export const SHELVES: Shelf[] = [
 ];
 
 export function shopsForShelf(shelf: Shelf, limit = 5): Shop[] {
-  return SHOPS.filter(shelf.match)
+  return SHOPS.filter((s) => shelfEligible(s) && shelf.match(s))
     .sort(
       (a, b) =>
         b.keioStudentScore - a.keioStudentScore ||

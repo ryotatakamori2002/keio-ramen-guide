@@ -21,6 +21,15 @@ export type PriceConfidence = "exact" | "approximate" | "unknown";
 // 店舗情報全体の信頼度。実在・営業状況・価格などの確かさ。
 export type DataConfidence = "high" | "medium" | "low";
 
+// 公開ステータス。本公開候補（ready）/ 要確認（needs_review）/ 調査候補（candidate）。
+// ready: トップ・用途別棚・診断に出してよい。
+// needs_review: /shops には出すが棚には出さない。詳細で「公開前に要確認」を出す。
+// candidate: 初期表示では非表示。「調査候補を含める」をONにした時だけ出す。
+export type PublishStatus = "ready" | "needs_review" | "candidate";
+
+// 編集上の優先度。棚やトップで前に出す強さ。
+export type EditorialPriority = "must" | "should" | "could";
+
 // 写真の状態。無断転載はしないため、許諾の取れた写真だけを provided/owned/official_permission にする。
 export type PhotoStatus = "none" | "placeholder" | "provided" | "owned" | "official_permission";
 
@@ -109,10 +118,12 @@ export interface Shop {
   googleMapsUrl: string;
   officialUrl?: string;
 
-  // --- データ信頼性 ---
+  // --- データ信頼性・公開ステータス ---
   /** 最終確認の年月（例: "2026-06"） */
   dataLastChecked: string;
   dataConfidence: DataConfidence;
   /** 価格・営業時間などの変動に関する注意書き */
   dataNote: string;
+  publishStatus: PublishStatus;
+  editorialPriority: EditorialPriority;
 }

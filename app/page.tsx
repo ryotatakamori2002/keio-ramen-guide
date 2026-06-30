@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { resolveShelves } from "@/lib/shelves";
 import ShelfRow from "@/components/ShelfRow";
+import PhotoCallout from "@/components/PhotoCallout";
 
 const QUICK_LINKS: { label: string; href: string }[] = [
   { label: "日吉", href: "/shops?area=日吉" },
@@ -86,6 +87,8 @@ export default function Home() {
           店舗を探す →
         </Link>
       </section>
+
+      <PhotoCallout />
     </div>
   );
 }

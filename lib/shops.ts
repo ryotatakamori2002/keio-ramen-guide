@@ -1,4 +1,11 @@
-import type { DataConfidence, PhotoStatus, Shop, ShopImage } from "./types";
+import type {
+  DataConfidence,
+  EditorialPriority,
+  PhotoStatus,
+  PublishStatus,
+  Shop,
+  ShopImage,
+} from "./types";
 
 // 店名・エリア・最寄駅・ジャンルなどの事実情報はWeb検索で収集した公開情報を元にしている。
 // レビュー文・口コミ文・写真・他サイトの紹介文はコピーしておらず、コメント類（selectionReason /
@@ -23,8 +30,51 @@ const COMMON = {
   dataNote: "価格・営業時間・並び・サービス内容は変動します。訪問前にGoogle Mapsや公式情報で最新をご確認ください。",
 };
 
-function shop(s: Omit<Shop, keyof typeof COMMON> & { dataConfidence: DataConfidence }): Shop {
-  return { ...COMMON, ...s };
+// 公開ステータスと編集優先度は id をキーに一元管理する。
+// ready の店だけがトップ・用途別棚・診断の前面に出る。low信頼は candidate に寄せ、
+// 確認待ちは needs_review にして棚から外す。未登録の id は安全側で candidate/could 扱い。
+const PUBLISH: Record<string, { publishStatus: PublishStatus; editorialPriority: EditorialPriority }> = {
+  // 日吉（ready 8 / candidate 2）
+  "hiyoshi-musashiya": { publishStatus: "ready", editorialPriority: "must" },
+  "hiyoshi-rasuta": { publishStatus: "ready", editorialPriority: "must" },
+  "hiyoshi-kokoro": { publishStatus: "ready", editorialPriority: "should" },
+  "hiyoshi-ramendon": { publishStatus: "ready", editorialPriority: "should" },
+  "hiyoshi-hiyoshiya": { publishStatus: "ready", editorialPriority: "should" },
+  "hiyoshi-gatton": { publishStatus: "ready", editorialPriority: "should" },
+  "hiyoshi-taishoken": { publishStatus: "ready", editorialPriority: "could" },
+  "hiyoshi-hamatora": { publishStatus: "ready", editorialPriority: "could" },
+  "hiyoshi-shibatashoten": { publishStatus: "candidate", editorialPriority: "could" },
+  "hiyoshi-asuhon": { publishStatus: "candidate", editorialPriority: "could" },
+  // 三田・田町（ready 7 / needs_review 2）
+  "mita-jiro": { publishStatus: "ready", editorialPriority: "must" },
+  "mita-buguenka": { publishStatus: "ready", editorialPriority: "must" },
+  "mita-tsukemen": { publishStatus: "ready", editorialPriority: "should" },
+  "mita-gorindo": { publishStatus: "ready", editorialPriority: "should" },
+  "mita-ichizuitei": { publishStatus: "ready", editorialPriority: "should" },
+  "mita-yattoko": { publishStatus: "ready", editorialPriority: "should" },
+  "mita-rikka": { publishStatus: "ready", editorialPriority: "should" },
+  "mita-daisouya": { publishStatus: "needs_review", editorialPriority: "should" },
+  "mita-kingken": { publishStatus: "needs_review", editorialPriority: "could" },
+  // 横浜（ready 8 / needs_review 2）
+  "yokohama-yoshimuraya": { publishStatus: "ready", editorialPriority: "must" },
+  "yokohama-afuri": { publishStatus: "ready", editorialPriority: "must" },
+  "yokohama-mokotanmen": { publishStatus: "ready", editorialPriority: "should" },
+  "yokohama-hamatora": { publishStatus: "ready", editorialPriority: "should" },
+  "yokohama-busou": { publishStatus: "ready", editorialPriority: "should" },
+  "yokohama-honmarutei": { publishStatus: "ready", editorialPriority: "should" },
+  "yokohama-machidashoten": { publishStatus: "ready", editorialPriority: "should" },
+  "yokohama-tonzan": { publishStatus: "ready", editorialPriority: "should" },
+  "yokohama-tori": { publishStatus: "needs_review", editorialPriority: "could" },
+  "yokohama-burabura": { publishStatus: "needs_review", editorialPriority: "could" },
+};
+
+function shop(
+  s: Omit<Shop, keyof typeof COMMON | "publishStatus" | "editorialPriority"> & {
+    dataConfidence: DataConfidence;
+  },
+): Shop {
+  const pub = PUBLISH[s.id] ?? { publishStatus: "candidate" as const, editorialPriority: "could" as const };
+  return { ...COMMON, ...pub, ...s };
 }
 
 export const SHOPS: Shop[] = [
@@ -1257,10 +1307,22 @@ export function getShopById(id: string): Shop | undefined {
   return SHOPS.find((shop) => shop.id === id);
 }
 
+// 初期表示する店（candidate を除く ready + needs_review）。
+export const VISIBLE_SHOPS: Shop[] = SHOPS.filter((s) => s.publishStatus !== "candidate");
+
+// 棚・トップ・診断の前面に出してよい店（ready のみ）。
+export const READY_SHOPS: Shop[] = SHOPS.filter((s) => s.publishStatus === "ready");
+
+/** その店を「要確認」として目立たせるべきか（低信頼 or 確認待ち） */
+export function needsReviewFlag(shop: Shop): boolean {
+  return shop.dataConfidence === "low" || shop.publishStatus === "needs_review";
+}
+
 export function getAllAreas(): string[] {
   return Array.from(new Set(SHOPS.map((shop) => shop.area)));
 }
 
 export function getAllGenres(): string[] {
-  return Array.from(new Set(SHOPS.flatMap((shop) => shop.genres)));
+  // ジャンルフィルタは初期表示対象（candidate除く）の店から作る
+  return Array.from(new Set(VISIBLE_SHOPS.flatMap((shop) => shop.genres)));
 }

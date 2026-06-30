@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SHOPS, getAllAreas, getAllGenres } from "@/lib/shops";
 import { resolveShelves } from "@/lib/shelves";
 import FilterableShopList from "@/components/FilterableShopList";
+import PhotoCallout from "@/components/PhotoCallout";
 
 export const metadata: Metadata = {
   title: "今日の一杯を探す | Keio Ramen Guide",
@@ -46,6 +47,10 @@ export default async function ShopsPage({
           initialQuick={initialQuick}
           shelves={shelves}
         />
+      </div>
+
+      <div className="mt-12">
+        <PhotoCallout />
       </div>
     </div>
   );

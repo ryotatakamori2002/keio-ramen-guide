@@ -7,6 +7,7 @@ import ShopThumb from "@/components/ShopThumb";
 import PriceNote from "@/components/PriceNote";
 import ScenePills from "@/components/ScenePills";
 import SaveButtons from "@/components/SaveButtons";
+import PhotoCallout from "@/components/PhotoCallout";
 
 export function generateStaticParams() {
   return SHOPS.map((shop) => ({ id: shop.id }));
@@ -49,11 +50,19 @@ export default async function ShopDetailPage({
   const shop = getShopById(id);
   if (!shop) notFound();
 
+  const needsReview = shop.dataConfidence === "low" || shop.publishStatus === "needs_review";
+
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/shops" className="text-xs text-muted hover:text-accent">
         ← 店舗を探す
       </Link>
+
+      {needsReview && (
+        <div className="mt-4 rounded-md border border-accent/30 bg-accent-soft px-3 py-2 text-xs text-accent-dark">
+          公開前に要確認：この店の実在・営業状況・価格はまだ十分に確認できていません。掲載前にGoogle Mapsや公式情報で確かめてください。
+        </div>
+      )}
 
       {/* 上部: 識別ビジュアル + 基本情報 + 価格 + アクション */}
       <div className="mt-4 flex gap-4">
@@ -79,6 +88,7 @@ export default async function ShopDetailPage({
             confidence={shop.priceConfidence}
           />
           <p className="mt-1 text-xs text-muted">{shop.expectedSpendNote}</p>
+          {!shop.primaryImageUrl && <PhotoCallout shopName={shop.name} variant="compact" />}
         </div>
       </div>
 

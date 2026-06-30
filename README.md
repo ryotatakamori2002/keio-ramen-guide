@@ -2,6 +2,10 @@
 
 授業終わり、どこ啜る？ — 日吉・三田・横浜の、慶應生が今日の一杯を外さないためのラーメン案内。
 
+> **現在は「慶應生10人検証用MVP」です。** 広く一般公開する完成版ではなく、まず身内で「使えるか・どの店が足りないか・見づらい所はないか」を検証する段階。
+> **全店舗の写真は未収集**（全店「写真募集中」）。写真は無断転載せず、自分で撮影した／掲載許可を得たものだけを載せます。
+> 価格・営業時間・学生サービスは変動します。`dataConfidence: "low"` や `publishStatus: "needs_review"` の店は実在・営業・価格が未確認の項目を含むため、公開前に各店の最新情報を確認してください。
+
 ## サービスの目的
 
 慶應生が「今いる場所」と「今日の気分・生活シーン」から、**今日行くラーメン屋を早く・失敗せず決められる**ことだけに集中したミニサイト。全国網羅・点数・ランキングでは勝負しない。広告なし・軽量・スマホファースト・生活シーン特化で、ラーメンDBやGoogle Mapsとは違う「局所的な使いやすさ」で勝つ。
@@ -48,6 +52,22 @@
 
 > 突然のご連絡失礼します。慶應生向けに日吉・三田・横浜のラーメン店を紹介する非営利のサイトを作っています。広告なし・店舗情報は事実ベースで掲載しています。差し支えなければ、貴店のメニュー写真を出典明記の上で掲載させていただけないでしょうか。掲載イメージは事前に共有します。
 
+## 公開ステータス（publishStatus）と編集優先度
+
+各店に `publishStatus` と `editorialPriority`、`dataConfidence` を持たせ、信頼できる店だけが前面に出るようにしている。
+
+| publishStatus | 意味 | トップ/棚/診断 | /shops |
+| --- | --- | --- | --- |
+| `ready` | 本公開候補。実在・概況を確認済み | 出す（high/medium・must/should を優先） | 出す |
+| `needs_review` | 掲載はするが要確認の項目あり | 用途別棚には出さない | 出す（「要確認」ラベル付き） |
+| `candidate` | 調査候補。未確認 | 出さない | 初期非表示。「調査候補も含める」ONで表示 |
+
+- 用途別ベスト棚に出る条件：`ready` かつ `dataConfidence` が high/medium かつ `editorialPriority` が must/should かつ selectionReason / firstVisitOrder / expectedSpendNote / Google Maps URL が揃っている。
+- 診断結果（/results）は `candidate` を除外し、high を優先・`low` と `needs_review` は上位に出ないよう減点。
+- 一覧・詳細では `dataConfidence: "low"` または `needs_review` の店に「要確認」ラベルを出し、詳細では「公開前に要確認」バナーを表示。
+
+現在の内訳（2026-06 時点）：ready 23（日吉8 / 三田7 / 横浜8）、needs_review 4、candidate 2。
+
 ## データ更新ルール
 
 - 事実情報（店名・最寄駅・ジャンル・地図リンク・公式URL・価格の目安・深夜営業の有無・アクセス）のみ公開情報から利用する。
@@ -74,6 +94,8 @@
 - [ ] `dataConfidence: low` の店を強く推していない
 - [ ] 無断転載の写真・コピー文章がない
 - [ ] favicon / OGP が設定されている
+
+身内検証時に送る配布文面は [docs/test-message.md](docs/test-message.md) を参照。
 
 ## 慶應生10人へのヒアリング質問
 
@@ -116,3 +138,28 @@ npm run dev
 npm run lint
 npm run build
 ```
+
+スクリーンショットは [docs/screenshots/](docs/screenshots/) に保存（Playwright で生成）。
+
+## GitHub / Vercel 公開手順
+
+リモート未設定。GitHub にリポジトリを作成後：
+
+```bash
+# 1) GitHub に push（gh CLI を使う場合）
+gh repo create keio-ramen-guide --private --source=. --remote=origin --push
+# もしくは手動でリモートを追加して push
+git remote add origin git@github.com:<your-account>/keio-ramen-guide.git
+git push -u origin main
+```
+
+Vercel に公開：
+
+```bash
+# 2) Vercel CLI でデプロイ（初回はプロジェクト設定を対話で作成）
+npm i -g vercel
+vercel        # プレビュー
+vercel --prod # 本番（検証URL）
+```
+
+または Vercel ダッシュボードで GitHub リポジトリを Import すれば、Next.js は自動検出される（追加設定不要）。公開前に `PhotoCallout` の連絡先（`ramen-guide@example.com`）と `app/layout.tsx` の `metadataBase` を実URLに差し替えること。

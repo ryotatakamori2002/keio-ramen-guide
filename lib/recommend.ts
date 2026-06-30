@@ -110,11 +110,20 @@ function scoreShop(shop: Shop, answers: QuizAnswers): { score: number; reasons: 
     pushReason(reasons, "慶應生に人気の一軒");
   }
 
+  // 公開ステータス・信頼度で前面に出す強さを調整。
+  // high を優先し、低信頼や確認待ちは上位に来ないよう大きく減点する。
+  if (shop.dataConfidence === "high") score += 12;
+  else if (shop.dataConfidence === "medium") score += 4;
+  else score -= 40;
+  if (shop.publishStatus === "needs_review") score -= 25;
+
   return { score, reasons: reasons.slice(0, 3) };
 }
 
 export function recommend(shops: Shop[], answers: QuizAnswers, limit = 5): RecommendResult[] {
   return shops
+    // 診断結果には調査候補（candidate）を出さない
+    .filter((shop) => shop.publishStatus !== "candidate")
     .map((shop) => {
       const { score, reasons } = scoreShop(shop, answers);
       return { shop, score, reasons };

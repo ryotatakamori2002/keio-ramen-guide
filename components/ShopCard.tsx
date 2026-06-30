@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Shop } from "@/lib/types";
+import { needsReviewFlag } from "@/lib/shops";
 import ShopThumb from "./ShopThumb";
 import PriceNote from "./PriceNote";
 import ScenePills from "./ScenePills";
@@ -28,7 +29,14 @@ export default function ShopCard({ shop, header }: { shop: Shop; header?: React.
 
         <div className="min-w-0 flex-1">
           <Link href={`/shops/${shop.id}`} className="group block">
-            <h3 className="truncate font-bold text-foreground group-hover:text-accent">{shop.name}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="truncate font-bold text-foreground group-hover:text-accent">{shop.name}</h3>
+              {needsReviewFlag(shop) && (
+                <span className="shrink-0 rounded border border-border px-1.5 py-0.5 text-[10px] text-muted">
+                  要確認
+                </span>
+              )}
+            </div>
             <p className="mt-0.5 truncate text-xs text-muted">
               {shop.area} ・ {shop.station} ・ {shop.genres.join("/")}
             </p>
