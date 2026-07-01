@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { copy } from "@/content/site-copy";
 import { adminLogin, type AdminLoginState } from "./actions";
 
 const initialState: AdminLoginState = { ok: false, message: "" };
@@ -19,15 +20,15 @@ export default function LoginForm() {
         type="password"
         name="password"
         required
-        placeholder="管理パスワード"
-        className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+        placeholder={copy.admin.passwordPlaceholder}
+        className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm focus:border-foreground focus:outline-none"
       />
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-foreground px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+        className="rounded-full bg-foreground px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
       >
-        {pending ? "確認中…" : "ログイン"}
+        {pending ? copy.admin.loggingIn : copy.admin.login}
       </button>
     </form>
   );

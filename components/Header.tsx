@@ -1,15 +1,15 @@
 import Link from "next/link";
+import { copy } from "@/content/site-copy";
+import { container } from "@/lib/design";
 import HeaderNav from "./HeaderNav";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-5 py-3.5 sm:px-8">
-        <Link href="/" className="flex shrink-0 items-baseline gap-2">
-          <span className="whitespace-nowrap text-sm font-bold tracking-tight text-foreground sm:text-base">
-            Keio Ramen Guide
-          </span>
-          <span className="hidden text-xs text-muted sm:inline">日吉・三田・横浜</span>
+    <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
+      <div className={`${container} flex items-center justify-between gap-3 py-4`}>
+        <Link href="/" className="flex shrink-0 flex-col leading-none">
+          <span className="text-sm font-bold tracking-tight text-foreground">{copy.serviceName}</span>
+          <span className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-muted">{copy.brandLine}</span>
         </Link>
         <HeaderNav />
       </div>

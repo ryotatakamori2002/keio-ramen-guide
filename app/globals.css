@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafaf8;
-  --foreground: #111111;
+  /* 背景はごく薄いウォームグレー。文字はほぼ黒（わずかに暖色）。 */
+  --background: #fbfaf7;
+  --foreground: #181511;
   --card: #ffffff;
-  --muted: #666666;
-  --border: #e7e2da;
-  --accent: #e3362d;
-  --accent-dark: #c6281f;
-  /* 差し色のごく薄いティント（アクティブなフィルタ等に最小限だけ使う） */
-  --accent-soft: #fdeceb;
+  --muted: #706a60;
+  --border: #e9e4db;
+  /* アクセントの赤は最小限。深め・落ち着いた赤にして安っぽさを避ける。 */
+  --accent: #b23a2e;
+  --accent-dark: #8f2c22;
+  --accent-soft: #f3ebe8;
 }
 
 @theme inline {
@@ -24,7 +25,17 @@
   --font-sans: var(--font-geist-sans);
 }
 
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* 編集的な見出しの字間を少し締める */
+.tracking-display {
+  letter-spacing: -0.02em;
 }

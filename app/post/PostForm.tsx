@@ -3,9 +3,12 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { SCENE_OPTIONS } from "@/lib/quiz";
+import { copy } from "@/content/site-copy";
+import { button } from "@/lib/design";
 import { submitPost, type PostFormState } from "./actions";
 
 const initialState: PostFormState = { ok: false, message: "" };
+const f = copy.post.fields;
 
 export default function PostForm({
   shops,
@@ -19,15 +22,15 @@ export default function PostForm({
 
   if (state.ok) {
     return (
-      <div className="rounded-lg border border-border bg-card p-6 text-center">
-        <p className="text-base font-bold text-foreground">{state.message}</p>
-        <p className="mt-2 text-sm text-muted">掲載まで少し時間がかかります。ありがとうございます。</p>
-        <div className="mt-5 flex justify-center gap-4 text-sm">
-          <Link href="/shops" className="font-medium text-accent hover:underline">
-            店舗を探す →
+      <div className="rounded-xl border border-border bg-card p-8 text-center">
+        <p className="text-lg font-bold tracking-tight text-foreground">{copy.post.successTitle}</p>
+        <p className="mt-2 text-sm text-muted">{copy.post.successBody}</p>
+        <div className="mt-6 flex justify-center gap-4 text-sm">
+          <Link href="/shops" className={button.link}>
+            {copy.post.successExplore}
           </Link>
           <Link href="/post" className="text-muted hover:text-foreground">
-            続けて投稿する
+            {copy.post.successAgain}
           </Link>
         </div>
       </div>
@@ -37,20 +40,20 @@ export default function PostForm({
   return (
     <form action={formAction} className="flex flex-col gap-6">
       {state.message && !state.ok && (
-        <p className="rounded-md border border-accent/30 bg-accent-soft px-3 py-2 text-sm text-accent-dark">
+        <p className="rounded-lg border border-accent/30 bg-accent-soft px-3.5 py-2.5 text-sm text-accent-dark">
           {state.message}
         </p>
       )}
 
-      <Field label="店舗" required>
+      <Field label={f.shop} required>
         <select
           name="shopId"
           required
           defaultValue={initialShopId}
-          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm focus:border-foreground focus:outline-none"
         >
           <option value="" disabled>
-            店舗を選ぶ
+            {f.shopPlaceholder}
           </option>
           {shops.map((s) => (
             <option key={s.id} value={s.id}>
@@ -60,8 +63,8 @@ export default function PostForm({
         </select>
       </Field>
 
-      <Field label="写真（任意）">
-        <label className="flex cursor-pointer items-center justify-center rounded-md border border-dashed border-border bg-card px-3 py-6 text-sm text-muted hover:border-accent">
+      <Field label={f.photo} optional>
+        <label className="flex cursor-pointer items-center justify-center rounded-lg border border-dashed border-border bg-card px-3 py-8 text-sm text-muted transition-colors hover:border-foreground">
           <input
             type="file"
             name="image"
@@ -74,24 +77,24 @@ export default function PostForm({
           />
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={preview} alt="プレビュー" className="max-h-56 rounded-md object-contain" />
+            <img src={preview} alt="preview" className="max-h-60 rounded-md object-contain" />
           ) : (
-            <span>タップして写真を選ぶ（自分で撮った写真のみ）</span>
+            <span>{f.photoHint}</span>
           )}
         </label>
       </Field>
 
-      <Field label="食べたメニュー名" required>
+      <Field label={f.menu} required>
         <input
           type="text"
           name="menuName"
           required
-          placeholder="例：ラーメン＋ライス"
-          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-accent focus:outline-none"
+          placeholder={f.menuPlaceholder}
+          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
         />
       </Field>
 
-      <Field label="支払った金額（任意）">
+      <Field label={f.price} optional>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted">¥</span>
           <input
@@ -100,28 +103,28 @@ export default function PostForm({
             inputMode="numeric"
             min={0}
             max={100000}
-            placeholder="950"
-            className="w-32 rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-accent focus:outline-none"
+            placeholder={f.pricePlaceholder}
+            className="w-32 rounded-lg border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
           />
         </div>
       </Field>
 
-      <Field label="一言コメント（任意）">
+      <Field label={f.note} optional>
         <textarea
           name="body"
           rows={3}
           maxLength={300}
-          placeholder="味・量・並び・雰囲気など、一言で。"
-          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-accent focus:outline-none"
+          placeholder={f.notePlaceholder}
+          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
         />
       </Field>
 
-      <Field label="シーン（任意・複数可）">
+      <Field label={f.scene} optional>
         <div className="flex flex-wrap gap-2">
           {SCENE_OPTIONS.map((opt) => (
             <label
               key={opt.value}
-              className="cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-foreground has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:text-white"
+              className="cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-muted transition-colors has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white"
             >
               <input type="checkbox" name="scene" value={opt.value} className="sr-only" />
               {opt.label}
@@ -130,26 +133,24 @@ export default function PostForm({
         </div>
       </Field>
 
-      <Field label="ニックネーム（任意）">
+      <Field label={f.name} optional>
         <input
           type="text"
           name="nickname"
           maxLength={30}
-          placeholder="慶應太郎 / 空欄でもOK"
-          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-accent focus:outline-none"
+          placeholder={f.namePlaceholder}
+          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
         />
       </Field>
 
-      <p className="text-xs text-muted">
-        投稿は確認後に掲載されます。掲載できるのは自分で撮った写真、または許可を得た写真だけです。
-      </p>
+      <p className="text-xs leading-relaxed text-muted">{copy.post.rights}</p>
 
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-foreground px-6 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto sm:self-start sm:px-10"
+        className={`${button.primary} w-full disabled:opacity-50 sm:w-auto sm:self-start sm:px-12`}
       >
-        {pending ? "送信中…" : "投稿する"}
+        {pending ? copy.post.submitting : copy.post.submit}
       </button>
     </form>
   );
@@ -158,17 +159,20 @@ export default function PostForm({
 function Field({
   label,
   required,
+  optional,
   children,
 }: {
   label: string;
   required?: boolean;
+  optional?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-foreground">
+      <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-foreground">
         {label}
-        {required && <span className="ml-1 text-accent">*</span>}
+        {required && <span className="text-accent">*</span>}
+        {optional && <span className="text-[11px] font-normal text-muted">{copy.post.fields.optional}</span>}
       </label>
       {children}
     </div>

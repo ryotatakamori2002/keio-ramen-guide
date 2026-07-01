@@ -4,11 +4,12 @@ import { getShopById } from "@/lib/shops";
 import { getPendingPosts } from "@/lib/posts";
 import { isSupabaseReady } from "@/lib/supabase";
 import { SCENE_LABEL } from "@/lib/quiz";
+import { copy } from "@/content/site-copy";
 import { adminLogout, approvePost, isAdmin, rejectPost } from "./actions";
 import LoginForm from "./LoginForm";
 
 export const metadata: Metadata = {
-  title: "投稿の承認 | Keio Ramen Guide",
+  title: `${copy.admin.title} | ${copy.serviceName}`,
   robots: { index: false },
 };
 
@@ -21,8 +22,8 @@ export default async function AdminPage() {
   if (!authed) {
     return (
       <div className="mx-auto max-w-xl">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">投稿の承認</h1>
-        <p className="mt-2 text-sm text-muted">管理パスワードでログインしてください。</p>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">{copy.admin.title}</h1>
+        <p className="mt-2 text-sm text-muted">{copy.admin.loginPrompt}</p>
         <LoginForm />
       </div>
     );
@@ -33,7 +34,7 @@ export default async function AdminPage() {
       <div className="mx-auto max-w-xl">
         <Header />
         <p className="mt-6 rounded-lg border border-border bg-card p-5 text-sm text-muted">
-          Supabaseが未設定のため、承認待ちの投稿を取得できません。READMEのセットアップ手順に従って設定してください。
+          {copy.admin.notConfigured}
         </p>
       </div>
     );
@@ -44,11 +45,11 @@ export default async function AdminPage() {
   return (
     <div className="mx-auto max-w-2xl">
       <Header />
-      <p className="mt-4 text-sm text-muted">承認待ち：{pending.length}件</p>
+      <p className="mt-4 text-sm text-muted">{copy.admin.pendingCount(pending.length)}</p>
 
       {pending.length === 0 ? (
         <p className="mt-6 rounded-lg border border-dashed border-border py-12 text-center text-sm text-muted">
-          承認待ちの投稿はありません。
+          {copy.admin.empty}
         </p>
       ) : (
         <div className="mt-4 flex flex-col gap-4">
@@ -63,7 +64,7 @@ export default async function AdminPage() {
                     </div>
                   ) : (
                     <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-md border border-border text-[11px] text-muted">
-                      写真なし
+                      {copy.admin.noPhoto}
                     </div>
                   )}
                   <div className="min-w-0 flex-1 text-sm">
@@ -79,21 +80,21 @@ export default async function AdminPage() {
                       </p>
                     )}
                     <p className="mt-1 text-xs text-muted">
-                      {post.nickname || "名無し"} ・ {formatDate(post.createdAt)}
+                      {post.nickname || copy.admin.anon} · {formatDate(post.createdAt)}
                     </p>
                   </div>
                 </div>
                 <div className="mt-3 flex gap-2">
                   <form action={approvePost}>
                     <input type="hidden" name="id" value={post.id} />
-                    <button className="rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
-                      承認
+                    <button className="rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
+                      {copy.admin.approve}
                     </button>
                   </form>
                   <form action={rejectPost}>
                     <input type="hidden" name="id" value={post.id} />
-                    <button className="rounded-md border border-border px-4 py-2 text-sm font-medium text-muted hover:border-accent hover:text-accent">
-                      却下
+                    <button className="rounded-full border border-border px-4 py-2 text-sm font-medium text-muted hover:border-foreground hover:text-foreground">
+                      {copy.admin.reject}
                     </button>
                   </form>
                 </div>
@@ -109,9 +110,9 @@ export default async function AdminPage() {
 function Header() {
   return (
     <div className="flex items-center justify-between">
-      <h1 className="text-2xl font-bold tracking-tight text-foreground">投稿の承認</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">{copy.admin.title}</h1>
       <form action={adminLogout}>
-        <button className="text-xs text-muted hover:text-accent">ログアウト</button>
+        <button className="text-xs text-muted hover:text-accent">{copy.admin.logout}</button>
       </form>
     </div>
   );

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { SHOPS } from "@/lib/shops";
 import { isSupabaseReady } from "@/lib/supabase";
+import { copy } from "@/content/site-copy";
+import { type as t } from "@/lib/design";
 import PostForm from "./PostForm";
 
 export const metadata: Metadata = {
-  title: "食べた一杯を投稿する | Keio Ramen Guide",
+  title: `${copy.post.eyebrow} | ${copy.serviceName}`,
 };
 
 export default async function PostPage({
@@ -15,7 +17,6 @@ export default async function PostPage({
   const { shop } = await searchParams;
   const ready = isSupabaseReady();
 
-  // フォームに渡すのは選択に必要な最小限（id/name/area）だけ。
   const shopOptions = SHOPS.filter((s) => s.publishStatus !== "candidate")
     .map((s) => ({ id: s.id, name: s.name, area: s.area }))
     .sort((a, b) => a.area.localeCompare(b.area, "ja"));
@@ -23,22 +24,18 @@ export default async function PostPage({
   const initialShopId = shop && SHOPS.some((s) => s.id === shop) ? shop : "";
 
   return (
-    <div className="mx-auto max-w-xl">
-      <p className="text-xs font-semibold tracking-widest text-accent">実食ログ</p>
-      <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground">食べた一杯を投稿する</h1>
-      <p className="mt-2 text-sm text-muted">
-        価格も、量も、雰囲気も。食べた人の一言でわかる。投稿は確認後に掲載されます。
-      </p>
+    <div className="mx-auto max-w-xl py-2">
+      <p className={t.eyebrow}>{copy.post.eyebrow}</p>
+      <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">{copy.post.title}</h1>
+      <p className="mt-2 text-sm text-muted">{copy.post.subtitle}</p>
 
       {!ready ? (
-        <div className="mt-6 rounded-lg border border-border bg-card p-5 text-sm text-muted">
-          <p className="font-medium text-foreground">投稿機能は準備中です</p>
-          <p className="mt-2">
-            Supabase設定後に投稿機能が有効になります。セットアップ手順は README を参照してください。
-          </p>
+        <div className="mt-8 rounded-xl border border-border bg-card p-6 text-sm text-muted">
+          <p className="font-medium text-foreground">{copy.post.disabledTitle}</p>
+          <p className="mt-2 leading-relaxed">{copy.post.disabledBody}</p>
         </div>
       ) : (
-        <div className="mt-6">
+        <div className="mt-8">
           <PostForm shops={shopOptions} initialShopId={initialShopId} />
         </div>
       )}

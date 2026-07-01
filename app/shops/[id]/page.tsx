@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { getShopById, SHOPS } from "@/lib/shops";
 import { getApprovedPostsByShop } from "@/lib/posts";
 import type { DataConfidence, Shop } from "@/lib/types";
+import { copy } from "@/content/site-copy";
+import { button, type as t } from "@/lib/design";
 import ShopThumb from "@/components/ShopThumb";
 import PriceNote from "@/components/PriceNote";
 import ScenePills from "@/components/ScenePills";
@@ -24,9 +26,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const shop = getShopById(id);
-  if (!shop) return { title: "店舗が見つかりません" };
+  if (!shop) return { title: "Not found" };
   return {
-    title: `${shop.name} | Keio Ramen Guide`,
+    title: `${shop.name} | ${copy.serviceName}`,
     description: shop.selectionReason,
   };
 }
@@ -39,11 +41,7 @@ const METRICS: { label: string; key: keyof Pick<Shop, "nearness" | "queueLevel" 
   { label: "初心者", key: "beginnerFriendly" },
 ];
 
-const CONFIDENCE_LABEL: Record<DataConfidence, string> = {
-  high: "高",
-  medium: "中",
-  low: "低（要確認）",
-};
+const CONFIDENCE_LABEL: Record<DataConfidence, string> = { high: "High", medium: "Medium", low: "Low" };
 
 export default async function ShopDetailPage({
   params,
@@ -58,36 +56,35 @@ export default async function ShopDetailPage({
   const needsReview = shop.dataConfidence === "low" || shop.publishStatus === "needs_review";
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-2xl py-2">
       <Link href="/shops" className="text-xs text-muted hover:text-accent">
-        ← 店舗を探す
+        {copy.detail.back}
       </Link>
 
-      {needsReview && (
-        <div className="mt-4 rounded-md border border-accent/30 bg-accent-soft px-3 py-2 text-xs text-accent-dark">
-          公開前に要確認：この店の実在・営業状況・価格はまだ十分に確認できていません。掲載前にGoogle Mapsや公式情報で確かめてください。
-        </div>
-      )}
-
-      {/* 上部: 識別ビジュアル + 基本情報 + 価格 + アクション */}
-      <div className="mt-4 flex gap-4">
+      {/* 1. Shop Header */}
+      <div className="mt-5 flex gap-4">
         <ShopThumb
           genre={shop.genres[0]}
-          tone={shop.visualTone}
           primaryImageUrl={shop.primaryImageUrl}
           imageAlt={shop.images[0]?.alt}
-          photoStatus={shop.photoStatus}
-          photoNeeded={shop.photoNeeded}
           className="h-28 w-28 shrink-0 sm:h-32 sm:w-32"
           sizes="128px"
         />
         <div className="min-w-0">
-          <h1 className="text-xl font-bold leading-tight text-foreground sm:text-2xl">{shop.name}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">{shop.name}</h1>
+            {needsReview && (
+              <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-[10px] text-muted">
+                {copy.shop.review}
+              </span>
+            )}
+          </div>
           <p className="mt-1 text-sm text-muted">
-            {shop.area} ・ {shop.station} ・ {shop.genres.join("/")}
+            {shop.area} · {shop.station} · {shop.genres.join("/")}
           </p>
+          <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-muted">{copy.shop.firstVisitLabel}</p>
           <PriceNote
-            className="mt-2"
+            className="mt-0.5"
             name={shop.firstVisitOrder}
             price={shop.firstVisitPrice}
             confidence={shop.priceConfidence}
@@ -96,131 +93,118 @@ export default async function ShopDetailPage({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3">
+      <div className="mt-4 flex flex-wrap items-center gap-2.5">
         <SaveButtons shopId={shop.id} size="md" />
-        <a
-          href={shop.googleMapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-accent hover:text-accent"
-        >
-          Google Maps
+        <a href={shop.googleMapsUrl} target="_blank" rel="noopener noreferrer" className={button.small}>
+          {copy.shop.maps}
         </a>
+        <Link href={`/post?shop=${shop.id}`} className={button.small}>
+          {copy.detail.logsEmptyCta}
+        </Link>
       </div>
 
-      {/* 指標カード */}
-      <div className="mt-6 grid grid-cols-5 gap-2 rounded-lg border border-border bg-card p-3 text-center">
-        {METRICS.map((m) => (
-          <div key={m.key}>
-            <div className="text-lg font-bold text-foreground">{shop[m.key]}</div>
-            <div className="mt-0.5 text-[11px] text-muted">{m.label}</div>
-          </div>
-        ))}
-      </div>
+      {needsReview && (
+        <p className="mt-4 rounded-lg border border-border bg-accent-soft px-3.5 py-2.5 text-xs leading-relaxed text-accent-dark">
+          {copy.detail.reviewBanner}
+        </p>
+      )}
 
-      {/* 慶應生の実食ログ */}
-      <section className="mt-8">
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-sm font-bold text-foreground">
-            慶應生の実食ログ {posts.length > 0 && <span className="text-muted">（{posts.length}）</span>}
-          </h2>
-          <Link
-            href={`/post?shop=${shop.id}`}
-            className="text-xs font-medium text-accent hover:underline"
-          >
-            投稿する →
-          </Link>
+      {/* 2. Logs */}
+      <section className="mt-10">
+        <SectionHead label={copy.detail.logsTitle.label} title={copy.detail.logsTitle.title} count={posts.length} />
+        <div className="mt-4">
+          {posts.length > 0 ? (
+            <PostList posts={posts} />
+          ) : (
+            <div className="rounded-xl border border-dashed border-border px-6 py-10 text-center">
+              <p className={t.eyebrow}>{copy.empty.noPhoto}</p>
+              <p className="mt-3 text-sm text-muted">{copy.detail.logsEmpty}</p>
+              <Link href={`/post?shop=${shop.id}`} className={`${button.link} mt-3 inline-block`}>
+                {copy.detail.logsEmptyCta} →
+              </Link>
+            </div>
+          )}
         </div>
-        {posts.length > 0 ? (
-          <PostList posts={posts} />
-        ) : (
-          <div className="rounded-lg border border-dashed border-border p-5 text-center text-sm text-muted">
-            <p>この店の写真・実食ログを募集中。</p>
-            <Link
-              href={`/post?shop=${shop.id}`}
-              className="mt-2 inline-block font-medium text-accent hover:underline"
-            >
-              食べた一杯を投稿する →
-            </Link>
-          </div>
-        )}
       </section>
 
-      <Section title="この店を選ぶ理由">
-        <p className="text-base leading-relaxed text-foreground">{shop.selectionReason}</p>
-      </Section>
+      {/* 3. Decision Notes */}
+      <section className="mt-10">
+        <SectionHead label={copy.detail.notesTitle.label} title={copy.detail.notesTitle.title} />
+        <p className="mt-4 text-base leading-relaxed text-foreground">{shop.selectionReason}</p>
 
-      <Section title="逆に、こんな日は避ける">
-        <p>{shop.avoidIf}</p>
-      </Section>
+        <dl className="mt-5 divide-y divide-border border-y border-border">
+          <Row term={copy.detail.avoid}>{shop.avoidIf}</Row>
+          <Row term={copy.detail.queue}>{shop.queueAdvice}</Row>
+          <Row term={copy.detail.solo}>{shop.soloAdvice}</Row>
+          <Row term={copy.detail.beginner}>{shop.beginnerAdvice}</Row>
+          <Row term={copy.detail.taste}>
+            {shop.tasteNotes}
+            {shop.atmosphereNotes ? ` ${shop.atmosphereNotes}` : ""}
+          </Row>
+          <Row term={copy.detail.rules}>{shop.rulesNotes}</Row>
+        </dl>
 
-      <Section title="初回のおすすめ注文">
-        <p className="font-medium text-foreground">{shop.firstVisitOrder}</p>
-        <p className="mt-1 text-sm text-muted">学生の一食目安：{shop.expectedSpendNote}</p>
-      </Section>
+        <div className="mt-5 grid grid-cols-5 gap-2 rounded-xl border border-border bg-card p-3 text-center">
+          {METRICS.map((m) => (
+            <div key={m.key}>
+              <div className="text-lg font-bold text-foreground">{shop[m.key]}</div>
+              <div className="mt-0.5 text-[11px] text-muted">{m.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      <Section title="慶應生向けの使い方">
-        <p>{shop.keioUseCase}</p>
-        <p className="mt-1.5 text-sm text-muted">{shop.accessNote}</p>
-      </Section>
-
-      <Section title="味の特徴・雰囲気">
-        <p>{shop.tasteNotes}</p>
-        <p className="mt-2">{shop.atmosphereNotes}</p>
-      </Section>
-
-      <Section title="並び・一人・初心者のアドバイス">
-        <ul className="flex flex-col gap-1.5">
-          <li>
-            <span className="text-muted">並び：</span>
-            {shop.queueAdvice}
-          </li>
-          <li>
-            <span className="text-muted">一人：</span>
-            {shop.soloAdvice}
-          </li>
-          <li>
-            <span className="text-muted">初心者：</span>
-            {shop.beginnerAdvice}
-          </li>
-        </ul>
-      </Section>
-
-      <Section title="注文ルール・暗黙知">
-        <p>{shop.rulesNotes}</p>
-      </Section>
-
-      <Section title="どんな日に向いているか">
-        <ScenePills tags={shop.sceneTags} max={shop.sceneTags.length} />
-        <ul className="mt-3 flex flex-col gap-1">
+      {/* 4. Keio Use Case */}
+      <section className="mt-10">
+        <SectionHead label={copy.detail.useCaseTitle.label} title={copy.detail.useCaseTitle.title} />
+        <p className="mt-4 text-sm leading-relaxed text-foreground/85">{shop.keioUseCase}</p>
+        <p className="mt-1.5 text-xs text-muted">{shop.accessNote}</p>
+        <div className="mt-3">
+          <ScenePills tags={shop.sceneTags} max={shop.sceneTags.length} />
+        </div>
+        <ul className="mt-3 flex flex-col gap-1 text-sm text-foreground/80">
           {shop.recommendedFor.map((item) => (
-            <li key={item}>・{item}</li>
+            <li key={item}>— {item}</li>
           ))}
         </ul>
-      </Section>
+      </section>
 
-      {/* データ信頼性 */}
-      <div className="mt-8 rounded-lg border border-border bg-card p-4 text-xs text-muted">
-        <div className="flex flex-wrap gap-x-5 gap-y-1">
-          <span>最終確認：{shop.dataLastChecked}</span>
-          <span>情報の信頼度：{CONFIDENCE_LABEL[shop.dataConfidence]}</span>
-          {shop.photoNeeded && <span>写真：募集中</span>}
+      {/* 5. Data Note */}
+      <section className="mt-10 rounded-xl border border-border bg-card p-4 text-xs text-muted">
+        <p className={t.eyebrow}>{copy.detail.dataTitle.label}</p>
+        <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
+          <span>{copy.detail.lastChecked}: {shop.dataLastChecked}</span>
+          <span>{copy.detail.confidence}: {CONFIDENCE_LABEL[shop.dataConfidence]}</span>
         </div>
-        <p className="mt-2">{shop.dataNote}</p>
-      </div>
+        <p className="mt-2 leading-relaxed">{copy.detail.dataNote}</p>
+      </section>
 
-      <div className="mt-5">
+      <div className="mt-6">
         <SaveButtons shopId={shop.id} size="md" />
       </div>
     </div>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionHead({ label, title, count }: { label: string; title: string; count?: number }) {
   return (
-    <section className="mt-7">
-      <h2 className="mb-2 text-xs font-semibold tracking-wide text-muted">{title}</h2>
-      <div className="text-[15px] leading-relaxed text-foreground/90">{children}</div>
-    </section>
+    <div className="flex items-end justify-between gap-3">
+      <div>
+        <p className={t.eyebrow}>{label}</p>
+        <h2 className="mt-1 text-lg font-bold tracking-tight text-foreground">
+          {title}
+          {typeof count === "number" && count > 0 && <span className="ml-2 text-sm font-normal text-muted">{count}</span>}
+        </h2>
+      </div>
+    </div>
+  );
+}
+
+function Row({ term, children }: { term: string; children: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-[64px_1fr] gap-3 py-3 text-sm">
+      <dt className="text-xs text-muted">{term}</dt>
+      <dd className="leading-relaxed text-foreground/85">{children}</dd>
+    </div>
   );
 }

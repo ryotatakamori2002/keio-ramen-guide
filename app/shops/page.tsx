@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { SHOPS, getAllAreas, getAllGenres } from "@/lib/shops";
 import { resolveShelves } from "@/lib/shelves";
 import { getApprovedPostMeta } from "@/lib/posts";
+import { copy } from "@/content/site-copy";
+import { type as t } from "@/lib/design";
 import FilterableShopList from "@/components/FilterableShopList";
 import PhotoCallout from "@/components/PhotoCallout";
 
 export const metadata: Metadata = {
-  title: "今日の一杯を探す | Keio Ramen Guide",
+  title: `${copy.shops.title} | ${copy.serviceName}`,
 };
 
 function quickFromParams(scene?: string, beginner?: string): string[] {
@@ -19,7 +21,7 @@ function quickFromParams(scene?: string, beginner?: string): string[] {
 }
 
 // 絞り込みが無い時だけ上部に出す棚。クライアント側のフィルタ状態で表示/非表示を切り替える。
-const SHELF_IDS = ["gap-time", "hearty", "jiro", "no-queue", "mita-lunch", "yokohama-nofail"];
+const SHELF_IDS = ["gap-time", "hearty", "no-queue", "mita-lunch", "yokohama-nofail", "first-iekei"];
 
 export default async function ShopsPage({
   searchParams,
@@ -35,13 +37,12 @@ export default async function ShopsPage({
   const postMeta = await getApprovedPostMeta();
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">今日の一杯を探す</h1>
-      <p className="mt-2 text-sm text-muted">
-        日吉・三田・横浜。授業後、空きコマ、飲み後に使えるラーメン案内。
-      </p>
+    <div className="py-2">
+      <p className={t.eyebrow}>{copy.brandLine}</p>
+      <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{copy.shops.title}</h1>
+      <p className="mt-2 max-w-xl text-sm text-muted">{copy.shops.subtitle}</p>
 
-      <div className="mt-7">
+      <div className="mt-8">
         <FilterableShopList
           shops={SHOPS}
           initialArea={initialArea}
@@ -52,7 +53,7 @@ export default async function ShopsPage({
         />
       </div>
 
-      <div className="mt-12">
+      <div className="mt-14">
         <PhotoCallout />
       </div>
     </div>

@@ -11,6 +11,7 @@ import {
   TASTE_OPTIONS,
   type QuizAnswers,
 } from "@/lib/quiz";
+import { copy } from "@/content/site-copy";
 
 interface QuestionConfig<K extends keyof QuizAnswers> {
   key: K;
@@ -53,10 +54,10 @@ export default function QuizForm() {
                   type="button"
                   onClick={() => setAnswers((prev) => ({ ...prev, [question.key]: option.value }))}
                   aria-pressed={active}
-                  className={`rounded-md border px-3.5 py-2 text-sm transition-colors ${
+                  className={`rounded-full border px-3.5 py-2 text-sm transition-colors ${
                     active
-                      ? "border-accent bg-accent text-white"
-                      : "border-border text-foreground hover:border-foreground"
+                      ? "border-foreground bg-foreground text-white"
+                      : "border-border text-muted hover:border-foreground hover:text-foreground"
                   }`}
                 >
                   {option.label}
@@ -69,9 +70,9 @@ export default function QuizForm() {
 
       <button
         type="submit"
-        className="mt-1 w-full rounded-md bg-foreground px-6 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto sm:self-start sm:px-10"
+        className="mt-1 w-full rounded-full bg-foreground px-6 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto sm:self-start sm:px-12"
       >
-        結果を見る →
+        {copy.quiz.submit}
       </button>
     </form>
   );

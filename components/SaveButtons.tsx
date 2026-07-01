@@ -1,6 +1,7 @@
 "use client";
 
 import { useSavedShops } from "@/hooks/useSavedShops";
+import { copy } from "@/content/site-copy";
 
 export default function SaveButtons({ shopId, size = "sm" }: { shopId: string; size?: "sm" | "md" }) {
   const { isWant, isVisited, toggleWant, toggleGone } = useSavedShops();
@@ -18,13 +19,13 @@ export default function SaveButtons({ shopId, size = "sm" }: { shopId: string; s
           toggleWant(shopId);
         }}
         aria-pressed={want}
-        className={`rounded-md border font-medium transition-colors ${pad} ${
+        className={`rounded-full border font-medium transition-colors ${pad} ${
           want
-            ? "border-accent bg-accent text-white"
-            : "border-border text-foreground hover:border-accent hover:text-accent"
+            ? "border-foreground bg-foreground text-white"
+            : "border-border text-muted hover:border-foreground hover:text-foreground"
         }`}
       >
-        {want ? "✓ 行きたい" : "行きたい"}
+        {want ? `✓ ${copy.saved.want}` : copy.saved.want}
       </button>
       <button
         type="button"
@@ -33,13 +34,13 @@ export default function SaveButtons({ shopId, size = "sm" }: { shopId: string; s
           toggleGone(shopId);
         }}
         aria-pressed={visited}
-        className={`rounded-md border font-medium transition-colors ${pad} ${
+        className={`rounded-full border font-medium transition-colors ${pad} ${
           visited
             ? "border-foreground bg-foreground text-white"
             : "border-border text-muted hover:border-foreground hover:text-foreground"
         }`}
       >
-        {visited ? "✓ 行った" : "行った"}
+        {visited ? `✓ ${copy.saved.visited}` : copy.saved.visited}
       </button>
     </div>
   );

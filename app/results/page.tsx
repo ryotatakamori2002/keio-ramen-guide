@@ -12,9 +12,11 @@ import {
   TASTE_OPTIONS,
   type QuizAnswers,
 } from "@/lib/quiz";
+import { copy } from "@/content/site-copy";
+import { type as t } from "@/lib/design";
 
 export const metadata: Metadata = {
-  title: "診断結果 | Keio Ramen Guide",
+  title: `${copy.results.title} | ${copy.serviceName}`,
 };
 
 function pickValid<T extends string>(value: string | undefined, options: { value: T }[], fallback: T): T {
@@ -46,18 +48,19 @@ export default async function ResultsPage({
   const results = recommend(SHOPS, answers, 5);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold tracking-tight text-foreground">気分に合う一杯</h1>
-      <p className="mt-2 text-sm text-muted">回答から、相性の良い順に並べています。</p>
+    <div className="py-2">
+      <p className={t.eyebrow}>{copy.results.eyebrow}</p>
+      <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">{copy.results.title}</h1>
+      <p className="mt-2 text-sm text-muted">{copy.results.subtitle}</p>
 
-      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {results.map((result, i) => (
           <ResultCard key={result.shop.id} result={result} rank={i + 1} />
         ))}
       </div>
 
-      <Link href="/quiz" className="mt-6 inline-block text-sm font-medium text-accent hover:underline">
-        もう一度診断する →
+      <Link href="/quiz" className="mt-8 inline-block text-sm font-medium text-accent hover:underline">
+        {copy.results.again} →
       </Link>
     </div>
   );
