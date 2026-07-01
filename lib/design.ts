@@ -13,8 +13,8 @@ export const stack = "flex flex-col";
 export const type = {
   // セクション上の小さなラベル（英字・字間広め）
   eyebrow: "text-[11px] font-semibold uppercase tracking-[0.2em] text-muted",
-  // トップの主役見出し
-  display: "tracking-display text-[2rem] font-bold leading-[1.12] text-foreground sm:text-5xl",
+  // トップの主役見出し（text-balance で改行を自然に）
+  display: "text-balance tracking-display text-[2rem] font-bold leading-[1.15] text-foreground sm:text-[2.75rem]",
   // ページ見出し
   h1: "tracking-display text-2xl font-bold leading-tight text-foreground sm:text-3xl",
   // セクション見出し
@@ -27,17 +27,17 @@ export const type = {
   small: "text-xs text-muted",
 };
 
-// ── 角丸 ───────────────────────────────────
+// ── 角丸（小さめに統一）───────────────────────
 export const radius = {
-  card: "rounded-xl",
-  control: "rounded-lg",
+  card: "rounded-lg",
+  control: "rounded-md",
   pill: "rounded-full",
 };
 
 // ── ボタン ─────────────────────────────────
-// 黒ボタンを主役に。赤はリンク/強調のみ。CTAごとに見た目を変える。
+// 黒ボタンを主役に。角丸は小さめ。赤はリンク/強調のみ。
 const buttonBase =
-  "inline-flex items-center justify-center gap-1.5 rounded-full text-sm font-medium transition-colors";
+  "inline-flex items-center justify-center gap-1.5 rounded-md text-sm font-medium transition-colors";
 export const button = {
   // 主役（黒）
   primary: `${buttonBase} bg-foreground px-6 py-3 text-white hover:opacity-90`,
@@ -51,9 +51,9 @@ export const button = {
   quiet: "text-sm text-muted underline-offset-4 hover:text-foreground",
 };
 
-// ── カード ─────────────────────────────────
+// ── カード（薄い罫線中心・影は控えめ）──────────
 export const card = {
-  base: "rounded-xl border border-border bg-card",
+  base: "rounded-lg border border-border bg-card",
   pad: "p-5",
   hover: "transition-colors hover:border-foreground/25",
 };

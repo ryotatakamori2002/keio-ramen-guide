@@ -30,10 +30,12 @@ export default function ShopThumb({
     <div
       className={`flex flex-col items-center justify-center gap-1 rounded-lg border border-border bg-[#f4f2ee] ${className}`}
       role="img"
-      aria-label={`${genre}・${copy.empty.noPhoto}`}
+      aria-label={`${genre}・${copy.emptyStates.noPhoto}`}
     >
       <span className="text-xs font-medium text-foreground/70">{genre}</span>
-      {showLabel && <span className="text-[9px] uppercase tracking-wider text-muted">{copy.empty.noPhoto}</span>}
+      {showLabel && (
+        <span className="text-[9px] uppercase tracking-wider text-muted">{copy.emptyStates.noPhoto}</span>
+      )}
     </div>
   );
 }

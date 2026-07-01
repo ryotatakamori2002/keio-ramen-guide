@@ -6,6 +6,7 @@ import type { ResolvedShelf } from "@/lib/shelves";
 import { copy } from "@/content/site-copy";
 import ShopCard from "./ShopCard";
 import ShelfRow from "./ShelfRow";
+import Stagger from "./motion/Stagger";
 
 interface QuickCondition {
   key: string;
@@ -114,7 +115,7 @@ export default function FilterableShopList({
           ))}
         </FilterGroup>
 
-        <FilterGroup label={copy.shops.filterCondition}>
+        <FilterGroup label={copy.shops.filterMood}>
           {QUICK_CONDITIONS.map((c) => (
             <Chip key={c.key} active={quick.has(c.key)} label={c.label} onClick={() => toggleQuick(c.key)} />
           ))}
@@ -147,11 +148,11 @@ export default function FilterableShopList({
               {copy.shops.empty}
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <Stagger className="flex flex-col gap-3" gap={0.06}>
               {filtered.map((shop) => (
                 <ShopCard key={shop.id} shop={shop} postMeta={postMeta[shop.id]} />
               ))}
-            </div>
+            </Stagger>
           )}
         </div>
       </div>
