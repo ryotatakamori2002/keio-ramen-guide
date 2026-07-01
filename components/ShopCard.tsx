@@ -2,12 +2,13 @@ import Link from "next/link";
 import type { PostMeta, Shop } from "@/lib/types";
 import { needsReviewFlag } from "@/lib/shops";
 import { copy } from "@/content/site-copy";
-import { card, tag } from "@/lib/design";
+import { tag } from "@/lib/design";
 import ShopThumb from "./ShopThumb";
 import PriceNote from "./PriceNote";
 import ScenePills from "./ScenePills";
 import MetricStrip from "./MetricStrip";
 import SaveButtons from "./SaveButtons";
+import MotionCard from "./motion/MotionCard";
 
 // 「次の一杯を決める判断材料」を主役にした店舗カード。
 export default function ShopCard({
@@ -23,7 +24,7 @@ export default function ShopCard({
   const postCount = postMeta?.count ?? 0;
 
   return (
-    <article className={`${card.base} ${card.hover} p-4`}>
+    <MotionCard className="h-full rounded-lg border border-border bg-card p-4 transition-colors hover:border-foreground/25">
       {header}
 
       <div className="flex gap-3.5">
@@ -43,7 +44,7 @@ export default function ShopCard({
               <h3 className="truncate font-bold tracking-tight text-foreground group-hover:text-accent">
                 {shop.name}
               </h3>
-              {needsReviewFlag(shop) && <span className={`${tag.status} shrink-0`}>{copy.shop.review}</span>}
+              {needsReviewFlag(shop) && <span className={`${tag.status} shrink-0`}>{copy.shopCard.review}</span>}
             </div>
             <p className="mt-0.5 truncate text-xs text-muted">
               {shop.area} · {shop.station} · {shop.genres.join("/")}
@@ -55,8 +56,8 @@ export default function ShopCard({
             price={shop.firstVisitPrice}
             confidence={shop.priceConfidence}
           />
-          <p className="mt-1 text-[11px] uppercase tracking-wider text-muted">
-            {postCount > 0 ? `${copy.shop.logsLabel} · ${postCount}` : copy.shop.logsNone}
+          <p className="mt-1 text-[11px] text-muted">
+            {postCount > 0 ? copy.shopCard.logsCount(postCount) : copy.shopCard.logsNone}
           </p>
         </div>
       </div>
@@ -75,10 +76,10 @@ export default function ShopCard({
         <SaveButtons shopId={shop.id} size="sm" />
         <div className="flex items-center gap-3 text-sm">
           <Link href={`/post?shop=${shop.id}`} className="font-medium text-accent hover:underline">
-            {copy.shop.addLog}
+            {copy.shopCard.log}
           </Link>
           <Link href={`/shops/${shop.id}`} className="font-medium text-foreground hover:text-accent">
-            {copy.shop.detail}
+            {copy.shopCard.detail}
           </Link>
           <a
             href={shop.googleMapsUrl}
@@ -86,10 +87,10 @@ export default function ShopCard({
             rel="noopener noreferrer"
             className="text-muted hover:text-accent"
           >
-            {copy.shop.maps}
+            {copy.shopCard.maps}
           </a>
         </div>
       </div>
-    </article>
+    </MotionCard>
   );
 }

@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { SCENE_OPTIONS } from "@/lib/quiz";
 import { copy } from "@/content/site-copy";
 import { button } from "@/lib/design";
+import Stagger from "@/components/motion/Stagger";
 import { submitPost, type PostFormState } from "./actions";
 
 const initialState: PostFormState = { ok: false, message: "" };
@@ -22,7 +23,7 @@ export default function PostForm({
 
   if (state.ok) {
     return (
-      <div className="rounded-xl border border-border bg-card p-8 text-center">
+      <div className="rounded-lg border border-border bg-card p-8 text-center">
         <p className="text-lg font-bold tracking-tight text-foreground">{copy.post.successTitle}</p>
         <p className="mt-2 text-sm text-muted">{copy.post.successBody}</p>
         <div className="mt-6 flex justify-center gap-4 text-sm">
@@ -38,33 +39,16 @@ export default function PostForm({
   }
 
   return (
-    <form action={formAction} className="flex flex-col gap-6">
+    <form action={formAction}>
+      <Stagger className="flex flex-col gap-6" gap={0.06}>
       {state.message && !state.ok && (
-        <p className="rounded-lg border border-accent/30 bg-accent-soft px-3.5 py-2.5 text-sm text-accent-dark">
+        <p className="rounded-md border border-accent/30 bg-accent-soft px-3.5 py-2.5 text-sm text-accent-dark">
           {state.message}
         </p>
       )}
 
-      <Field label={f.shop} required>
-        <select
-          name="shopId"
-          required
-          defaultValue={initialShopId}
-          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm focus:border-foreground focus:outline-none"
-        >
-          <option value="" disabled>
-            {f.shopPlaceholder}
-          </option>
-          {shops.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}（{s.area}）
-            </option>
-          ))}
-        </select>
-      </Field>
-
       <Field label={f.photo} optional>
-        <label className="flex cursor-pointer items-center justify-center rounded-lg border border-dashed border-border bg-card px-3 py-8 text-sm text-muted transition-colors hover:border-foreground">
+        <label className="flex cursor-pointer items-center justify-center rounded-lg border border-dashed border-border bg-card px-3 py-12 text-sm text-muted transition-colors hover:border-foreground">
           <input
             type="file"
             name="image"
@@ -77,11 +61,29 @@ export default function PostForm({
           />
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={preview} alt="preview" className="max-h-60 rounded-md object-contain" />
+            <img src={preview} alt="preview" className="max-h-64 rounded-md object-contain" />
           ) : (
             <span>{f.photoHint}</span>
           )}
         </label>
+      </Field>
+
+      <Field label={f.shop} required>
+        <select
+          name="shopId"
+          required
+          defaultValue={initialShopId}
+          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm focus:border-foreground focus:outline-none"
+        >
+          <option value="" disabled>
+            {f.shopPlaceholder}
+          </option>
+          {shops.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}（{s.area}）
+            </option>
+          ))}
+        </select>
       </Field>
 
       <Field label={f.menu} required>
@@ -90,7 +92,7 @@ export default function PostForm({
           name="menuName"
           required
           placeholder={f.menuPlaceholder}
-          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
+          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
         />
       </Field>
 
@@ -104,7 +106,7 @@ export default function PostForm({
             min={0}
             max={100000}
             placeholder={f.pricePlaceholder}
-            className="w-32 rounded-lg border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
+            className="w-32 rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
           />
         </div>
       </Field>
@@ -115,7 +117,7 @@ export default function PostForm({
           rows={3}
           maxLength={300}
           placeholder={f.notePlaceholder}
-          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
+          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
         />
       </Field>
 
@@ -139,11 +141,14 @@ export default function PostForm({
           name="nickname"
           maxLength={30}
           placeholder={f.namePlaceholder}
-          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
+          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
         />
       </Field>
 
-      <p className="text-xs leading-relaxed text-muted">{copy.post.rights}</p>
+      <div className="text-xs leading-relaxed text-muted">
+        <p>{copy.post.moderationNote}</p>
+        <p className="mt-1">{copy.post.rights}</p>
+      </div>
 
       <button
         type="submit"
@@ -152,6 +157,7 @@ export default function PostForm({
       >
         {pending ? copy.post.submitting : copy.post.submit}
       </button>
+      </Stagger>
     </form>
   );
 }

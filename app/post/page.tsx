@@ -30,7 +30,7 @@ export default async function PostPage({
       <p className="mt-2 text-sm text-muted">{copy.post.subtitle}</p>
 
       {!ready ? (
-        <div className="mt-8 rounded-xl border border-border bg-card p-6 text-sm text-muted">
+        <div className="mt-8 rounded-lg border border-border bg-card p-6 text-sm text-muted">
           <p className="font-medium text-foreground">{copy.post.disabledTitle}</p>
           <p className="mt-2 leading-relaxed">{copy.post.disabledBody}</p>
         </div>
