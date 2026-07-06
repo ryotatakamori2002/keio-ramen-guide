@@ -2,10 +2,8 @@
 
 import { useMemo, useState } from "react";
 import type { PostMeta, Shop } from "@/lib/types";
-import type { ResolvedShelf } from "@/lib/shelves";
 import { copy } from "@/content/site-copy";
 import ShopCard from "./ShopCard";
-import ShelfRow from "./ShelfRow";
 import Stagger from "./motion/Stagger";
 
 interface QuickCondition {
@@ -23,20 +21,20 @@ const QUICK_CONDITIONS: QuickCondition[] = [
   { key: "drinking", label: "深夜・飲み後", test: (s) => s.sceneTags.includes("after_drinking") },
 ];
 
+// エリアの表示順。絞り込みが無い時はこの順でグルーピングして見出しを付ける。
+const AREA_ORDER = ["日吉", "三田", "横浜"];
+
 export default function FilterableShopList({
   shops,
   initialArea = null,
   initialGenre = null,
   initialQuick = [],
-  shelves = [],
   postMeta = {},
 }: {
   shops: Shop[];
   initialArea?: string | null;
   initialGenre?: string | null;
   initialQuick?: string[];
-  /** 絞り込みが無い時だけ上部に出す用途別ベスト棚（解決済みのシリアライズ可能な形） */
-  shelves?: ResolvedShelf[];
   /** 店ごとの投稿サマリ（shopId -> 件数・最新写真） */
   postMeta?: Record<string, PostMeta>;
 }) {
@@ -79,6 +77,17 @@ export default function FilterableShopList({
     });
   }, [shops, keyword, area, genre, quick, includeCandidates]);
 
+  // 絞り込みが無い時はエリアごとに見出しを付けて、単調な縦積みに構造を与える
+  const groupedByArea = useMemo(() => {
+    const groups = new Map<string, Shop[]>();
+    for (const shop of filtered) {
+      const list = groups.get(shop.area) ?? [];
+      list.push(shop);
+      groups.set(shop.area, list);
+    }
+    return AREA_ORDER.filter((a) => groups.has(a)).map((a) => ({ area: a, shops: groups.get(a)! }));
+  }, [filtered]);
+
   function toggleQuick(key: string) {
     setQuick((prev) => {
       const next = new Set(prev);
@@ -89,27 +98,18 @@ export default function FilterableShopList({
   }
 
   return (
-    <div>
-      {shelves.length > 0 && !hasActiveFilter && (
-        <div className="mb-9 flex flex-col gap-9 border-b border-border pb-9">
-          {shelves.map((shelf) => (
-            <ShelfRow key={shelf.id} shelf={shelf} />
-          ))}
-        </div>
-      )}
-
-      <div className="lg:grid lg:grid-cols-[230px_1fr] lg:gap-8">
-        <aside className="lg:sticky lg:top-20 lg:self-start">
+    <div className="lg:grid lg:grid-cols-[230px_1fr] lg:gap-8">
+      <aside className="lg:sticky lg:top-20 lg:self-start">
         <input
           type="text"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           placeholder={copy.shops.searchPlaceholder}
-          className="w-full rounded-lg border border-border bg-card px-3.5 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
+          className="w-full rounded-md border border-border bg-card px-3.5 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
         />
 
         <FilterGroup label={copy.shops.filterArea}>
-          <Chip active={area === null} label="All" onClick={() => setArea(null)} />
+          <Chip active={area === null} label="すべて" onClick={() => setArea(null)} />
           {areas.map((a) => (
             <Chip key={a} active={area === a} label={a} onClick={() => setArea(area === a ? null : a)} />
           ))}
@@ -122,7 +122,7 @@ export default function FilterableShopList({
         </FilterGroup>
 
         <FilterGroup label={copy.shops.filterGenre}>
-          <Chip active={genre === null} label="All" onClick={() => setGenre(null)} />
+          <Chip active={genre === null} label="すべて" onClick={() => setGenre(null)} />
           {genres.map((g) => (
             <Chip key={g} active={genre === g} label={g} onClick={() => setGenre(genre === g ? null : g)} />
           ))}
@@ -141,20 +141,37 @@ export default function FilterableShopList({
         )}
       </aside>
 
-        <div className="mt-8 lg:mt-0">
-          <p className="mb-4 text-[11px] uppercase tracking-[0.16em] text-muted">{copy.shops.count(filtered.length)}</p>
-          {filtered.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border py-14 text-center text-sm text-muted">
-              {copy.shops.empty}
-            </div>
-          ) : (
-            <Stagger className="flex flex-col gap-3" gap={0.06}>
+      <div className="mt-8 lg:mt-0">
+        {filtered.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border py-14 text-center text-sm text-muted">
+            {copy.shops.empty}
+          </div>
+        ) : hasActiveFilter ? (
+          <>
+            <p className="mb-4 text-xs tracking-[0.14em] text-muted">{copy.shops.count(filtered.length)}</p>
+            <Stagger className="flex flex-col gap-3" gap={0.05}>
               {filtered.map((shop) => (
                 <ShopCard key={shop.id} shop={shop} postMeta={postMeta[shop.id]} />
               ))}
             </Stagger>
-          )}
-        </div>
+          </>
+        ) : (
+          <div className="flex flex-col gap-12">
+            {groupedByArea.map(({ area: a, shops: group }) => (
+              <section key={a}>
+                <div className="mb-4 flex items-baseline gap-2.5 border-b-2 border-foreground pb-2">
+                  <h2 className="text-lg font-bold tracking-tight text-foreground">{a}</h2>
+                  <span className="text-xs text-muted">{copy.shops.count(group.length)}</span>
+                </div>
+                <Stagger className="flex flex-col gap-3" gap={0.05}>
+                  {group.map((shop) => (
+                    <ShopCard key={shop.id} shop={shop} postMeta={postMeta[shop.id]} />
+                  ))}
+                </Stagger>
+              </section>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -163,7 +180,7 @@ export default function FilterableShopList({
 function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="mt-5">
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">{label}</p>
+      <p className="mb-2 text-[11px] font-semibold tracking-[0.14em] text-muted">{label}</p>
       <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 lg:flex-wrap lg:overflow-visible">
         {children}
       </div>

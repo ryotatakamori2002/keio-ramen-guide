@@ -86,7 +86,7 @@ export const copy = {
 
   shops: {
     title: "店を探す",
-    subtitle: "日吉・三田・横浜。エリアと気分で絞り込めます。",
+    subtitle: "エリア・気分・ジャンルで絞り込めます。迷ったら",
     searchPlaceholder: "店名・駅・ジャンルで検索",
     filterArea: "エリア",
     filterMood: "気分",
@@ -94,13 +94,15 @@ export const copy = {
     includeCandidates: "調査中の店も表示",
     empty: "条件に合う店が見つかりませんでした。少し条件をゆるめてみてください。",
     count: (n: number) => `${n}店`,
+    postPrompt:
+      "食べたことのある店があれば、ひとことだけでも投稿してください。次に行く人の判断材料になります。",
+    postCta: "投稿する",
   },
 
   // 店舗カード
   shopCard: {
     review: "要確認",
     logsCount: (n: number) => `投稿 ${n}件`,
-    logsNone: "投稿はまだ",
     detail: "詳細",
     maps: "地図",
     log: "投稿",
@@ -207,11 +209,6 @@ export const copy = {
     reject: "却下",
     noPhoto: "写真なし",
     anon: "名無し",
-  },
-
-  // 写真なし・空状態（小さく静かに）
-  emptyStates: {
-    noPhoto: "No photo yet",
   },
 
   footer:
