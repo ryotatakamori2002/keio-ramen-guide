@@ -7,7 +7,7 @@ import { copy } from "@/content/site-copy";
 const NAV_ITEMS = [
   { href: "/shops", label: copy.nav.shops },
   { href: "/post", label: copy.nav.post },
-  { href: "/quiz", label: copy.nav.quiz },
+  { href: "/me", label: copy.nav.myLog },
   { href: "/saved", label: copy.nav.saved },
 ];
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SHOPS, getAllAreas, getAllGenres } from "@/lib/shops";
 import { resolveShelves } from "@/lib/shelves";
 import { getApprovedPostMeta } from "@/lib/posts";
@@ -40,7 +41,12 @@ export default async function ShopsPage({
     <div className="py-2">
       <p className={t.eyebrow}>{copy.brandLine}</p>
       <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{copy.shops.title}</h1>
-      <p className="mt-2 max-w-xl text-sm text-muted">{copy.shops.subtitle}</p>
+      <p className="mt-2 max-w-xl text-sm text-muted">
+        {copy.shops.subtitle}{" "}
+        <Link href="/quiz" className="text-accent hover:underline">
+          {copy.quiz.title} →
+        </Link>
+      </p>
 
       <div className="mt-8">
         <FilterableShopList

@@ -30,12 +30,29 @@ export type PublishStatus = "ready" | "needs_review" | "candidate";
 // 編集上の優先度。棚やトップで前に出す強さ。
 export type EditorialPriority = "must" | "should" | "could";
 
+// アカウントのプロフィール。
+export interface Profile {
+  id: string;
+  handle: string;
+  displayName: string;
+  avatarUrl: string | null;
+  bio: string | null;
+}
+
+// 投稿カードに出す投稿者情報（profiles 由来）。
+export interface PostAuthor {
+  handle: string;
+  displayName: string;
+  avatarUrl: string | null;
+}
+
 // 慶應生の実食投稿。承認制（pending → approved/rejected）。
 export type PostStatus = "pending" | "approved" | "rejected";
 
 export interface RamenPost {
   id: string;
-  shopId: string;
+  shopId: string | null;
+  userId: string | null;
   nickname: string | null;
   menuName: string;
   priceYen: number | null;
@@ -43,9 +60,17 @@ export interface RamenPost {
   sceneTags: SceneTag[];
   imageUrl: string | null;
   imagePath: string | null;
+  isPublic: boolean;
+  /** 新規店舗として投稿された場合の店名・エリア */
+  shopNameManual: string | null;
+  shopAreaManual: string | null;
+  /** unmatched（未紐付け）| matched（既存店舗に紐付け済み） */
+  shopMergeStatus: string;
   status: PostStatus;
   createdAt: string;
   approvedAt: string | null;
+  /** profiles から解決した投稿者。無ければ null（nickname にフォールバック） */
+  author: PostAuthor | null;
 }
 
 // /shops カードに出す、店ごとの投稿サマリ。

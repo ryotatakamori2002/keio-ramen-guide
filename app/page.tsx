@@ -156,7 +156,7 @@ function Section({
 }
 
 function HeroVisual({ post }: { post: RamenPost }) {
-  const shop = getShopById(post.shopId);
+  const shop = post.shopId ? getShopById(post.shopId) : null;
   return (
     <FadeIn delay={0.2}>
       <Link href={shop ? `/shops/${shop.id}` : "/shops"} className="group block">

@@ -54,7 +54,12 @@ export default async function AdminPage() {
       ) : (
         <div className="mt-4 flex flex-col gap-4">
           {pending.map((post) => {
-            const shop = getShopById(post.shopId);
+            const shop = post.shopId ? getShopById(post.shopId) : null;
+            const unmatched = !post.shopId;
+            const shopLabel = shop
+              ? shop.name
+              : [post.shopNameManual, post.shopAreaManual].filter(Boolean).join(" · ") || "（店舗未指定）";
+            const author = post.author ? `${post.author.displayName}（@${post.author.handle}）` : post.nickname || copy.admin.anon;
             return (
               <article key={post.id} className="rounded-lg border border-border bg-card p-4">
                 <div className="flex gap-4">
@@ -68,7 +73,14 @@ export default async function AdminPage() {
                     </div>
                   )}
                   <div className="min-w-0 flex-1 text-sm">
-                    <p className="font-bold text-foreground">{shop?.name ?? post.shopId}</p>
+                    <p className="flex items-center gap-2 font-bold text-foreground">
+                      <span>{shopLabel}</span>
+                      {unmatched && (
+                        <span className="shrink-0 rounded-full border border-accent/40 px-1.5 py-0.5 text-[10px] font-normal text-accent-dark">
+                          未紐付け
+                        </span>
+                      )}
+                    </p>
                     <p className="mt-0.5 text-foreground">
                       {post.menuName}
                       {post.priceYen != null && <span className="ml-2 text-muted">¥{post.priceYen.toLocaleString()}</span>}
@@ -80,7 +92,8 @@ export default async function AdminPage() {
                       </p>
                     )}
                     <p className="mt-1 text-xs text-muted">
-                      {post.nickname || copy.admin.anon} · {formatDate(post.createdAt)}
+                      {author} · {formatDate(post.createdAt)}
+                      {!post.isPublic && " · 非公開"}
                     </p>
                   </div>
                 </div>

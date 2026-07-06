@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SHOPS } from "@/lib/shops";
-import { isSupabaseReady } from "@/lib/supabase";
+import { isSupabaseReady, isSupabaseAuthReady } from "@/lib/supabase";
+import { getSessionUser } from "@/lib/auth/server";
 import { copy } from "@/content/site-copy";
-import { type as t } from "@/lib/design";
+import { button, type as t } from "@/lib/design";
 import PostForm from "./PostForm";
 
-export const metadata: Metadata = {
-  title: `${copy.post.eyebrow} | ${copy.serviceName}`,
-};
+export const metadata: Metadata = { title: `${copy.post.title} | ${copy.serviceName}` };
+export const dynamic = "force-dynamic";
 
 export default async function PostPage({
   searchParams,
@@ -16,11 +17,11 @@ export default async function PostPage({
 }) {
   const { shop } = await searchParams;
   const ready = isSupabaseReady();
+  const user = isSupabaseAuthReady() ? await getSessionUser() : null;
 
   const shopOptions = SHOPS.filter((s) => s.publishStatus !== "candidate")
     .map((s) => ({ id: s.id, name: s.name, area: s.area }))
     .sort((a, b) => a.area.localeCompare(b.area, "ja"));
-
   const initialShopId = shop && SHOPS.some((s) => s.id === shop) ? shop : "";
 
   return (
@@ -33,6 +34,19 @@ export default async function PostPage({
         <div className="mt-8 rounded-lg border border-border bg-card p-6 text-sm text-muted">
           <p className="font-medium text-foreground">{copy.post.disabledTitle}</p>
           <p className="mt-2 leading-relaxed">{copy.post.disabledBody}</p>
+        </div>
+      ) : !user ? (
+        <div className="mt-8 rounded-lg border border-border bg-card p-6">
+          <p className="font-medium text-foreground">{copy.post.loginTitle}</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted">{copy.post.loginBody}</p>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <Link href="/login" className={button.primary}>
+              {copy.post.login}
+            </Link>
+            <Link href="/signup" className={button.secondary}>
+              {copy.post.signup}
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="mt-8">

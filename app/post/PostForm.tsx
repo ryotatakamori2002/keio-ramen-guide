@@ -6,6 +6,7 @@ import { SCENE_OPTIONS } from "@/lib/quiz";
 import { copy } from "@/content/site-copy";
 import { button } from "@/lib/design";
 import Stagger from "@/components/motion/Stagger";
+import ShopSearch, { type ShopOption } from "./ShopSearch";
 import { submitPost, type PostFormState } from "./actions";
 
 const initialState: PostFormState = { ok: false, message: "" };
@@ -15,7 +16,7 @@ export default function PostForm({
   shops,
   initialShopId,
 }: {
-  shops: { id: string; name: string; area: string }[];
+  shops: ShopOption[];
   initialShopId: string;
 }) {
   const [state, formAction, pending] = useActionState(submitPost, initialState);
@@ -69,21 +70,7 @@ export default function PostForm({
       </Field>
 
       <Field label={f.shop} required>
-        <select
-          name="shopId"
-          required
-          defaultValue={initialShopId}
-          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm focus:border-foreground focus:outline-none"
-        >
-          <option value="" disabled>
-            {f.shopPlaceholder}
-          </option>
-          {shops.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}（{s.area}）
-            </option>
-          ))}
-        </select>
+        <ShopSearch shops={shops} initialShopId={initialShopId} />
       </Field>
 
       <Field label={f.menu} required>
@@ -144,6 +131,11 @@ export default function PostForm({
           className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
         />
       </Field>
+
+      <label className="flex cursor-pointer items-center gap-2 text-sm text-foreground">
+        <input type="checkbox" name="isPublic" defaultChecked className="h-4 w-4 accent-foreground" />
+        {f.isPublic}
+      </label>
 
       <div className="text-xs leading-relaxed text-muted">
         <p>{copy.post.moderationNote}</p>

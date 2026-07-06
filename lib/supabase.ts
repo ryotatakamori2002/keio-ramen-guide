@@ -18,6 +18,11 @@ export function isSupabasePublicReady(): boolean {
   return Boolean(url && anonKey);
 }
 
+// 認証（ログイン/新規登録）が使えるか。URL + anon key が必要。
+export function isSupabaseAuthReady(): boolean {
+  return Boolean(url && anonKey);
+}
+
 // サーバー専用クライアント。service role キーはクライアントへ絶対に渡さない。
 let adminClient: SupabaseClient | null | undefined;
 export function getSupabaseAdmin(): SupabaseClient | null {
