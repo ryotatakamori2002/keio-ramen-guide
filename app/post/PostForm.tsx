@@ -6,6 +6,7 @@ import { SCENE_OPTIONS } from "@/lib/quiz";
 import { copy } from "@/content/site-copy";
 import { button } from "@/lib/design";
 import Stagger from "@/components/motion/Stagger";
+import ShopSelect, { type ShopOption } from "./ShopSelect";
 import { submitPost, type PostFormState } from "./actions";
 
 const initialState: PostFormState = { ok: false, message: "" };
@@ -15,7 +16,7 @@ export default function PostForm({
   shops,
   initialShopId,
 }: {
-  shops: { id: string; name: string; area: string }[];
+  shops: ShopOption[];
   initialShopId: string;
 }) {
   const [state, formAction, pending] = useActionState(submitPost, initialState);
@@ -25,13 +26,13 @@ export default function PostForm({
     return (
       <div className="rounded-lg border border-border bg-card p-8 text-center">
         <p className="text-lg font-bold tracking-tight text-foreground">{copy.post.successTitle}</p>
-        <p className="mt-2 text-sm text-muted">{copy.post.successBody}</p>
-        <div className="mt-6 flex justify-center gap-4 text-sm">
-          <Link href="/shops" className={button.link}>
-            {copy.post.successExplore}
-          </Link>
-          <Link href="/post" className="text-muted hover:text-foreground">
+        <p className="mt-2 text-sm leading-relaxed text-muted">{copy.post.successBody}</p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link href="/post" className={button.small}>
             {copy.post.successAgain}
+          </Link>
+          <Link href="/shops" className={button.small}>
+            {copy.post.successExplore}
           </Link>
         </div>
       </div>
@@ -40,123 +41,122 @@ export default function PostForm({
 
   return (
     <form action={formAction}>
-      <Stagger className="flex flex-col gap-6" gap={0.06}>
-      {state.message && !state.ok && (
-        <p className="rounded-md border border-accent/30 bg-accent-soft px-3.5 py-2.5 text-sm text-accent-dark">
-          {state.message}
-        </p>
-      )}
+      <Stagger className="flex flex-col gap-6" gap={0.05}>
+        {state.message && !state.ok && (
+          <p className="rounded-md border border-accent/30 bg-accent-soft px-3.5 py-2.5 text-sm text-accent-dark">
+            {state.message}
+          </p>
+        )}
 
-      <Field label={f.photo} optional>
-        <label className="flex cursor-pointer items-center justify-center rounded-lg border border-dashed border-border bg-card px-3 py-12 text-sm text-muted transition-colors hover:border-foreground">
+        <Field label={f.shop} required>
+          <ShopSelect shops={shops} initialShopId={initialShopId} />
+        </Field>
+
+        <Field label={f.menu} required>
           <input
-            type="file"
-            name="image"
-            accept="image/*"
-            className="sr-only"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              setPreview(file ? URL.createObjectURL(file) : null);
-            }}
+            type="text"
+            name="menuName"
+            required
+            placeholder={f.menuPlaceholder}
+            className="w-full rounded-md border border-border bg-card px-3.5 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
           />
-          {preview ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={preview} alt="preview" className="max-h-64 rounded-md object-contain" />
-          ) : (
-            <span>{f.photoHint}</span>
-          )}
-        </label>
-      </Field>
+        </Field>
 
-      <Field label={f.shop} required>
-        <select
-          name="shopId"
-          required
-          defaultValue={initialShopId}
-          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm focus:border-foreground focus:outline-none"
+        <Field label={f.price} optional>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted">¥</span>
+            <input
+              type="number"
+              name="priceYen"
+              inputMode="numeric"
+              min={0}
+              max={100000}
+              placeholder={f.pricePlaceholder}
+              className="w-32 rounded-md border border-border bg-card px-3.5 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
+            />
+          </div>
+        </Field>
+
+        <Field label={f.photo} optional>
+          <label className="flex cursor-pointer items-center gap-3.5 rounded-md border border-dashed border-border bg-card px-3.5 py-3 transition-colors hover:border-foreground">
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              className="sr-only"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                setPreview(file ? URL.createObjectURL(file) : null);
+              }}
+            />
+            {preview ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={preview} alt="選択中の写真" className="h-16 w-16 shrink-0 rounded object-cover" />
+                <span className="text-xs text-muted">{f.photoChange}</span>
+              </>
+            ) : (
+              <>
+                <span
+                  aria-hidden
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border text-muted"
+                >
+                  <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none">
+                    <path d="M8 2.5v11M2.5 8h11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                </span>
+                <span className="text-sm text-muted">{f.photoHint}</span>
+              </>
+            )}
+          </label>
+        </Field>
+
+        <Field label={f.note} optional>
+          <textarea
+            name="body"
+            rows={3}
+            maxLength={300}
+            placeholder={f.notePlaceholder}
+            className="w-full rounded-md border border-border bg-card px-3.5 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
+          />
+        </Field>
+
+        <Field label={f.scene} optional>
+          <div className="flex flex-wrap gap-2">
+            {SCENE_OPTIONS.map((opt) => (
+              <label
+                key={opt.value}
+                className="cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-muted transition-colors has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white"
+              >
+                <input type="checkbox" name="scene" value={opt.value} className="sr-only" />
+                {opt.label}
+              </label>
+            ))}
+          </div>
+        </Field>
+
+        <Field label={f.name} optional>
+          <input
+            type="text"
+            name="nickname"
+            maxLength={30}
+            placeholder={f.namePlaceholder}
+            className="w-full rounded-md border border-border bg-card px-3.5 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
+          />
+        </Field>
+
+        <div className="border-t border-border pt-4 text-xs leading-relaxed text-muted">
+          <p>{copy.post.moderationNote}</p>
+          <p className="mt-1">{copy.post.rights}</p>
+        </div>
+
+        <button
+          type="submit"
+          disabled={pending}
+          className={`${button.primary} w-full disabled:opacity-50 sm:w-auto sm:self-start sm:px-12`}
         >
-          <option value="" disabled>
-            {f.shopPlaceholder}
-          </option>
-          {shops.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}（{s.area}）
-            </option>
-          ))}
-        </select>
-      </Field>
-
-      <Field label={f.menu} required>
-        <input
-          type="text"
-          name="menuName"
-          required
-          placeholder={f.menuPlaceholder}
-          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
-        />
-      </Field>
-
-      <Field label={f.price} optional>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted">¥</span>
-          <input
-            type="number"
-            name="priceYen"
-            inputMode="numeric"
-            min={0}
-            max={100000}
-            placeholder={f.pricePlaceholder}
-            className="w-32 rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
-          />
-        </div>
-      </Field>
-
-      <Field label={f.note} optional>
-        <textarea
-          name="body"
-          rows={3}
-          maxLength={300}
-          placeholder={f.notePlaceholder}
-          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
-        />
-      </Field>
-
-      <Field label={f.scene} optional>
-        <div className="flex flex-wrap gap-2">
-          {SCENE_OPTIONS.map((opt) => (
-            <label
-              key={opt.value}
-              className="cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-muted transition-colors has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white"
-            >
-              <input type="checkbox" name="scene" value={opt.value} className="sr-only" />
-              {opt.label}
-            </label>
-          ))}
-        </div>
-      </Field>
-
-      <Field label={f.name} optional>
-        <input
-          type="text"
-          name="nickname"
-          maxLength={30}
-          placeholder={f.namePlaceholder}
-          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
-        />
-      </Field>
-
-      <div className="text-xs leading-relaxed text-muted">
-        <p>{copy.post.moderationNote}</p>
-        <p className="mt-1">{copy.post.rights}</p>
-      </div>
-
-      <button
-        type="submit"
-        disabled={pending}
-        className={`${button.primary} w-full disabled:opacity-50 sm:w-auto sm:self-start sm:px-12`}
-      >
-        {pending ? copy.post.submitting : copy.post.submit}
-      </button>
+          {pending ? copy.post.submitting : copy.post.submit}
+        </button>
       </Stagger>
     </form>
   );
