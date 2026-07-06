@@ -1,8 +1,9 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 
 // カードに控えめな hover の浮き上がりを与える。派手な拡大やバウンスはしない。
+// reduced motion 時の無効化は MotionProvider（MotionConfig）が行う。
 export default function MotionCard({
   children,
   className,
@@ -10,9 +11,6 @@ export default function MotionCard({
   children: React.ReactNode;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
-
   return (
     <motion.div
       className={className}

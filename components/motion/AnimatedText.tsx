@@ -1,8 +1,9 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 
 // 見出し用の控えめな出現。日本語を壊さないよう、文字分割はせず塊でフェード＋上昇させる。
+// reduced motion 時の無効化は MotionProvider（MotionConfig）が行う。
 export default function AnimatedText({
   text,
   className,
@@ -12,9 +13,6 @@ export default function AnimatedText({
   className?: string;
   delay?: number;
 }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <span className={className}>{text}</span>;
-
   return (
     <motion.span
       className={className}

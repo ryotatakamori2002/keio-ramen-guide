@@ -4,7 +4,7 @@
 
 export const copy = {
   serviceName: "Keio Ramen Guide",
-  brandLine: "The Keio Ramen Log",
+  brandLine: "日吉・三田・横浜",
 
   nav: {
     shops: "店を探す",
@@ -15,33 +15,38 @@ export const copy = {
 
   metadata: {
     title: "Keio Ramen Guide｜慶應生のラーメンガイド",
-    description: "日吉・三田・横浜のラーメンを、慶應生の投稿と価格メモから探せるガイド。",
+    description: "日吉・三田・横浜のラーメンを、慶應生の投稿と価格の目安から探せるガイド。",
     ogTitle: "Keio Ramen Guide｜慶應生のラーメンガイド",
     ogDescription:
-      "店選びは、食べた人の一言から。日吉・三田・横浜のラーメンを、慶應生の投稿と価格メモから探せるガイド。",
+      "店選びは、食べた人の一言から。日吉・三田・横浜のラーメンを、慶應生の投稿と価格の目安から探せるガイド。",
   },
 
   hero: {
+    eyebrow: "慶應生のためのラーメンガイド",
     title: "店選びは、食べた人の一言から。",
-    subtitle: "日吉・三田・横浜のラーメンを、慶應生の投稿と価格メモから探せるガイド。",
+    subtitle: "日吉・三田・横浜のラーメンを、実際に食べた慶應生の投稿と価格の目安で選べます。",
     primaryCta: "店を探す",
     secondaryCta: "投稿する",
+    quizLead: "決めきれない日は",
+    quizCta: "気分で選ぶ（30秒）",
   },
 
-  areaIndex: {
-    label: "Area Index",
-    title: "エリアで選ぶ",
-    viewShops: "店を見る",
-    shopsCount: (n: number) => `${n}店`,
-    areas: [
-      { id: "日吉", name: "日吉", en: "Hiyoshi", note: "授業後や空きコマに、キャンパス徒歩圏で。" },
-      { id: "三田", name: "三田・田町", en: "Mita", note: "昼休みと授業後、三田キャンパス周辺で。" },
-      { id: "横浜", name: "横浜", en: "Yokohama", note: "遊びや帰り道に、横浜駅周辺で。" },
+  // トップの沿線図。三田−日吉−横浜が1本の鉄道軸でつながっている事実をそのまま見せる。
+  lineMap: {
+    label: "エリアで選ぶ",
+    viewAll: "すべての店",
+    count: (n: number) => `${n}店`,
+    legend: "赤い印は、慶應キャンパスの最寄り駅",
+    stations: [
+      { id: "三田", name: "三田・田町", en: "Mita", note: "三田キャンパスの昼休みと授業後に", campus: true },
+      { id: "日吉", name: "日吉", en: "Hiyoshi", note: "日吉キャンパスから徒歩圏で", campus: true },
+      { id: "横浜", name: "横浜", en: "Yokohama", note: "帰り道や遊びのついでに", campus: false },
     ],
+    segments: ["都営三田線・東急目黒線で直通", "東急東横線 急行で約15分"],
   },
 
   recentLogs: {
-    label: "Recent Logs",
+    label: "投稿",
     title: "みんなの投稿",
     subtitle: "慶應生が実際に食べた一杯。",
     viewAll: "投稿する",
@@ -49,8 +54,10 @@ export const copy = {
   },
 
   curated: {
-    label: "Curated",
+    label: "特集",
     title: "シーンで選ぶ",
+    filterCta: "この条件で一覧を見る",
+    viewAll: "すべての店",
     // 棚ごとの短い編集意図。lib/shelves.ts の id に対応。
     titles: {
       "hiyoshi-after-class": { ja: "授業後に", note: "キャンパスからすぐ行ける店。" },
@@ -67,9 +74,14 @@ export const copy = {
   },
 
   about: {
-    label: "About",
     title: "このサイトについて",
-    body: "ランキングや広告ではなく、実際に食べた慶應生の投稿と価格メモから店を選べるガイドです。エリアは日吉・三田・横浜の3つに絞っています。",
+    body: "ランキングや広告ではなく、実際に食べた慶應生の投稿と価格の目安から店を選べるガイドです。エリアは日吉・三田・横浜の3つに絞り、投稿は掲載前に内容を確認しています。",
+  },
+
+  notFound: {
+    title: "ページが見つかりませんでした",
+    body: "URLが変わったか、削除された可能性があります。",
+    cta: "店を探す",
   },
 
   shops: {
@@ -165,16 +177,16 @@ export const copy = {
     submit: "結果を見る",
   },
   results: {
-    eyebrow: "Results",
+    eyebrow: "結果",
     title: "気分に近い一杯",
     subtitle: "回答から、相性の良い順に。",
     again: "もう一度選ぶ",
     matchLabel: "相性",
   },
   saved: {
-    eyebrow: "Saved",
+    eyebrow: "保存",
     title: "保存した店",
-    subtitle: "「行きたい」「行った」がここに集まります。",
+    subtitle: "店のカードで「行きたい」「行った」を押すと、ここに並びます。",
     want: "行きたい",
     visited: "行った",
     empty: "まだありません。",
@@ -193,7 +205,7 @@ export const copy = {
     notConfigured: "Supabaseが未設定のため投稿を取得できません。READMEの手順に従ってください。",
     approve: "承認",
     reject: "却下",
-    noPhoto: "No photo",
+    noPhoto: "写真なし",
     anon: "名無し",
   },
 

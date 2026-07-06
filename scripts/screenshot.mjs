@@ -29,12 +29,29 @@ for (const shot of SHOTS) {
   for (const width of shot.widths) {
     const ctx = await browser.newContext({
       viewport: { width, height: HEIGHTS[width] },
-      reducedMotion: "reduce",
       deviceScaleFactor: 2,
     });
     const page = await ctx.newPage();
     await page.goto(baseUrl + shot.url, { waitUntil: "networkidle", timeout: 45000 });
     await page.waitForTimeout(600);
+    if (shot.fullPage !== false) {
+      // whileInView のアニメーションを発火させるため、一度最下部まで段階的にスクロールする
+      await page.evaluate(async () => {
+        await new Promise((resolve) => {
+          let y = 0;
+          const step = () => {
+            y += 500;
+            window.scrollTo(0, y);
+            if (y < document.body.scrollHeight) setTimeout(step, 70);
+            else resolve(undefined);
+          };
+          step();
+        });
+      });
+      await page.waitForTimeout(700);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(300);
+    }
     const file = path.join(outDir, `${shot.name}-${width}.png`);
     await page.screenshot({ path: file, fullPage: shot.fullPage !== false });
     console.log("saved", file);

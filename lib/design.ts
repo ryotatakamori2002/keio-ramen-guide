@@ -11,8 +11,8 @@ export const stack = "flex flex-col";
 
 // ── タイポグラフィ ─────────────────────────
 export const type = {
-  // セクション上の小さなラベル（英字・字間広め）
-  eyebrow: "text-[11px] font-semibold uppercase tracking-[0.2em] text-muted",
+  // セクション上の小さなラベル（字間広めの和文）
+  eyebrow: "text-[11px] font-semibold tracking-[0.14em] text-muted",
   // トップの主役見出し（text-balance で改行を自然に）
   display: "text-balance tracking-display text-[2rem] font-bold leading-[1.15] text-foreground sm:text-[2.75rem]",
   // ページ見出し
