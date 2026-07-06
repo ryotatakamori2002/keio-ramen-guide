@@ -115,13 +115,11 @@ export const copy = {
     maps: "地図で見る",
     addLog: "投稿する",
     logs: {
-      label: "Recent Logs",
       title: "みんなの投稿",
       empty: "まだ投稿はありません。",
       emptyCta: "最初の一件を投稿する",
     },
     notes: {
-      label: "Decision Notes",
       title: "選ぶ・避ける",
       reason: "選ぶ理由",
       avoid: "避けたい日",
@@ -131,8 +129,8 @@ export const copy = {
       taste: "味・雰囲気",
       rules: "注文のこと",
     },
-    useCase: { label: "Keio Use Case", title: "どんな時に" },
-    data: { label: "Data Note", title: "情報について", lastChecked: "最終確認", confidence: "信頼度" },
+    useCase: { title: "どんな時に" },
+    data: { title: "情報について", lastChecked: "最終確認", confidence: "情報の信頼度" },
     reviewBanner:
       "情報を確認中の店です。実在・営業・価格は、訪問前にGoogle Mapsや公式でご確認ください。",
     dataNote:
