@@ -18,8 +18,10 @@ export default function PriceNote({
     <p className={`text-sm ${className}`}>
       <span className="font-medium text-foreground">{name}</span>
       <span className="mx-1.5 text-muted">·</span>
-      <span className="font-bold text-foreground">¥{price.toLocaleString()}{approx ? "前後" : ""}</span>
-      {approx && <span className="ml-1 text-xs text-muted">目安</span>}
+      <span className="font-bold text-foreground">
+        ¥{price.toLocaleString()}
+        {approx && <span className="ml-0.5 text-xs font-normal text-muted">前後</span>}
+      </span>
     </p>
   );
 }

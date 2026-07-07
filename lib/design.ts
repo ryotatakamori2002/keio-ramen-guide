@@ -11,16 +11,14 @@ export const stack = "flex flex-col";
 
 // ── タイポグラフィ ─────────────────────────
 export const type = {
-  // セクション上の小さなラベル（英字・字間広め）
-  eyebrow: "text-[11px] font-semibold uppercase tracking-[0.2em] text-muted",
+  // セクション上の小さなラベル（字間広めの和文）
+  eyebrow: "text-[11px] font-semibold tracking-[0.14em] text-muted",
   // トップの主役見出し（text-balance で改行を自然に）
   display: "text-balance tracking-display text-[2rem] font-bold leading-[1.15] text-foreground sm:text-[2.75rem]",
   // ページ見出し
   h1: "tracking-display text-2xl font-bold leading-tight text-foreground sm:text-3xl",
   // セクション見出し
   h2: "text-lg font-bold tracking-tight text-foreground",
-  // 小見出し（英字ラベル＋和文の組み合わせで使う）
-  sectionLabel: "text-[11px] font-semibold uppercase tracking-[0.18em] text-muted",
   // 本文
   body: "text-sm leading-relaxed text-foreground/80 sm:text-[15px]",
   lead: "text-base leading-relaxed text-muted sm:text-lg",

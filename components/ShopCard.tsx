@@ -56,9 +56,7 @@ export default function ShopCard({
             price={shop.firstVisitPrice}
             confidence={shop.priceConfidence}
           />
-          <p className="mt-1 text-[11px] text-muted">
-            {postCount > 0 ? copy.shopCard.logsCount(postCount) : copy.shopCard.logsNone}
-          </p>
+          {postCount > 0 && <p className="mt-1 text-[11px] text-muted">{copy.shopCard.logsCount(postCount)}</p>}
         </div>
       </div>
 
@@ -75,7 +73,7 @@ export default function ShopCard({
       <div className="mt-3 flex items-center justify-between gap-3">
         <SaveButtons shopId={shop.id} size="sm" />
         <div className="flex items-center gap-3 text-sm">
-          <Link href={`/post?shop=${shop.id}`} className="font-medium text-accent hover:underline">
+          <Link href={`/post?shop=${shop.id}`} className="text-muted transition-colors hover:text-accent">
             {copy.shopCard.log}
           </Link>
           <Link href={`/shops/${shop.id}`} className="font-medium text-foreground hover:text-accent">

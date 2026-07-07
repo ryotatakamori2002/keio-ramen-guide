@@ -27,27 +27,40 @@ export default function SavedPage() {
       <p className="mt-2 text-sm text-muted">{copy.saved.subtitle}</p>
 
       <div className="mt-10 flex flex-col gap-12">
-        <Group title={copy.saved.want} shops={wantShops} />
+        <Group title={copy.saved.want} shops={wantShops} emptyCta />
         <Group title={copy.saved.visited} shops={visitedShops} />
       </div>
     </div>
   );
 }
 
-function Group({ title, shops }: { title: string; shops: ReturnType<typeof getShopById>[] }) {
+function Group({
+  title,
+  shops,
+  emptyCta = false,
+}: {
+  title: string;
+  shops: ReturnType<typeof getShopById>[];
+  emptyCta?: boolean;
+}) {
   const items = shops.filter((s): s is NonNullable<typeof s> => Boolean(s));
   return (
     <section>
-      <h2 className="mb-4 border-b border-border pb-2 text-sm font-semibold tracking-tight text-foreground">
+      <h2 className="mb-4 border-b-2 border-foreground pb-2 text-sm font-semibold tracking-tight text-foreground">
         {title} <span className="font-normal text-muted">{items.length}</span>
       </h2>
       {items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-muted">
-          <p>{copy.saved.empty}</p>
-          <Link href="/shops" className="mt-2 inline-block font-medium text-accent hover:underline">
-            {copy.saved.exploreCta} →
-          </Link>
-        </div>
+        <p className="text-sm text-muted">
+          {copy.saved.empty}
+          {emptyCta && (
+            <>
+              {" "}
+              <Link href="/shops" className="font-medium text-accent hover:underline">
+                {copy.saved.exploreCta} →
+              </Link>
+            </>
+          )}
+        </p>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {items.map((shop) => (

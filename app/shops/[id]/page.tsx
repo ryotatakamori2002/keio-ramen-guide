@@ -5,7 +5,7 @@ import { getShopById, SHOPS } from "@/lib/shops";
 import { getApprovedPostsByShop } from "@/lib/posts";
 import type { DataConfidence, Shop } from "@/lib/types";
 import { copy } from "@/content/site-copy";
-import { button, type as t } from "@/lib/design";
+import { button } from "@/lib/design";
 import ShopThumb from "@/components/ShopThumb";
 import PriceNote from "@/components/PriceNote";
 import ScenePills from "@/components/ScenePills";
@@ -36,7 +36,7 @@ export async function generateMetadata({
 
 const METRICS: { label: string; key: keyof Pick<Shop, "nearness" | "queueLevel" | "soloFriendly" | "volume" | "beginnerFriendly"> }[] = [
   { label: "近さ", key: "nearness" },
-  { label: "並び", key: "queueLevel" },
+  { label: "混雑", key: "queueLevel" },
   { label: "一人", key: "soloFriendly" },
   { label: "量", key: "volume" },
   { label: "初心者", key: "beginnerFriendly" },
@@ -85,14 +85,15 @@ export default async function ShopDetailPage({
             <p className="mt-1 text-sm text-muted">
               {shop.area} · {shop.station} · {shop.genres.join("/")}
             </p>
-            <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-muted">{d.firstOrderLabel}</p>
+            <p className="mt-2 text-[11px] font-semibold tracking-[0.14em] text-muted">{d.firstOrderLabel}</p>
             <PriceNote
               className="mt-0.5"
               name={shop.firstVisitOrder}
               price={shop.firstVisitPrice}
               confidence={shop.priceConfidence}
             />
-            <p className="mt-1 text-xs text-muted">{shop.expectedSpendNote}</p>
+            {/* 直上の PriceNote と価格が重複するので、先頭の「¥xxx前後。」だけ落とす */}
+            <p className="mt-1 text-xs text-muted">{shop.expectedSpendNote.replace(/^¥[\d,]+前後。/, "")}</p>
           </div>
         </div>
 
@@ -115,7 +116,7 @@ export default async function ShopDetailPage({
 
       {/* 2. Logs */}
       <FadeIn className="mt-12">
-        <SectionHead label={d.logs.label} title={d.logs.title} count={posts.length} />
+        <SectionHead title={d.logs.title} count={posts.length} />
         <div className="mt-4">
           {posts.length > 0 ? (
             <PostList posts={posts} />
@@ -132,7 +133,7 @@ export default async function ShopDetailPage({
 
       {/* 3. Decision Notes */}
       <FadeIn className="mt-12">
-        <SectionHead label={d.notes.label} title={d.notes.title} />
+        <SectionHead title={d.notes.title} />
         <p className="mt-4 text-base leading-relaxed text-foreground">{shop.selectionReason}</p>
 
         <dl className="mt-5 divide-y divide-border border-y border-border">
@@ -147,19 +148,22 @@ export default async function ShopDetailPage({
           <Row term={d.notes.rules}>{shop.rulesNotes}</Row>
         </dl>
 
-        <div className="mt-5 grid grid-cols-5 gap-2 rounded-lg border border-border bg-card p-3 text-center">
+        <dl className="mt-5 flex flex-wrap gap-x-6 gap-y-2 border-y border-border py-3.5">
           {METRICS.map((m) => (
-            <div key={m.key}>
-              <div className="text-lg font-bold text-foreground">{shop[m.key]}</div>
-              <div className="mt-0.5 text-[11px] text-muted">{m.label}</div>
+            <div key={m.key} className="flex items-baseline gap-1.5">
+              <dt className="text-xs text-muted">{m.label}</dt>
+              <dd className="text-sm font-semibold text-foreground">
+                {shop[m.key]}
+                <span className="text-[10px] font-normal text-muted">/5</span>
+              </dd>
             </div>
           ))}
-        </div>
+        </dl>
       </FadeIn>
 
       {/* 4. Keio Use Case */}
       <FadeIn className="mt-12">
-        <SectionHead label={d.useCase.label} title={d.useCase.title} />
+        <SectionHead title={d.useCase.title} />
         <p className="mt-4 text-sm leading-relaxed text-foreground/85">{shop.keioUseCase}</p>
         <p className="mt-1.5 text-xs text-muted">{shop.accessNote}</p>
         <div className="mt-3">
@@ -174,7 +178,7 @@ export default async function ShopDetailPage({
 
       {/* 5. Data Note */}
       <FadeIn className="mt-12 rounded-lg border border-border bg-card p-4 text-xs text-muted">
-        <p className={t.eyebrow}>{d.data.label}</p>
+        <p className="font-semibold text-foreground">{d.data.title}</p>
         <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
           <span>
             {d.data.lastChecked}: {shop.dataLastChecked}
@@ -185,25 +189,16 @@ export default async function ShopDetailPage({
         </div>
         <p className="mt-2 leading-relaxed">{d.dataNote}</p>
       </FadeIn>
-
-      <div className="mt-6">
-        <SaveButtons shopId={shop.id} size="md" />
-      </div>
     </div>
   );
 }
 
-function SectionHead({ label, title, count }: { label: string; title: string; count?: number }) {
+function SectionHead({ title, count }: { title: string; count?: number }) {
   return (
-    <div>
-      <p className={t.eyebrow}>{label}</p>
-      <h2 className="mt-1 text-lg font-bold tracking-tight text-foreground">
-        {title}
-        {typeof count === "number" && count > 0 && (
-          <span className="ml-2 text-sm font-normal text-muted">{count}</span>
-        )}
-      </h2>
-    </div>
+    <h2 className="border-b-2 border-foreground pb-2 text-lg font-bold tracking-tight text-foreground">
+      {title}
+      {typeof count === "number" && count > 0 && <span className="ml-2 text-sm font-normal text-muted">{count}</span>}
+    </h2>
   );
 }
 

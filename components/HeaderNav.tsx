@@ -4,10 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { copy } from "@/content/site-copy";
 
+// 「気分で選ぶ」はトップと /shops からの導線に任せ、ヘッダーは3項目に絞る（モバイル幅対策）。
 const NAV_ITEMS = [
   { href: "/shops", label: copy.nav.shops },
   { href: "/post", label: copy.nav.post },
-  { href: "/quiz", label: copy.nav.quiz },
   { href: "/saved", label: copy.nav.saved },
 ];
 

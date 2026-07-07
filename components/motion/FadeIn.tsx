@@ -1,8 +1,9 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 
-// 要素をフェード＋わずかな上方向スライドで表示する。reduced motion 時は即時表示。
+// 要素をフェード＋わずかな上方向スライドで表示する。
+// reduced motion 時の無効化は MotionProvider（MotionConfig）が行う。
 export default function FadeIn({
   children,
   className,
@@ -14,9 +15,6 @@ export default function FadeIn({
   delay?: number;
   y?: number;
 }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
-
   return (
     <motion.div
       className={className}

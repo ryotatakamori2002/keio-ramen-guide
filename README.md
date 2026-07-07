@@ -1,6 +1,6 @@
 # Keio Ramen Guide
 
-The Keio Ramen Log — 日吉、三田、横浜。慶應生の実食ログで育つラーメンガイド。
+日吉・三田・横浜。慶應生の投稿で育つラーメンガイド。
 
 ## コピーとデザインの直し方（最初に読む）
 
@@ -8,7 +8,7 @@ The Keio Ramen Log — 日吉、三田、横浜。慶應生の実食ログで育
 - **色・余白・タイポ・ボタン/カードの見た目を直したい時は [`lib/design.ts`](lib/design.ts)（と色は [`app/globals.css`](app/globals.css) のCSS変数）を編集する。** ボタンやカードの variant、余白リズム、文字スケールをここに集約している。
 
 > **現在は「慶應生10人検証用MVP」です。** 広く一般公開する完成版ではなく、まず身内で「使えるか・どの店が足りないか・見づらい所はないか」を検証する段階。
-> **全店舗の写真は未収集**（全店「写真募集中」）。写真は無断転載せず、自分で撮影した／掲載許可を得たものだけを載せます。
+> **全店舗の写真は未収集**。写真がない店は縦書きのジャンル名タイルで表示する（偽画像・英語の空状態ラベルは使わない）。写真は無断転載せず、自分で撮影した／掲載許可を得たものだけを載せます。
 > 価格・営業時間・学生サービスは変動します。`dataConfidence: "low"` や `publishStatus: "needs_review"` の店は実在・営業・価格が未確認の項目を含むため、公開前に各店の最新情報を確認してください。
 
 ## サービスの目的
@@ -52,16 +52,16 @@ The Keio Ramen Log — 日吉、三田、横浜。慶應生の実食ログで育
 
 - ユーザーが本当に求めているのは綺麗なUIではなく、**失敗しない店選び**：初回注文・価格目安・並び・一人で入れるか・初心者でも怖くないか・営業情報の信頼性・行った/行きたいの記録。
 - 既存サービスへの不満：広告が多い、UIが古くごちゃつく、スマホで使いづらい、点数の信頼性が不明、写真や営業情報が古い、自分の生活シーンに合うか分からない、初回の注文ルールが分からない。
-- 勝ち筋は全国網羅ではなく「生活シーン別の店選び」：日吉で授業後 / 三田で昼休み / 横浜で帰り道 / 空きコマ / 一人飯 / 飲み後 / 腹パン / 初めての家系 / 二郎系初心者 / 並びたくない日。
+- 勝ち筋は全国網羅ではなく「生活シーン別の店選び」：日吉で授業後 / 三田で昼休み / 横浜で帰り道 / 空きコマ / 一人飯 / 飲み後 / しっかり食べたい日 / 初めての家系 / 二郎系初心者 / 並びたくない日。
 - だから本サイトは「店舗一覧」ではなく、**今日の一杯を決める意思決定ツール**として作る。
 
 ## MVPのMust機能
 
 - 店舗一覧（`/shops`）と店舗詳細（`/shops/[id]`）。一覧は「決める画面」として、カードだけで判断材料が揃う。
-- 写真対応のデータ構造（`images` / `primaryImageUrl` / `photoStatus` / `photoNeeded`）と、**写真がない時のUI（巨大な偽イラストを出さず「写真募集中」と明示）**。
+- 写真対応のデータ構造（`images` / `primaryImageUrl` / `photoStatus` / `photoNeeded`）と、**写真がない時のUI（巨大な偽イラストや英語ラベルを出さず、縦書きジャンル名の静かなタイルで表示）**。
 - 初回おすすめ注文（`firstVisitOrder`）＋価格目安（`firstVisitPrice` / `expectedSpendNote`、すべて「目安」）。
 - 用途別ベスト棚（`lib/shelves.ts`、編集された棚）。
-- エリア / ジャンル / シーン別検索、一人飯・飲み後・腹パン・初心者・並び少なめの絞り込み。
+- エリア / ジャンル / シーン別検索、一人飯・飲み後・がっつり・初心者・並び少なめの絞り込み。
 - 行きたい / 行った保存（localStorage）。
 - Google Mapsリンク。
 - データ信頼性表示（最終確認日・信頼度・注意書き）。
@@ -78,7 +78,7 @@ The Keio Ramen Log — 日吉、三田、横浜。慶應生の実食ログで育
 3. **店舗公式写真**は、店舗の許諾を得た場合のみOK（`sourceType: "official_permission"`）。
 4. 他サイト・SNSの写真の無断使用は禁止。レビュー文・紹介文のコピーも禁止。
 
-写真がない店は `photoStatus: "none"` / `photoNeeded: true` のままにし、UIでは「写真募集中」と小さく表示する。許諾済み写真ができたら `images` に追加し `primaryImageUrl` を設定すると、一覧・詳細・棚に自動反映される。
+写真がない店は `photoStatus: "none"` / `photoNeeded: true` のままにし、UIでは縦書きのジャンル名タイル（`components/ShopThumb.tsx`）で表示する。許諾済み写真ができたら `images` に追加し `primaryImageUrl` を設定すると、一覧・詳細に自動反映される。
 
 ### 友達に写真提供を依頼する文面（例）
 
@@ -117,7 +117,7 @@ The Keio Ramen Log — 日吉、三田、横浜。慶應生の実食ログで育
 
 - 掲載は MVP 時点の調査ベース。価格・営業時間・並び・学生サービス（大盛無料など）は変動する。
 - `dataConfidence: "low"` の店は実在・営業・詳細が未確認の項目を含む。訪問前に Google Maps や公式で確認すること。
-- 写真は現状すべて未掲載（プレースホルダー＝写真募集中）。
+- 写真は現状すべて未掲載（縦書きジャンル名のプレースホルダー表示）。
 
 ## 公開前チェックリスト
 
@@ -141,8 +141,8 @@ The Keio Ramen Log — 日吉、三田、横浜。慶應生の実食ログで育
 4. 店舗カードだけで「今日行くか」を判断できた？ 足りない情報は？
 5. 初めての店で不安なこと（注文方法 / 並び / 一人で入れるか）は解消された？
 6. 価格の「目安」表示は信頼できる？ 数字は欲しい？ 範囲で十分？
-7. 用途別ベスト棚（一人飯・腹パン等）は使いたいと思った？
-8. 写真がない店の「写真募集中」表示はどう感じた？
+7. 用途別ベスト棚（一人飯・がっつり等）は使いたいと思った？
+8. 写真がない店の縦書きジャンル表示はどう感じた？
 9. このサイトを友達にLINEで送る？ 送るなら誰に・どの店？
 10. 次に行きたい店が決まった？ 決まらなかったとしたら理由は？
 
@@ -175,39 +175,21 @@ npm run lint
 npm run build
 ```
 
-スクリーンショットは [docs/screenshots/](docs/screenshots/) に保存（Playwright で生成）。
+スクリーンショットは [docs/screenshots/](docs/screenshots/) に保存（`node scripts/screenshot.mjs <outDir>`。Playwright は `npm i --no-save playwright` で導入）。
 
 ## GitHub / Vercel 公開手順
 
-リモート未設定。GitHub にリポジトリを作成後：
-
-```bash
-# 1) GitHub に push（gh CLI を使う場合）
-gh repo create keio-ramen-guide --private --source=. --remote=origin --push
-# もしくは手動でリモートを追加して push
-git remote add origin git@github.com:<your-account>/keio-ramen-guide.git
-git push -u origin main
-```
-
-Vercel に公開：
-
-```bash
-# 2) Vercel CLI でデプロイ（初回はプロジェクト設定を対話で作成）
-npm i -g vercel
-vercel        # プレビュー
-vercel --prod # 本番（検証URL）
-```
-
-または Vercel ダッシュボードで GitHub リポジトリを Import すれば、Next.js は自動検出される。
+リモートは `origin`（GitHub: ryotatakamori2002/keio-ramen-guide）設定済み。`main` に push すると Vercel が自動デプロイする。
 
 **Vercel の環境変数設定**（Project > Settings > Environment Variables）：`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` / `ADMIN_PASSWORD` を登録して再デプロイ。これらを入れるまで投稿機能は無効（サイトは表示される）。
 
-公開前に、`app/layout.tsx` の `metadataBase` を実URLに、`components/PhotoCallout.tsx` の連絡先（`ramen-guide@example.com`）を実アドレス/SNSハンドルに差し替える。
+- **OG画像・favicon**：`app/icon.svg` / `app/icon.png` / `app/apple-icon.png` / `app/opengraph-image.png`（再生成は `node scripts/brand-assets.mjs`）。
+- **metadataBase**：Vercel 上では本番URLが自動で入る（`VERCEL_PROJECT_PRODUCTION_URL`）。独自ドメインにした場合は `NEXT_PUBLIC_SITE_URL` を設定する。
 
 ### 公開URLを友達に共有する方法
 
 - 各店舗ページは `/(検証URL)/shops/<shop-id>` で個別に共有できる（例：吉村家 → `/shops/yokohama-yoshimuraya`）。
-- トップ（検証URL）を LINE に貼ると、OGP（タイトル「授業終わり、どこ啜る？」＋説明）が表示される。共有用の文面は [docs/test-message.md](docs/test-message.md)。
+- トップ（検証URL）を LINE に貼ると、OGP（「店選びは、食べた人の一言から。」の共有カード画像＋説明）が表示される。共有用の文面は [docs/test-message.md](docs/test-message.md)。
 
 ### スマホでの検証方法
 

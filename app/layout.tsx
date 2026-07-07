@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
-import PageProgress from "@/components/motion/PageProgress";
+import MotionProvider from "@/components/motion/MotionProvider";
 import { copy } from "@/content/site-copy";
 import { container } from "@/lib/design";
 
@@ -11,8 +11,15 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+// OG画像などの絶対URLの基準。Vercel上では本番URLが自動で入る。
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://keio-ramen-guide.example.com"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: copy.metadata.title,
     template: "%s",
@@ -27,7 +34,7 @@ export const metadata: Metadata = {
     locale: "ja_JP",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: copy.metadata.ogTitle,
     description: copy.metadata.ogDescription,
   },
@@ -41,12 +48,13 @@ export default function RootLayout({
   return (
     <html lang="ja" className={`${geistSans.variable} h-full`}>
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground antialiased">
-        <PageProgress />
-        <Header />
-        <main className={`${container} flex-1 pb-20 pt-6`}>{children}</main>
-        <footer className="border-t border-border">
-          <div className={`${container} py-10 text-xs leading-relaxed text-muted`}>{copy.footer}</div>
-        </footer>
+        <MotionProvider>
+          <Header />
+          <main className={`${container} flex-1 pb-20 pt-6`}>{children}</main>
+          <footer className="border-t border-border">
+            <div className={`${container} py-10 text-xs leading-relaxed text-muted`}>{copy.footer}</div>
+          </footer>
+        </MotionProvider>
       </body>
     </html>
   );

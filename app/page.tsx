@@ -1,121 +1,124 @@
 import Link from "next/link";
-import Image from "next/image";
-import { resolveShelves } from "@/lib/shelves";
+import { resolveShelves, shelfLinks } from "@/lib/shelves";
 import { getRecentApprovedPosts } from "@/lib/posts";
-import { getShopById, READY_SHOPS } from "@/lib/shops";
+import { VISIBLE_SHOPS } from "@/lib/shops";
 import { copy } from "@/content/site-copy";
 import { button, type } from "@/lib/design";
-import ShelfRow from "@/components/ShelfRow";
+import AreaLineMap from "@/components/AreaLineMap";
+import ShelfList from "@/components/ShelfList";
 import PostList from "@/components/PostList";
 import FadeIn from "@/components/motion/FadeIn";
-import Stagger from "@/components/motion/Stagger";
 import AnimatedText from "@/components/motion/AnimatedText";
-import MagneticButton from "@/components/motion/MagneticButton";
-import type { RamenPost } from "@/lib/types";
 
 export const revalidate = 60;
 
-const HOME_SHELF_IDS = ["hiyoshi-after-class", "solo", "after-drinking", "first-iekei"];
+// トップに出す編集棚。両キャンパスの生活シーンを対で見せる（店の重複が出ない組み合わせにする）。
+const HOME_SHELF_IDS = ["hiyoshi-after-class", "mita-lunch"];
+const SCENE_LINK_IDS = ["first-iekei", "solo", "after-drinking", "no-queue", "gap-time", "yokohama-nofail", "jiro", "hearty"];
 
 export default async function Home() {
-  const homeShelves = resolveShelves(HOME_SHELF_IDS, 5);
+  const shelves = resolveShelves(HOME_SHELF_IDS, 5);
+  const links = shelfLinks(SCENE_LINK_IDS);
   const recentPosts = await getRecentApprovedPosts(4);
-  const heroPost = recentPosts.find((p) => p.imageUrl) ?? null;
-  const areaCount = (id: string) => READY_SHOPS.filter((s) => s.area === id).length;
+  const counts = Object.fromEntries(
+    copy.lineMap.stations.map((st) => [st.id, VISIBLE_SHOPS.filter((s) => s.area === st.id).length]),
+  );
 
   return (
-    <div className="flex flex-col gap-20 py-8 sm:gap-28 sm:py-12">
-      {/* 1. Hero — 写真があれば2カラム、なければテキスト中心（巨大な空カードは出さない） */}
-      <section className={heroPost ? "grid items-center gap-10 lg:grid-cols-2" : ""}>
-        <div className={heroPost ? "" : "max-w-2xl"}>
-          <p className={type.eyebrow}>{copy.brandLine}</p>
-          <h1 className={`mt-5 max-w-[20ch] break-keep ${type.display}`}>
+    <div className="flex flex-col gap-16 py-8 sm:gap-24 sm:py-12">
+      {/* 1. Hero — コピー＋沿線図。写真が無くても成立する主役ビジュアル */}
+      <section className="grid items-center gap-10 lg:grid-cols-[1fr_400px] lg:gap-16">
+        <div>
+          <p className={type.eyebrow}>{copy.hero.eyebrow}</p>
+          <h1 className={`mt-4 max-w-[22ch] break-keep ${type.display}`}>
             <AnimatedText text={copy.hero.title} />
           </h1>
-          <FadeIn delay={0.15}>
-            <p className={`mt-6 max-w-xl text-pretty ${type.lead}`}>{copy.hero.subtitle}</p>
+          <FadeIn delay={0.12}>
+            <p className={`mt-5 max-w-xl text-pretty ${type.lead}`}>{copy.hero.subtitle}</p>
           </FadeIn>
-          <FadeIn delay={0.28}>
+          <FadeIn delay={0.22}>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <MagneticButton>
-                <Link href="/shops" className={button.primary}>
-                  {copy.hero.primaryCta}
-                </Link>
-              </MagneticButton>
-              <MagneticButton>
-                <Link href="/post" className={button.secondary}>
-                  {copy.hero.secondaryCta}
-                </Link>
-              </MagneticButton>
+              <Link href="/shops" className={button.primary}>
+                {copy.hero.primaryCta}
+              </Link>
+              <Link href="/post" className={button.secondary}>
+                {copy.hero.secondaryCta}
+              </Link>
             </div>
+            <p className="mt-5 text-sm text-muted">
+              {copy.hero.quizLead}{" "}
+              <Link href="/quiz" className={button.link}>
+                {copy.hero.quizCta} →
+              </Link>
+            </p>
           </FadeIn>
         </div>
-        {heroPost && <HeroVisual post={heroPost} />}
+        <FadeIn delay={0.2} y={16}>
+          <AreaLineMap counts={counts} />
+        </FadeIn>
       </section>
 
-      {/* 2. Area Index */}
-      <Section label={copy.areaIndex.label} title={copy.areaIndex.title}>
-        <Stagger className="mt-6 grid gap-4 sm:grid-cols-3" gap={0.08}>
-          {copy.areaIndex.areas.map((area) => (
-            <Link
-              key={area.id}
-              href={`/shops?area=${encodeURIComponent(area.id)}`}
-              className="group flex h-full flex-col rounded-lg border border-border bg-card p-5 transition-colors hover:border-foreground/25"
-            >
-              <span className={type.eyebrow}>{area.en}</span>
-              <span className="mt-2 text-xl font-bold tracking-tight text-foreground">{area.name}</span>
-              <span className="mt-2 flex-1 text-sm leading-relaxed text-muted">{area.note}</span>
-              <span className="mt-5 flex items-center justify-between text-xs">
-                <span className="text-muted">{copy.areaIndex.shopsCount(areaCount(area.id))}</span>
-                <span className="font-medium text-foreground group-hover:text-accent">
-                  {copy.areaIndex.viewShops} →
-                </span>
-              </span>
-            </Link>
+      {/* 2. シーン特集 — 写真に頼らない編集リスト */}
+      <Section label={copy.curated.label} title={copy.curated.title}>
+        <div className="mt-7 grid gap-x-14 gap-y-12 lg:grid-cols-2">
+          {shelves.map((shelf) => (
+            <FadeIn key={shelf.id}>
+              <ShelfList shelf={shelf} />
+            </FadeIn>
           ))}
-        </Stagger>
+        </div>
+        <FadeIn>
+          <div className="mt-9 flex flex-wrap items-center gap-2">
+            {links.map((link) => {
+              const meta = copy.curated.titles[link.id];
+              if (!meta) return null;
+              return (
+                <Link
+                  key={link.id}
+                  href={link.href}
+                  className="rounded-full border border-border px-3.5 py-1.5 text-sm text-foreground/80 transition-colors hover:border-foreground hover:text-foreground"
+                >
+                  {meta.ja}
+                </Link>
+              );
+            })}
+            <Link
+              href="/shops"
+              className="px-1 text-sm font-medium text-muted underline-offset-4 transition-colors hover:text-accent"
+            >
+              {copy.curated.viewAll} →
+            </Link>
+          </div>
+        </FadeIn>
       </Section>
 
-      {/* 3. Recent Logs */}
+      {/* 3. みんなの投稿 */}
       <Section
         label={copy.recentLogs.label}
         title={copy.recentLogs.title}
         subtitle={copy.recentLogs.subtitle}
-        action={{ href: "/post", label: copy.recentLogs.viewAll }}
+        action={recentPosts.length > 0 ? { href: "/post", label: copy.recentLogs.viewAll } : undefined}
       >
         {recentPosts.length > 0 ? (
           <FadeIn className="mt-6">
             <PostList posts={recentPosts} />
           </FadeIn>
         ) : (
-          <p className="mt-4 text-sm text-muted">
-            {copy.recentLogs.empty.title}{" "}
-            <Link href="/post" className={button.link}>
-              {copy.recentLogs.empty.cta} →
-            </Link>
-          </p>
+          <FadeIn>
+            <p className="mt-5 text-sm text-muted">
+              {copy.recentLogs.empty.title}{" "}
+              <Link href="/post" className={button.link}>
+                {copy.recentLogs.empty.cta} →
+              </Link>
+            </p>
+          </FadeIn>
         )}
       </Section>
 
-      {/* 4. Curated */}
-      <Section label={copy.curated.label} title={copy.curated.title}>
-        <div className="mt-8 flex flex-col gap-14">
-          {homeShelves.map((shelf) => (
-            <FadeIn key={shelf.id}>
-              <ShelfRow shelf={shelf} />
-            </FadeIn>
-          ))}
-        </div>
-      </Section>
-
-      {/* 5. About */}
-      <FadeIn className="border-t border-border pt-12">
-        <p className={type.eyebrow}>{copy.about.label}</p>
-        <h2 className="mt-1.5 text-xl font-bold tracking-tight text-foreground">{copy.about.title}</h2>
-        <p className="mt-4 max-w-2xl text-pretty text-sm leading-loose text-muted">{copy.about.body}</p>
-        <Link href="/shops" className={`${button.link} mt-4 inline-block`}>
-          {copy.hero.primaryCta} →
-        </Link>
+      {/* 4. About */}
+      <FadeIn className="border-t border-border pt-10">
+        <h2 className="text-base font-bold tracking-tight text-foreground">{copy.about.title}</h2>
+        <p className="mt-3 max-w-2xl text-pretty text-sm leading-loose text-muted">{copy.about.body}</p>
       </FadeIn>
     </div>
   );
@@ -152,31 +155,5 @@ function Section({
       </FadeIn>
       {children}
     </section>
-  );
-}
-
-function HeroVisual({ post }: { post: RamenPost }) {
-  const shop = getShopById(post.shopId);
-  return (
-    <FadeIn delay={0.2}>
-      <Link href={shop ? `/shops/${shop.id}` : "/shops"} className="group block">
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-border bg-border">
-          {post.imageUrl && (
-            <Image
-              src={post.imageUrl}
-              alt={post.menuName}
-              fill
-              sizes="(max-width: 1024px) 100vw, 480px"
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-              priority
-            />
-          )}
-        </div>
-        <p className="mt-3 text-xs text-muted">
-          {post.menuName}
-          {shop && ` · ${shop.name}`}
-        </p>
-      </Link>
-    </FadeIn>
   );
 }

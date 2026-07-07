@@ -6,7 +6,7 @@ import { type as t } from "@/lib/design";
 import PostForm from "./PostForm";
 
 export const metadata: Metadata = {
-  title: `${copy.post.eyebrow} | ${copy.serviceName}`,
+  title: `${copy.post.title} | ${copy.serviceName}`,
 };
 
 export default async function PostPage({
@@ -17,9 +17,12 @@ export default async function PostPage({
   const { shop } = await searchParams;
   const ready = isSupabaseReady();
 
-  const shopOptions = SHOPS.filter((s) => s.publishStatus !== "candidate")
-    .map((s) => ({ id: s.id, name: s.name, area: s.area }))
-    .sort((a, b) => a.area.localeCompare(b.area, "ja"));
+  const shopOptions = SHOPS.filter((s) => s.publishStatus !== "candidate").map((s) => ({
+    id: s.id,
+    name: s.name,
+    area: s.area,
+    station: s.station,
+  }));
 
   const initialShopId = shop && SHOPS.some((s) => s.id === shop) ? shop : "";
 

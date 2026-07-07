@@ -1,9 +1,10 @@
 "use client";
 
 import { Children } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 
 // 直下の子要素を少しずつ時間差で出現させる。子をラップするので、className にレイアウト（grid/flex）を渡せる。
+// reduced motion 時の無効化は MotionProvider（MotionConfig）が行う。
 export default function Stagger({
   children,
   className,
@@ -17,9 +18,6 @@ export default function Stagger({
   delay?: number;
   y?: number;
 }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
-
   return (
     <motion.div
       className={className}

@@ -1,10 +1,11 @@
 import type { Shop } from "@/lib/types";
 
-// 近さ/並び/一人/量 を数値で横並びにし、店どうしを比較しやすくする。
+// 近さ/混雑/一人/量/初心者 を数値で横並びにし、店どうしを比較しやすくする。
+// 「混雑」は数字が大きいほど並ぶ（他は大きいほど良い/多い）。
 export default function MetricStrip({ shop }: { shop: Shop }) {
   const items: { label: string; value: number }[] = [
     { label: "近さ", value: shop.nearness },
-    { label: "並び", value: shop.queueLevel },
+    { label: "混雑", value: shop.queueLevel },
     { label: "一人", value: shop.soloFriendly },
     { label: "量", value: shop.volume },
     { label: "初心者", value: shop.beginnerFriendly },
