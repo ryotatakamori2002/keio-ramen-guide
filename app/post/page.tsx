@@ -4,6 +4,7 @@ import { isSupabaseReady } from "@/lib/supabase";
 import { copy } from "@/content/site-copy";
 import { type as t } from "@/lib/design";
 import PostForm from "./PostForm";
+import FaintRamenDecor from "@/components/visual/FaintRamenDecor";
 
 export const metadata: Metadata = {
   title: `${copy.post.title} | ${copy.serviceName}`,
@@ -27,21 +28,24 @@ export default async function PostPage({
   const initialShopId = shop && SHOPS.some((s) => s.id === shop) ? shop : "";
 
   return (
-    <div className="mx-auto max-w-xl py-2">
-      <p className={t.eyebrow}>{copy.post.eyebrow}</p>
+    <div className="relative">
+      <FaintRamenDecor />
+      <div className="relative mx-auto max-w-xl py-2">
+        <p className={t.eyebrow}>{copy.post.eyebrow}</p>
       <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">{copy.post.title}</h1>
       <p className="mt-2 text-sm text-muted">{copy.post.subtitle}</p>
 
-      {!ready ? (
-        <div className="mt-8 rounded-lg border border-border bg-card p-6 text-sm text-muted">
-          <p className="font-medium text-foreground">{copy.post.disabledTitle}</p>
-          <p className="mt-2 leading-relaxed">{copy.post.disabledBody}</p>
-        </div>
-      ) : (
-        <div className="mt-8">
-          <PostForm shops={shopOptions} initialShopId={initialShopId} />
-        </div>
-      )}
+        {!ready ? (
+          <div className="mt-8 rounded-lg border border-border bg-card p-6 text-sm text-muted">
+            <p className="font-medium text-foreground">{copy.post.disabledTitle}</p>
+            <p className="mt-2 leading-relaxed">{copy.post.disabledBody}</p>
+          </div>
+        ) : (
+          <div className="mt-8">
+            <PostForm shops={shopOptions} initialShopId={initialShopId} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -78,7 +78,7 @@ export default function PostForm({
         </Field>
 
         <Field label={f.photo} optional>
-          <label className="flex cursor-pointer items-center gap-3.5 rounded-md border border-dashed border-border bg-card px-3.5 py-3 transition-colors hover:border-foreground">
+          <label className="group/photo flex cursor-pointer items-center gap-3.5 rounded-md border border-dashed border-border bg-card px-3.5 py-3 transition-colors hover:border-foreground">
             <input
               type="file"
               name="image"
@@ -92,14 +92,18 @@ export default function PostForm({
             {preview ? (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={preview} alt="選択中の写真" className="h-16 w-16 shrink-0 rounded object-cover" />
+                <img
+                  src={preview}
+                  alt="選択中の写真"
+                  className="h-20 w-20 shrink-0 -rotate-[1.5deg] rounded-sm border border-border object-cover shadow-[2px_3px_0_rgba(17,16,14,0.08)]"
+                />
                 <span className="text-xs text-muted">{f.photoChange}</span>
               </>
             ) : (
               <>
                 <span
                   aria-hidden
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border text-muted"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border text-muted transition-transform duration-300 group-hover/photo:rotate-90"
                 >
                   <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none">
                     <path d="M8 2.5v11M2.5 8h11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -126,7 +130,7 @@ export default function PostForm({
             {SCENE_OPTIONS.map((opt) => (
               <label
                 key={opt.value}
-                className="cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-muted transition-colors has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white"
+                className="cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-muted transition-colors has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-background"
               >
                 <input type="checkbox" name="scene" value={opt.value} className="sr-only" />
                 {opt.label}

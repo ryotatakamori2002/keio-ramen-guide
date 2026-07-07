@@ -24,7 +24,7 @@ export default function HeaderNav() {
               <Link
                 href={item.href}
                 className={`block rounded-full px-3 py-1.5 tracking-tight transition-colors ${
-                  active ? "bg-foreground text-white" : "text-muted hover:text-foreground"
+                  active ? "bg-foreground text-background" : "text-muted hover:text-foreground"
                 }`}
               >
                 {item.label}

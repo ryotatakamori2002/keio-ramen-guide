@@ -31,10 +31,11 @@ export const copy = {
     quizCta: "気分で選ぶ（30秒）",
   },
 
-  // Heroの「今日の一杯」（Featured Bowl）。
+  // Heroと帯の「今日の一杯」（Featured Bowl）。
   featured: {
     label: "今日の一杯",
     cta: "この店を見る",
+    postCta: "食べたら投稿する",
   },
 
   // Keio Picks（数を絞った基準の店。星や点数は使わない）。
@@ -64,7 +65,7 @@ export const copy = {
     title: "みんなの投稿",
     subtitle: "慶應生が実際に食べた一杯。",
     viewAll: "投稿する",
-    empty: { title: "まだ投稿はありません。", cta: "最初の一件を投稿する" },
+    empty: { title: "最初の投稿を待っています。", cta: "一杯を記録する" },
   },
 
   curated: {
@@ -160,8 +161,8 @@ export const copy = {
     rights: "掲載できるのは、自分で撮った写真だけです。",
     submit: "投稿する",
     submitting: "送信中…",
-    successTitle: "投稿を受け付けました。",
-    successBody: "承認後に掲載されます。ありがとうございます。",
+    successTitle: "ごちそうさまでした。",
+    successBody: "記録を受け取りました。内容を確認してから掲載します。",
     successExplore: "店を見る",
     successAgain: "続けて投稿する",
     anon: "名無しの慶應生",

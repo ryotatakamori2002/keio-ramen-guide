@@ -1,16 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  /* 紙面の生成り。文字はほぼ黒。罫線は紙になじむ濃いめのグレージュ。 */
-  --background: #f7f4ef;
-  --foreground: #111111;
-  --card: #fcfaf6;
-  --muted: #6b6459;
-  --border: #d8d2c8;
-  /* アクセントの赤は最小限。印刷の特色のような赤にする。 */
-  --accent: #c53024;
-  --accent-dark: #9c2318;
-  --accent-soft: #f0e3dc;
+  /* Body: 紙面の生成り。文字はほぼ黒。 */
+  --background: #f5f0e8;
+  --foreground: #11100e;
+  --card: #fbf8f2;
+  --muted: #6f675e;
+  --border: #d8cfc2;
+  /* 赤は暖簾の赤。最小限に。 */
+  --accent: #b3261e;
+  --accent-dark: #8f1d16;
+  --accent-soft: #f0e0d8;
+  /* ラーメンの記号色（多用しない） */
+  --ginger: #c88a32;
+  --brown: #3a241b;
+  --thumb-bg: #ece5d8;
+}
+
+/* Hero: 夜の店先。セクション単位でトークンを上書きして空気を変える */
+.theme-hero {
+  --background: #11100e;
+  --foreground: #f7f1e8;
+  --card: #1b1712;
+  --muted: #cfc6b8;
+  --border: #453e33;
+  /* 暗所ではアクセントを生姜ゴールドに寄せる（赤は暖簾グラフィック側で使う） */
+  --accent: #c88a32;
+  --accent-dark: #a86f1f;
+  --thumb-bg: #241c14;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* 今日の一杯: 醤油ブラウンの帯 */
+.theme-brown {
+  --background: #3a241b;
+  --foreground: #f7f1e8;
+  --card: #462d21;
+  --muted: #d4c3b4;
+  --border: #5d4334;
+  --accent: #c88a32;
+  --accent-dark: #a86f1f;
+  --thumb-bg: #2c1a12;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Scene Guide: 紙面より一段明るい表面色の帯 */
+.theme-surface {
+  --background: #fbf8f2;
+  background-color: var(--background);
 }
 
 @theme inline {
@@ -22,6 +61,8 @@
   --color-accent: var(--accent);
   --color-accent-dark: var(--accent-dark);
   --color-accent-soft: var(--accent-soft);
+  --color-ginger: var(--ginger);
+  --color-brown: var(--brown);
   --font-sans: var(--font-geist-sans);
 }
 
@@ -38,4 +79,25 @@ body {
 /* 編集的な見出しの字間を少し締める */
 .tracking-display {
   letter-spacing: -0.02em;
+}
+
+/* 湯気のゆらぎ（常時アニメはここ1種類だけ。reduced-motionでは止める） */
+@keyframes steam-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+.animate-steam {
+  animation: steam-drift 8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-steam {
+    animation: none;
+  }
 }

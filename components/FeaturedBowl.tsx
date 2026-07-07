@@ -9,7 +9,7 @@ import PriceNote from "./PriceNote";
 // 雑誌の記事枠のように太罫線で組む（Eater Heatmap / Michelin Picksの1枠を1店に絞った形）。
 export default function FeaturedBowl({ shop }: { shop: Shop }) {
   return (
-    <article className="border-y-2 border-foreground py-5">
+    <article className="border-y-2 border-foreground bg-card/90 px-5 py-5 backdrop-blur-[2px]">
       <div className="flex items-baseline justify-between gap-3">
         <p className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] text-muted">
           <span aria-hidden className="h-2 w-2 bg-accent" />

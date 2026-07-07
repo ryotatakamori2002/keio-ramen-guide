@@ -38,7 +38,7 @@ const buttonBase =
   "inline-flex items-center justify-center gap-1.5 rounded-md text-sm font-medium transition-colors";
 export const button = {
   // 主役（黒）
-  primary: `${buttonBase} bg-foreground px-6 py-3 text-white hover:opacity-90`,
+  primary: `${buttonBase} bg-foreground px-6 py-3 text-background hover:opacity-90`,
   // 副次（枠線）
   secondary: `${buttonBase} border border-border px-6 py-3 text-foreground hover:border-foreground`,
   // 小さめ
