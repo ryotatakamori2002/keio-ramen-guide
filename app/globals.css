@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  /* 背景はごく薄いウォームグレー。文字はほぼ黒（わずかに暖色）。 */
-  --background: #fbfaf7;
-  --foreground: #181511;
-  --card: #ffffff;
-  --muted: #706a60;
-  --border: #e9e4db;
-  /* アクセントの赤は最小限。深め・落ち着いた赤にして安っぽさを避ける。 */
-  --accent: #b23a2e;
-  --accent-dark: #8f2c22;
-  --accent-soft: #f3ebe8;
+  /* 紙面の生成り。文字はほぼ黒。罫線は紙になじむ濃いめのグレージュ。 */
+  --background: #f7f4ef;
+  --foreground: #111111;
+  --card: #fcfaf6;
+  --muted: #6b6459;
+  --border: #d8d2c8;
+  /* アクセントの赤は最小限。印刷の特色のような赤にする。 */
+  --accent: #c53024;
+  --accent-dark: #9c2318;
+  --accent-soft: #f0e3dc;
 }
 
 @theme inline {

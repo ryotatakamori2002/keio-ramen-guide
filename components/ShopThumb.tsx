@@ -27,7 +27,7 @@ export default function ShopThumb({
 
   return (
     <div
-      className={`relative flex items-center justify-center overflow-hidden rounded-md border border-border bg-[#f4f2ee] ${className}`}
+      className={`relative flex items-center justify-center overflow-hidden rounded-md border border-border bg-[#efeae2] ${className}`}
       role="img"
       aria-label={genre}
     >

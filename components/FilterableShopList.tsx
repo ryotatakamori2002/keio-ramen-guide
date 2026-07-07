@@ -143,13 +143,11 @@ export default function FilterableShopList({
 
       <div className="mt-8 lg:mt-0">
         {filtered.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border py-14 text-center text-sm text-muted">
-            {copy.shops.empty}
-          </div>
+          <div className="border-y border-border py-12 text-center text-sm text-muted">{copy.shops.empty}</div>
         ) : hasActiveFilter ? (
           <>
-            <p className="mb-4 text-xs tracking-[0.14em] text-muted">{copy.shops.count(filtered.length)}</p>
-            <Stagger className="flex flex-col gap-3" gap={0.05}>
+            <p className="mb-3 text-xs tracking-[0.14em] text-muted">{copy.shops.count(filtered.length)}</p>
+            <Stagger className="flex flex-col border-b border-border" gap={0.05}>
               {filtered.map((shop) => (
                 <ShopCard key={shop.id} shop={shop} postMeta={postMeta[shop.id]} />
               ))}
@@ -159,11 +157,15 @@ export default function FilterableShopList({
           <div className="flex flex-col gap-12">
             {groupedByArea.map(({ area: a, shops: group }) => (
               <section key={a}>
-                <div className="mb-4 flex items-baseline gap-2.5 border-b-2 border-foreground pb-2">
+                <div className="flex items-baseline gap-2.5 border-b-2 border-foreground pb-2">
                   <h2 className="text-lg font-bold tracking-tight text-foreground">{a}</h2>
                   <span className="text-xs text-muted">{copy.shops.count(group.length)}</span>
                 </div>
-                <Stagger className="flex flex-col gap-3" gap={0.05}>
+                {/* 見出しの太罫線が上端の役をするので、先頭行の細罫線だけ消す */}
+                <Stagger
+                  className="flex flex-col border-b border-border [&>div:first-child_article]:border-t-0"
+                  gap={0.05}
+                >
                   {group.map((shop) => (
                     <ShopCard key={shop.id} shop={shop} postMeta={postMeta[shop.id]} />
                   ))}

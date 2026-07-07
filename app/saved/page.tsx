@@ -62,7 +62,7 @@ function Group({
           )}
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 border-b border-border sm:grid-cols-2 sm:gap-x-10 [&>article:first-child]:border-t-0">
           {items.map((shop) => (
             <ShopCard key={shop.id} shop={shop} />
           ))}

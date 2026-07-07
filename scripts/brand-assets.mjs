@@ -4,11 +4,11 @@
 // - OG画像はトップの沿線図モチーフを踏襲する。
 import { chromium } from "playwright";
 
-const RED = "#b23a2e";
-const BG = "#fbfaf7";
-const FG = "#181511";
-const MUTED = "#706a60";
-const BORDER = "#e9e4db";
+const RED = "#c53024";
+const BG = "#f7f4ef";
+const FG = "#111111";
+const MUTED = "#6b6459";
+const BORDER = "#d8d2c8";
 
 // BrandMark と同じ図形（丼＋箸）。rx はアイコン種別ごとに変える。
 const mark = (rx) => `
