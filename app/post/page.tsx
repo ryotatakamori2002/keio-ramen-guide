@@ -4,7 +4,6 @@ import { isSupabaseReady } from "@/lib/supabase";
 import { copy } from "@/content/site-copy";
 import { type as t } from "@/lib/design";
 import PostForm from "./PostForm";
-import FaintRamenDecor from "@/components/visual/FaintRamenDecor";
 
 export const metadata: Metadata = {
   title: `${copy.post.title} | ${copy.serviceName}`,
@@ -29,7 +28,6 @@ export default async function PostPage({
 
   return (
     <div className="relative">
-      <FaintRamenDecor />
       <div className="relative mx-auto max-w-xl py-2">
         <p className={t.eyebrow}>{copy.post.eyebrow}</p>
       <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">{copy.post.title}</h1>

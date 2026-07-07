@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShopById, SHOPS } from "@/lib/shops";
@@ -63,19 +64,39 @@ export default async function ShopDetailPage({
         {d.back}
       </Link>
 
-      {/* 1. Shop Header */}
+      {/* 1. Shop Header — 実写真がある店は写真を最初に大きく見せる */}
       <FadeIn className="mt-5">
+        {shop.heroImageUrl && (
+          <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden rounded-sm sm:aspect-[2/1]">
+            <Image
+              src={shop.heroImageUrl}
+              alt={shop.imageAlt ?? shop.name}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 672px"
+              className="object-cover"
+            />
+          </div>
+        )}
         <div className="flex gap-4">
-          <ShopThumb
-            genre={shop.genres[0]}
-            primaryImageUrl={shop.primaryImageUrl}
-            imageAlt={shop.images[0]?.alt}
-            className="h-28 w-28 shrink-0 sm:h-32 sm:w-32"
-            sizes="128px"
-          />
+          {!shop.heroImageUrl && (
+            <ShopThumb
+              genre={shop.genres[0]}
+              primaryImageUrl={shop.primaryImageUrl}
+              imageAlt={shop.imageAlt ?? shop.images[0]?.alt}
+              className="h-28 w-28 shrink-0 sm:h-32 sm:w-32"
+              sizes="128px"
+            />
+          )}
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">{shop.name}</h1>
+              <h1
+                className={`font-bold tracking-tight text-foreground ${
+                  shop.heroImageUrl ? "text-2xl sm:text-3xl" : "text-xl sm:text-2xl"
+                }`}
+              >
+                {shop.name}
+              </h1>
               {needsReview && (
                 <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-[10px] text-muted">
                   {copy.shopCard.review}

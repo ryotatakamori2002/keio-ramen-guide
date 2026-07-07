@@ -11,9 +11,6 @@
   --accent: #b3261e;
   --accent-dark: #8f1d16;
   --accent-soft: #f0e0d8;
-  /* ラーメンの記号色（多用しない） */
-  --ginger: #c88a32;
-  --brown: #3a241b;
   --thumb-bg: #ece5d8;
 }
 
@@ -28,20 +25,6 @@
   --accent: #c88a32;
   --accent-dark: #a86f1f;
   --thumb-bg: #241c14;
-  background-color: var(--background);
-  color: var(--foreground);
-}
-
-/* 今日の一杯: 醤油ブラウンの帯 */
-.theme-brown {
-  --background: #3a241b;
-  --foreground: #f7f1e8;
-  --card: #462d21;
-  --muted: #d4c3b4;
-  --border: #5d4334;
-  --accent: #c88a32;
-  --accent-dark: #a86f1f;
-  --thumb-bg: #2c1a12;
   background-color: var(--background);
   color: var(--foreground);
 }
@@ -61,8 +44,6 @@
   --color-accent: var(--accent);
   --color-accent-dark: var(--accent-dark);
   --color-accent-soft: var(--accent-soft);
-  --color-ginger: var(--ginger);
-  --color-brown: var(--brown);
   --font-sans: var(--font-geist-sans);
 }
 
@@ -79,25 +60,4 @@ body {
 /* 編集的な見出しの字間を少し締める */
 .tracking-display {
   letter-spacing: -0.02em;
-}
-
-/* 湯気のゆらぎ（常時アニメはここ1種類だけ。reduced-motionでは止める） */
-@keyframes steam-drift {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.85;
-  }
-  50% {
-    transform: translateY(-10px);
-    opacity: 1;
-  }
-}
-.animate-steam {
-  animation: steam-drift 8s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .animate-steam {
-    animation: none;
-  }
 }

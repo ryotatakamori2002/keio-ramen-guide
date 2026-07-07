@@ -30,13 +30,14 @@ export default function ShopCard({
       {header}
 
       <div className="flex gap-3.5">
-        <Link href={`/shops/${shop.id}`} className="shrink-0" tabIndex={-1} aria-hidden>
+        {/* 実写真がある店は横長サムネで一覧の中でも目に入るようにする */}
+        <Link href={`/shops/${shop.id}`} className="group shrink-0" tabIndex={-1} aria-hidden>
           <ShopThumb
             genre={shop.genres[0]}
             primaryImageUrl={thumbImage}
-            imageAlt={shop.images[0]?.alt}
-            className="h-[84px] w-[84px]"
-            sizes="84px"
+            imageAlt={shop.imageAlt ?? shop.images[0]?.alt}
+            className={thumbImage ? "h-[88px] w-[124px]" : "h-[88px] w-[88px]"}
+            sizes="124px"
           />
         </Link>
 
