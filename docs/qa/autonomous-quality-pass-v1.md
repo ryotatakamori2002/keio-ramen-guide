@@ -106,7 +106,7 @@
 - [x] 自己レビュー3回＋修正（下記）
 - [x] 最終スクショ（本番ビルドで撮影）・全ルートQA
 - [x] README/配布文面の古い記述更新（写真募集中・どこ啜る？・PhotoCallout・リモート手順）
-- [ ] merge・push・Vercel確認
+- [x] merge・push・Vercel確認（main c46d4c5 → https://keio-ramen-guide.vercel.app 反映確認済み）
 
 ## 自己レビュー結果
 
