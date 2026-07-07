@@ -56,7 +56,7 @@ export default function QuizForm() {
                   aria-pressed={active}
                   className={`rounded-full border px-3.5 py-2 text-sm transition-colors ${
                     active
-                      ? "border-foreground bg-foreground text-white"
+                      ? "border-foreground bg-foreground text-background"
                       : "border-border text-muted hover:border-foreground hover:text-foreground"
                   }`}
                 >
@@ -70,7 +70,7 @@ export default function QuizForm() {
 
       <button
         type="submit"
-        className="mt-1 w-full rounded-full bg-foreground px-6 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto sm:self-start sm:px-12"
+        className="mt-1 w-full rounded-full bg-foreground px-6 py-3.5 text-sm font-semibold text-background transition-opacity hover:opacity-90 sm:w-auto sm:self-start sm:px-12"
       >
         {copy.quiz.submit}
       </button>

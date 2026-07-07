@@ -21,7 +21,7 @@ export default function SaveButtons({ shopId, size = "sm" }: { shopId: string; s
         aria-pressed={want}
         className={`rounded-full border font-medium transition-colors ${pad} ${
           want
-            ? "border-foreground bg-foreground text-white"
+            ? "border-foreground bg-foreground text-background"
             : "border-border text-muted hover:border-foreground hover:text-foreground"
         }`}
       >
@@ -36,7 +36,7 @@ export default function SaveButtons({ shopId, size = "sm" }: { shopId: string; s
         aria-pressed={visited}
         className={`rounded-full border font-medium transition-colors ${pad} ${
           visited
-            ? "border-foreground bg-foreground text-white"
+            ? "border-foreground bg-foreground text-background"
             : "border-border text-muted hover:border-foreground hover:text-foreground"
         }`}
       >

@@ -26,7 +26,7 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-full bg-foreground px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+        className="rounded-full bg-foreground px-6 py-2.5 text-sm font-semibold text-background hover:opacity-90 disabled:opacity-50"
       >
         {pending ? copy.admin.loggingIn : copy.admin.login}
       </button>

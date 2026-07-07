@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { PostMeta, Shop } from "@/lib/types";
 import { copy } from "@/content/site-copy";
 import ShopCard from "./ShopCard";
+import FadeIn from "./motion/FadeIn";
 import Stagger from "./motion/Stagger";
 
 interface QuickCondition {
@@ -157,10 +158,12 @@ export default function FilterableShopList({
           <div className="flex flex-col gap-12">
             {groupedByArea.map(({ area: a, shops: group }) => (
               <section key={a}>
-                <div className="flex items-baseline gap-2.5 border-b-2 border-foreground pb-2">
-                  <h2 className="text-lg font-bold tracking-tight text-foreground">{a}</h2>
-                  <span className="text-xs text-muted">{copy.shops.count(group.length)}</span>
-                </div>
+                <FadeIn y={8}>
+                  <div className="flex items-baseline gap-2.5 border-b-2 border-foreground pb-2">
+                    <h2 className="text-lg font-bold tracking-tight text-foreground">{a}</h2>
+                    <span className="text-xs text-muted">{copy.shops.count(group.length)}</span>
+                  </div>
+                </FadeIn>
                 {/* 見出しの太罫線が上端の役をするので、先頭行の細罫線だけ消す */}
                 <Stagger
                   className="flex flex-col border-b border-border [&>div:first-child_article]:border-t-0"
@@ -198,7 +201,7 @@ function Chip({ active, label, onClick }: { active: boolean; label: string; onCl
       aria-pressed={active}
       className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-sm transition-colors ${
         active
-          ? "border-foreground bg-foreground text-white"
+          ? "border-foreground bg-foreground text-background"
           : "border-border text-muted hover:border-foreground hover:text-foreground"
       }`}
     >

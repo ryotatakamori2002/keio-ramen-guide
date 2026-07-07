@@ -87,7 +87,7 @@ export default async function AdminPage() {
                 <div className="mt-3 flex gap-2">
                   <form action={approvePost}>
                     <input type="hidden" name="id" value={post.id} />
-                    <button className="rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
+                    <button className="rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-background hover:opacity-90">
                       {copy.admin.approve}
                     </button>
                   </form>
