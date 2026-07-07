@@ -24,7 +24,7 @@ export default function PostForm({
 
   if (state.ok) {
     return (
-      <div className="rounded-lg border border-border bg-card p-8 text-center">
+      <div className="border-y-2 border-foreground py-10 text-center">
         <p className="text-lg font-bold tracking-tight text-foreground">{copy.post.successTitle}</p>
         <p className="mt-2 text-sm leading-relaxed text-muted">{copy.post.successBody}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">

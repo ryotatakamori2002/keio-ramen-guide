@@ -8,7 +8,7 @@ export default function PostList({ posts }: { posts: RamenPost[] }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {posts.map((post) => (
-        <article key={post.id} className="overflow-hidden rounded-xl border border-border bg-card">
+        <article key={post.id} className="overflow-hidden rounded-sm border border-border">
           {post.imageUrl && (
             <div className="relative aspect-[4/3] w-full bg-border">
               <Image

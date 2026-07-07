@@ -77,7 +77,17 @@ export default function ShopSelect({
         className="w-full rounded-md border border-border bg-card px-3.5 py-2.5 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
       />
       {matches.length === 0 ? (
-        <p className="mt-2 text-xs leading-relaxed text-muted">{f.shopEmpty}</p>
+        <div className="mt-2 border-y border-border py-3 text-xs leading-relaxed text-muted">
+          <p className="font-medium text-foreground">{f.shopEmpty}</p>
+          <p className="mt-1">{f.shopEmptyHint}</p>
+          <button
+            type="button"
+            onClick={() => setQuery("")}
+            className="mt-2 font-medium text-foreground underline underline-offset-4 transition-colors hover:text-accent"
+          >
+            {f.shopReset}
+          </button>
+        </div>
       ) : (
         <div className="mt-2 max-h-72 overflow-y-auto rounded-md border border-border bg-card">
           {grouped.map((group) => (

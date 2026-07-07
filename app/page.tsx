@@ -1,24 +1,30 @@
 import Link from "next/link";
-import { resolveShelves, shelfLinks } from "@/lib/shelves";
+import { shelfLinks } from "@/lib/shelves";
 import { getRecentApprovedPosts } from "@/lib/posts";
-import { VISIBLE_SHOPS } from "@/lib/shops";
+import { getShopById, VISIBLE_SHOPS } from "@/lib/shops";
+import type { Shop } from "@/lib/types";
 import { copy } from "@/content/site-copy";
 import { button, type } from "@/lib/design";
+import FeaturedBowl from "@/components/FeaturedBowl";
 import AreaLineMap from "@/components/AreaLineMap";
-import ShelfList from "@/components/ShelfList";
+import KeioPicks from "@/components/KeioPicks";
 import PostList from "@/components/PostList";
 import FadeIn from "@/components/motion/FadeIn";
 import AnimatedText from "@/components/motion/AnimatedText";
 
 export const revalidate = 60;
 
-// トップに出す編集棚。両キャンパスの生活シーンを対で見せる（店の重複が出ない組み合わせにする）。
-const HOME_SHELF_IDS = ["hiyoshi-after-class", "mita-lunch"];
-const SCENE_LINK_IDS = ["first-iekei", "solo", "after-drinking", "no-queue", "gap-time", "yokohama-nofail", "jiro", "hearty"];
+// Heroの「今日の一杯」。今は固定1店、投稿が増えたらローテーションにする。
+const FEATURED_SHOP_ID = "yokohama-ishinshoten";
+// Keio Picks（editorialPriority: must から、エリアとジャンルが重ならないよう編集）。
+const PICK_IDS = ["yokohama-ishinshoten", "hiyoshi-musashiya", "mita-jiro", "yokohama-afuri"];
+// Scene Guide の6シーン。
+const SCENE_IDS = ["hiyoshi-after-class", "mita-lunch", "yokohama-nofail", "solo", "after-drinking", "first-iekei"];
 
 export default async function Home() {
-  const shelves = resolveShelves(HOME_SHELF_IDS, 5);
-  const links = shelfLinks(SCENE_LINK_IDS);
+  const featured = getShopById(FEATURED_SHOP_ID);
+  const picks = PICK_IDS.map((id) => getShopById(id)).filter((s): s is Shop => Boolean(s));
+  const scenes = shelfLinks(SCENE_IDS);
   const recentPosts = await getRecentApprovedPosts(4);
   const counts = Object.fromEntries(
     copy.lineMap.stations.map((st) => [st.id, VISIBLE_SHOPS.filter((s) => s.area === st.id).length]),
@@ -26,8 +32,8 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col gap-16 py-8 sm:gap-24 sm:py-12">
-      {/* 1. Hero — コピー＋沿線図。写真が無くても成立する主役ビジュアル */}
-      <section className="grid items-center gap-10 lg:grid-cols-[1fr_400px] lg:gap-16">
+      {/* 1. Hero — 左にコピー、右に今日の一杯（Featured Bowl） */}
+      <section className="grid items-center gap-10 lg:grid-cols-[1fr_420px] lg:gap-16">
         <div>
           <p className={type.eyebrow}>{copy.hero.eyebrow}</p>
           <h1 className={`mt-4 max-w-[22ch] break-keep ${type.display}`}>
@@ -53,46 +59,63 @@ export default async function Home() {
             </p>
           </FadeIn>
         </div>
-        <FadeIn delay={0.2} y={16}>
-          <AreaLineMap counts={counts} />
-        </FadeIn>
+        {featured && (
+          <FadeIn delay={0.2} y={16}>
+            <FeaturedBowl shop={featured} />
+          </FadeIn>
+        )}
       </section>
 
-      {/* 2. シーン特集 — 写真に頼らない編集リスト */}
-      <Section label={copy.curated.label} title={copy.curated.title}>
-        <div className="mt-7 grid gap-x-14 gap-y-12 lg:grid-cols-2">
-          {shelves.map((shelf) => (
-            <FadeIn key={shelf.id}>
-              <ShelfList shelf={shelf} />
-            </FadeIn>
-          ))}
-        </div>
-        <FadeIn>
-          <div className="mt-9 flex flex-wrap items-center gap-2">
-            {links.map((link) => {
-              const meta = copy.curated.titles[link.id];
-              if (!meta) return null;
-              return (
-                <Link
-                  key={link.id}
-                  href={link.href}
-                  className="rounded-full border border-border px-3.5 py-1.5 text-sm text-foreground/80 transition-colors hover:border-foreground hover:text-foreground"
-                >
-                  {meta.ja}
-                </Link>
-              );
-            })}
-            <Link
-              href="/shops"
-              className="px-1 text-sm font-medium text-muted underline-offset-4 transition-colors hover:text-accent"
-            >
-              {copy.curated.viewAll} →
-            </Link>
-          </div>
+      {/* 2. Area Index — 沿線図（Heroから降ろしてここに置く） */}
+      <Section label={copy.lineMap.sectionLabel} title={copy.lineMap.sectionTitle}>
+        <FadeIn className="mt-8">
+          <AreaLineMap counts={counts} />
         </FadeIn>
       </Section>
 
-      {/* 3. みんなの投稿 */}
+      {/* 3. Keio Picks — 数を絞った基準の店 */}
+      <Section label={copy.picks.label} title={copy.picks.title} subtitle={copy.picks.subtitle}>
+        <FadeIn className="mt-6">
+          <KeioPicks shops={picks} />
+        </FadeIn>
+      </Section>
+
+      {/* 4. Scene Guide — 生活シーンから入る */}
+      <Section label={copy.curated.label} title={copy.curated.title}>
+        <FadeIn>
+          <div className="mt-5 grid sm:grid-cols-2 sm:gap-x-14">
+            {scenes.map((scene) => {
+              const meta = copy.curated.titles[scene.id];
+              if (!meta) return null;
+              return (
+                <Link
+                  key={scene.id}
+                  href={scene.href}
+                  className="group flex items-center justify-between gap-3 border-b border-border py-3.5"
+                >
+                  <span className="min-w-0">
+                    <span className="block font-semibold tracking-tight text-foreground transition-colors group-hover:text-accent">
+                      {meta.ja}
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs text-muted">{meta.note}</span>
+                  </span>
+                  <span aria-hidden className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5">
+                    →
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+          <Link
+            href="/shops"
+            className="mt-5 inline-block text-sm font-medium text-muted underline-offset-4 transition-colors hover:text-accent"
+          >
+            {copy.curated.viewAll} →
+          </Link>
+        </FadeIn>
+      </Section>
+
+      {/* 5. Recent Logs */}
       <Section
         label={copy.recentLogs.label}
         title={copy.recentLogs.title}
@@ -115,7 +138,7 @@ export default async function Home() {
         )}
       </Section>
 
-      {/* 4. About */}
+      {/* 6. About */}
       <FadeIn className="border-t border-border pt-10">
         <h2 className="text-base font-bold tracking-tight text-foreground">{copy.about.title}</h2>
         <p className="mt-3 max-w-2xl text-pretty text-sm leading-loose text-muted">{copy.about.body}</p>

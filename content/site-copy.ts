@@ -31,10 +31,24 @@ export const copy = {
     quizCta: "気分で選ぶ（30秒）",
   },
 
-  // トップの沿線図。三田−日吉−横浜が1本の鉄道軸でつながっている事実をそのまま見せる。
+  // Heroの「今日の一杯」（Featured Bowl）。
+  featured: {
+    label: "今日の一杯",
+    cta: "この店を見る",
+  },
+
+  // Keio Picks（数を絞った基準の店。星や点数は使わない）。
+  picks: {
+    label: "特集",
+    title: "Keio Picks",
+    subtitle: "迷ったらここから。慶應生の基準になる店。",
+    detail: "詳細",
+  },
+
+  // Area Indexの沿線図。三田−日吉−横浜が1本の鉄道軸でつながっている事実をそのまま見せる。
   lineMap: {
-    label: "エリアで選ぶ",
-    viewAll: "すべての店",
+    sectionLabel: "エリア",
+    sectionTitle: "キャンパスの沿線で選ぶ",
     count: (n: number) => `${n}店`,
     legend: "赤い印は、慶應キャンパスの最寄り駅",
     stations: [
@@ -54,9 +68,8 @@ export const copy = {
   },
 
   curated: {
-    label: "特集",
+    label: "シーン",
     title: "シーンで選ぶ",
-    filterCta: "この条件で一覧を見る",
     viewAll: "すべての店",
     // 棚ごとの短い編集意図。lib/shelves.ts の id に対応。
     titles: {
@@ -138,9 +151,9 @@ export const copy = {
   },
 
   post: {
-    eyebrow: "投稿",
-    title: "食べた一杯を残す",
-    subtitle: "写真、メニュー名、価格、ひとこと。次に行く人の判断材料になります。",
+    eyebrow: "記録",
+    title: "食べた一杯を記録する",
+    subtitle: "自分の記録として残り、次に行く誰かの判断材料になります。写真は無くても大丈夫です。",
     disabledTitle: "準備中",
     disabledBody: "投稿機能はSupabaseの設定後に有効になります。手順はREADMEを参照してください。",
     moderationNote: "投稿は承認後に掲載されます。",
@@ -156,7 +169,9 @@ export const copy = {
       shop: "店",
       shopSearchPlaceholder: "店名・駅名で探す",
       shopChange: "変更",
-      shopEmpty: "見つかりませんでした。掲載店以外への投稿は、いまは受け付けていません。",
+      shopEmpty: "掲載店に見つかりませんでした。",
+      shopEmptyHint: "追加してほしい店があれば、別の店の記録の「ひとこと」に店名を添えてください。次の更新で検討します。",
+      shopReset: "掲載店の一覧に戻る",
       photo: "写真",
       photoHint: "タップして写真を追加",
       photoChange: "タップで変更",

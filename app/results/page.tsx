@@ -53,7 +53,7 @@ export default async function ResultsPage({
       <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">{copy.results.title}</h1>
       <p className="mt-2 text-sm text-muted">{copy.results.subtitle}</p>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 border-b border-border sm:grid-cols-2 sm:gap-x-10 lg:grid-cols-3 [&>article:first-child]:border-t-0">
         {results.map((result, i) => (
           <ResultCard key={result.shop.id} result={result} rank={i + 1} />
         ))}

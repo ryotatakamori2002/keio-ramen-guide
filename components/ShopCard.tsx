@@ -8,9 +8,9 @@ import PriceNote from "./PriceNote";
 import ScenePills from "./ScenePills";
 import MetricStrip from "./MetricStrip";
 import SaveButtons from "./SaveButtons";
-import MotionCard from "./motion/MotionCard";
 
-// 「次の一杯を決める判断材料」を主役にした店舗カード。
+// 「次の一杯を決める判断材料」を主役にした店舗の1枠。
+// 白カードの箱ではなく、罫線で区切る紙面のリスト行として組む。
 export default function ShopCard({
   shop,
   header,
@@ -22,9 +22,11 @@ export default function ShopCard({
 }) {
   const thumbImage = postMeta?.latestImageUrl ?? shop.primaryImageUrl;
   const postCount = postMeta?.count ?? 0;
+  // 編集部の基準店（Keio Picks対象）は名前の前に小さな赤印を置く
+  const isPick = shop.editorialPriority === "must";
 
   return (
-    <MotionCard className="h-full rounded-lg border border-border bg-card p-4 transition-colors hover:border-foreground/25">
+    <article className="border-t border-border pt-4 pb-5">
       {header}
 
       <div className="flex gap-3.5">
@@ -41,6 +43,9 @@ export default function ShopCard({
         <div className="min-w-0 flex-1">
           <Link href={`/shops/${shop.id}`} className="group block">
             <div className="flex items-center gap-2">
+              {isPick && (
+                <span aria-hidden className="h-2 w-2 shrink-0 bg-accent" title={copy.picks.title} />
+              )}
               <h3 className="truncate font-bold tracking-tight text-foreground group-hover:text-accent">
                 {shop.name}
               </h3>
@@ -66,7 +71,7 @@ export default function ShopCard({
         <ScenePills tags={shop.sceneTags} max={3} />
       </div>
 
-      <div className="mt-3 border-t border-border pt-3">
+      <div className="mt-3 border-t border-border/70 pt-3">
         <MetricStrip shop={shop} />
       </div>
 
@@ -89,6 +94,6 @@ export default function ShopCard({
           </a>
         </div>
       </div>
-    </MotionCard>
+    </article>
   );
 }
