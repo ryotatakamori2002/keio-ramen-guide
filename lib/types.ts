@@ -85,6 +85,14 @@ export interface Shop {
   images: ShopImage[];
   /** 表示に使うメイン写真URL。permissionConfirmed な写真がある時だけ設定 */
   primaryImageUrl?: string;
+  /** 詳細・Heroで大きく使う横長写真（/images/shops/{id}/hero.jpg） */
+  heroImageUrl?: string;
+  /** 一覧サムネ用（/images/shops/{id}/thumb.jpg） */
+  thumbnailImageUrl?: string;
+  /** 正方形トリミング（/images/shops/{id}/square.jpg） */
+  squareImageUrl?: string;
+  /** 写真のalt（一杯の内容を書く） */
+  imageAlt?: string;
   photoStatus: PhotoStatus;
   /** まだ掲載できる写真がなく、募集・撮影が必要か */
   photoNeeded: boolean;

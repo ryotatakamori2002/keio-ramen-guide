@@ -5,9 +5,7 @@ import { getShopById, VISIBLE_SHOPS } from "@/lib/shops";
 import type { Shop } from "@/lib/types";
 import { copy } from "@/content/site-copy";
 import { button, type } from "@/lib/design";
-import FloatingRamenLayers from "@/components/visual/FloatingRamenLayers";
-import FeaturedBowl from "@/components/FeaturedBowl";
-import TodaysBowl from "@/components/TodaysBowl";
+import HeroPhoto from "@/components/visual/HeroPhoto";
 import AreaLineMap from "@/components/AreaLineMap";
 import KeioPicks from "@/components/KeioPicks";
 import PostList from "@/components/PostList";
@@ -16,10 +14,10 @@ import AnimatedText from "@/components/motion/AnimatedText";
 
 export const revalidate = 60;
 
-// Heroと「今日の一杯」。今は固定1店、投稿が増えたらローテーションにする。
+// Heroの「今日の一杯」。今は固定1店、写真が増えたらローテーションにする。
 const FEATURED_SHOP_ID = "yokohama-ishinshoten";
-// Keio Picks（editorialPriority: must から編集。維新商店はHero/今日の一杯に出すため重複させない）。
-const PICK_IDS = ["yokohama-yoshimuraya", "mita-jiro", "yokohama-afuri", "hiyoshi-musashiya"];
+// Keio Picks。写真のある店（維新・武蔵家・二郎）＋情報カード1枠（AFURI）で誌面を組む。
+const PICK_IDS = ["yokohama-ishinshoten", "hiyoshi-musashiya", "mita-jiro", "yokohama-afuri"];
 // Scene Guide の6シーン。
 const SCENE_IDS = ["hiyoshi-after-class", "mita-lunch", "yokohama-nofail", "solo", "after-drinking", "first-iekei"];
 
@@ -34,41 +32,38 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col gap-16 pb-4 sm:gap-24">
-      {/* 1. Hero — 夜の店先。暗い背景にラーメンのレイヤーが浮かぶ */}
+      {/* 1. Hero — 実写真が主役。左は暗色パネルのコピー、右は維新商店の一杯 */}
       <Bleed className="theme-hero -mt-6 overflow-hidden">
-        <FloatingRamenLayers />
-        <Container className="relative grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[1fr_400px] lg:gap-16 lg:py-24">
-          <div>
-            <p className={type.eyebrow}>{copy.hero.eyebrow}</p>
-            <h1 className={`mt-4 max-w-[22ch] break-keep ${type.display}`}>
-              <AnimatedText text={copy.hero.title} />
-            </h1>
-            <FadeIn delay={0.12}>
-              <p className={`mt-5 max-w-xl text-pretty ${type.lead}`}>{copy.hero.subtitle}</p>
-            </FadeIn>
-            <FadeIn delay={0.22}>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link href="/shops" className={button.primary}>
-                  {copy.hero.primaryCta}
-                </Link>
-                <Link href="/post" className={button.secondary}>
-                  {copy.hero.secondaryCta}
-                </Link>
-              </div>
-              <p className="mt-5 text-sm text-muted">
-                {copy.hero.quizLead}{" "}
-                <Link href="/quiz" className={button.link}>
-                  {copy.hero.quizCta} →
-                </Link>
-              </p>
-            </FadeIn>
+        <div className="grid lg:grid-cols-[minmax(0,42%)_1fr]">
+          <div className="relative z-10 flex items-center">
+            <div className="w-full px-5 py-9 sm:px-8 sm:py-14 lg:py-24 lg:pl-[max(2rem,calc((100vw-64rem)/2))] lg:pr-12">
+              <p className={type.eyebrow}>{copy.hero.eyebrow}</p>
+              <h1 className={`mt-4 max-w-[22ch] break-keep ${type.display}`}>
+                <AnimatedText text={copy.hero.title} />
+              </h1>
+              <FadeIn delay={0.12}>
+                <p className={`mt-5 max-w-xl text-pretty ${type.lead}`}>{copy.hero.subtitle}</p>
+              </FadeIn>
+              <FadeIn delay={0.22}>
+                <div className="mt-8 flex flex-wrap items-center gap-3">
+                  <Link href="/shops" className={button.primary}>
+                    {copy.hero.primaryCta}
+                  </Link>
+                  <Link href="/post" className={button.secondary}>
+                    {copy.hero.secondaryCta}
+                  </Link>
+                </div>
+                <p className="mt-5 text-sm text-muted">
+                  {copy.hero.quizLead}{" "}
+                  <Link href="/quiz" className={button.link}>
+                    {copy.hero.quizCta} →
+                  </Link>
+                </p>
+              </FadeIn>
+            </div>
           </div>
-          {featured && (
-            <FadeIn delay={0.2} y={16}>
-              <FeaturedBowl shop={featured} />
-            </FadeIn>
-          )}
-        </Container>
+          {featured && <HeroPhoto shop={featured} />}
+        </div>
       </Bleed>
 
       {/* 2. Campus Line — 紙面に戻る */}
@@ -77,17 +72,6 @@ export default async function Home() {
           <AreaLineMap counts={counts} />
         </FadeIn>
       </Section>
-
-      {/* 3. 今日の一杯 — 醤油ブラウンの帯 */}
-      {featured && (
-        <Bleed className="theme-brown overflow-hidden">
-          <Container className="py-12 sm:py-16">
-            <FadeIn>
-              <TodaysBowl shop={featured} />
-            </FadeIn>
-          </Container>
-        </Bleed>
-      )}
 
       {/* 4. Keio Picks — ポスターの壁 */}
       <Section label={copy.picks.label} title={copy.picks.title} subtitle={copy.picks.subtitle}>

@@ -1,0 +1,59 @@
+[
+  {
+    "slug": "mita-jiro",
+    "heroImageUrl": "/images/shops/mita-jiro/hero.jpg",
+    "thumbnailImageUrl": "/images/shops/mita-jiro/thumb.jpg",
+    "squareImageUrl": "/images/shops/mita-jiro/square.jpg",
+    "imageAlt": "ラーメン二郎 三田本店のラーメン",
+    "heroSize": [
+      1600,
+      900
+    ],
+    "thumbSize": [
+      900,
+      675
+    ],
+    "squareSize": [
+      900,
+      900
+    ]
+  },
+  {
+    "slug": "hiyoshi-musashiya",
+    "heroImageUrl": "/images/shops/hiyoshi-musashiya/hero.jpg",
+    "thumbnailImageUrl": "/images/shops/hiyoshi-musashiya/thumb.jpg",
+    "squareImageUrl": "/images/shops/hiyoshi-musashiya/square.jpg",
+    "imageAlt": "武蔵家 日吉店のラーメン",
+    "heroSize": [
+      640,
+      360
+    ],
+    "thumbSize": [
+      640,
+      480
+    ],
+    "squareSize": [
+      480,
+      480
+    ]
+  },
+  {
+    "slug": "yokohama-ishinshoten",
+    "heroImageUrl": "/images/shops/yokohama-ishinshoten/hero.jpg",
+    "thumbnailImageUrl": "/images/shops/yokohama-ishinshoten/thumb.jpg",
+    "squareImageUrl": "/images/shops/yokohama-ishinshoten/square.jpg",
+    "imageAlt": "維新商店の生姜醤油ラーメン",
+    "heroSize": [
+      1600,
+      900
+    ],
+    "thumbSize": [
+      900,
+      675
+    ],
+    "squareSize": [
+      900,
+      900
+    ]
+  }
+]

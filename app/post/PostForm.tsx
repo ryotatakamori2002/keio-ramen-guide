@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
+import { motion } from "motion/react";
 import { SCENE_OPTIONS } from "@/lib/quiz";
 import { copy } from "@/content/site-copy";
 import { button } from "@/lib/design";
@@ -91,11 +92,15 @@ export default function PostForm({
             />
             {preview ? (
               <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                {/* 貼った瞬間が気持ちいいように、少し落ちて傾いて収まる */}
+                <motion.img
+                  key={preview}
                   src={preview}
                   alt="選択中の写真"
-                  className="h-20 w-20 shrink-0 -rotate-[1.5deg] rounded-sm border border-border object-cover shadow-[2px_3px_0_rgba(17,16,14,0.08)]"
+                  initial={{ opacity: 0, y: -10, rotate: 3, scale: 1.04 }}
+                  animate={{ opacity: 1, y: 0, rotate: -1.5, scale: 1 }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="h-20 w-20 shrink-0 rounded-sm border border-border object-cover shadow-[2px_3px_0_rgba(17,16,14,0.08)]"
                 />
                 <span className="text-xs text-muted">{f.photoChange}</span>
               </>

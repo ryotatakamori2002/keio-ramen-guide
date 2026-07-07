@@ -31,11 +31,10 @@ export const copy = {
     quizCta: "気分で選ぶ（30秒）",
   },
 
-  // Heroと帯の「今日の一杯」（Featured Bowl）。
+  // Hero写真のキャプション（今日の一杯）。
   featured: {
     label: "今日の一杯",
     cta: "この店を見る",
-    postCta: "食べたら投稿する",
   },
 
   // Keio Picks（数を絞った基準の店。星や点数は使わない）。
@@ -162,7 +161,7 @@ export const copy = {
     submit: "投稿する",
     submitting: "送信中…",
     successTitle: "ごちそうさまでした。",
-    successBody: "記録を受け取りました。内容を確認してから掲載します。",
+    successBody: "記録を受け取りました。確認のあと、トップと店のページに載ります。",
     successExplore: "店を見る",
     successAgain: "続けて投稿する",
     anon: "名無しの慶應生",
