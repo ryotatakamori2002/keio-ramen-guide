@@ -19,8 +19,6 @@ export const type = {
   h1: "tracking-display text-2xl font-bold leading-tight text-foreground sm:text-3xl",
   // セクション見出し
   h2: "text-lg font-bold tracking-tight text-foreground",
-  // 小見出し（英字ラベル＋和文の組み合わせで使う）
-  sectionLabel: "text-[11px] font-semibold uppercase tracking-[0.18em] text-muted",
   // 本文
   body: "text-sm leading-relaxed text-foreground/80 sm:text-[15px]",
   lead: "text-base leading-relaxed text-muted sm:text-lg",
