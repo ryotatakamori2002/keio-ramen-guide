@@ -100,7 +100,7 @@ export default async function ResultsPage({
               </Link>
 
               <div className="min-w-0">
-                <h2 className="break-keep text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                   <Link href={`/shops/${top.shop.id}`} className="transition-colors hover:text-accent">
                     {top.shop.name}
                   </Link>

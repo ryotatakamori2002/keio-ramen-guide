@@ -14,11 +14,21 @@ const VALID_SCENES = new Set(SCENE_OPTIONS.map((o) => o.value));
 const MAX_IMAGE_BYTES = 6 * 1024 * 1024; // 6MB
 
 export async function submitPost(_prev: PostFormState, formData: FormData): Promise<PostFormState> {
+  // どんな失敗でも本番500にせず、フォーム上のエラーメッセージとして返す。
+  try {
+    return await handleSubmit(formData);
+  } catch (err) {
+    console.error("submitPost failed:", err);
+    return { ok: false, message: "投稿に失敗しました。時間をおいてもう一度試してください。" };
+  }
+}
+
+async function handleSubmit(formData: FormData): Promise<PostFormState> {
   if (!isSupabaseReady()) {
-    return { ok: false, message: "Supabase設定後に投稿機能が有効になります。" };
+    return { ok: false, message: "投稿機能は現在準備中です。" };
   }
   const db = getSupabaseAdmin();
-  if (!db) return { ok: false, message: "Supabase設定後に投稿機能が有効になります。" };
+  if (!db) return { ok: false, message: "投稿機能は現在準備中です。" };
 
   const shopId = String(formData.get("shopId") ?? "").trim();
   const menuName = String(formData.get("menuName") ?? "").trim();
@@ -57,7 +67,9 @@ export async function submitPost(_prev: PostFormState, formData: FormData): Prom
       .from(STORAGE_BUCKET)
       .upload(path, image, { contentType: image.type, upsert: false });
     if (upErr) {
-      return { ok: false, message: "画像のアップロードに失敗しました。時間をおいて試してください。" };
+      // bucket未作成・権限不足など。DB insertに進む前にここで止める。
+      console.error("submitPost image upload failed:", upErr);
+      return { ok: false, message: "画像のアップロードに失敗しました。時間をおいてもう一度試してください。" };
     }
     imagePath = path;
     imageUrl = db.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
@@ -76,7 +88,8 @@ export async function submitPost(_prev: PostFormState, formData: FormData): Prom
   });
 
   if (error) {
-    return { ok: false, message: "投稿の保存に失敗しました。時間をおいて試してください。" };
+    console.error("submitPost insert failed:", error);
+    return { ok: false, message: "投稿の保存に失敗しました。時間をおいてもう一度試してください。" };
   }
 
   return { ok: true, message: "投稿ありがとうございます。確認後に掲載されます。" };
