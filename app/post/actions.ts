@@ -1,6 +1,7 @@
 "use server";
 
 import { randomUUID } from "crypto";
+import { revalidatePath } from "next/cache";
 import { getShopById } from "@/lib/shops";
 import { getSupabaseAdmin, isSupabaseReady, STORAGE_BUCKET } from "@/lib/supabase";
 import { SCENE_OPTIONS } from "@/lib/quiz";
@@ -85,6 +86,8 @@ async function handleSubmit(formData: FormData): Promise<PostFormState> {
     imageUrl = db.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
   }
 
+  // MVP検証中は承認を挟まず即時公開する（荒らしが出たら status: "pending" の承認制に戻す。
+  // /admin と承認フローは残してあるので、この2行を戻すだけで復活できる）。
   const payload = {
     shop_id: shopId,
     nickname: nickname || null,
@@ -94,7 +97,8 @@ async function handleSubmit(formData: FormData): Promise<PostFormState> {
     scene_tags: sceneTags,
     image_url: imageUrl,
     image_path: imagePath,
-    status: "pending",
+    status: "approved",
+    approved_at: new Date().toISOString(),
   };
   const { error } = await db.from("ramen_posts").insert(payload);
 
@@ -123,5 +127,10 @@ async function handleSubmit(formData: FormData): Promise<PostFormState> {
     return { ok: false, message: "投稿の保存に失敗しました。時間をおいてもう一度試してください。" };
   }
 
-  return { ok: true, message: "投稿ありがとうございます。確認後に掲載されます。" };
+  // ISR（60秒）を待たず、トップ・一覧・該当店舗の詳細へ即時反映する
+  revalidatePath("/");
+  revalidatePath("/shops");
+  revalidatePath(`/shops/${shopId}`);
+
+  return { ok: true, message: "投稿ありがとうございます。すぐにサイトに表示されます。" };
 }
