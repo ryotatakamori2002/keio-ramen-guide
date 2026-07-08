@@ -21,8 +21,9 @@
 
 ## 投稿機能（実食ログ）
 
-- `/post`：ログインなしで投稿（ニックネーム任意・画像1枚・メニュー名・金額・一言・シーン）。投稿は **`pending` で保存**され、すぐには公開されない。
-- `/admin`：`ADMIN_PASSWORD` による簡易認証の承認画面。承認すると `approved`、却下で `rejected`。`approved` の投稿だけが店舗詳細・トップ・/shops に表示される（荒らし防止）。
+- `/post`：ログインなしで投稿（ニックネーム任意・画像1枚・メニュー名・金額・一言・シーン）。
+- **MVP検証中は即時公開**：投稿は `approved` で保存され、トップ・店舗詳細・/shops にすぐ表示される（`revalidatePath` で即時反映）。**荒らしが出たら `app/post/actions.ts` の insert を `status: "pending"` に戻すだけで承認制に復帰できる。**
+- `/admin`：`ADMIN_PASSWORD` による簡易認証の管理画面。承認制復帰用に残してあり、不適切な投稿の削除・却下にも使える。
 - 投稿の編集・削除は管理者のみ。いいね/フォロー/コメントはMVPでは作らない。
 - **Supabase が未設定でもローカル開発・build は壊れない。** 投稿系の読み取りは空配列を返し、`/post` は「Supabase設定後に投稿機能が有効になります」と表示する。
 
@@ -36,11 +37,11 @@
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` … anon キー
    - `SUPABASE_SERVICE_ROLE_KEY` … service role キー（サーバー専用・絶対に公開しない）
    - `ADMIN_PASSWORD` … `/admin` に入る共有パスワード
-5. `npm run dev` で `/post` から投稿 → `/admin` でログイン → 承認 → 店舗詳細に表示、を確認。
+5. `npm run dev` で `/post` から投稿 → トップ・店舗詳細に即表示されることを確認。
 
-### 投稿承認フロー
+### 投稿の公開フロー（MVP検証中）
 
-`/post` で投稿（`pending`）→ `/admin` でパスワードログイン → 写真・店・メニュー・価格・コメントを確認 → 「承認」で `approved`（公開）／「却下」で `rejected`（非公開）。承認済みは最大60秒（ISR）で各ページに反映。
+`/post` で投稿 → `approved` で保存され**すぐに公開**（トップ・/shops・店舗詳細に即反映）。不適切な投稿は `/admin` から却下（`rejected`）で非表示にできる。検証で荒らしが出た場合は、`app/post/actions.ts` の insert を `status: "pending"` に戻して従来の承認制（投稿→/adminで承認→公開）へ復帰する。
 
 ### 写真の権利ルール
 
