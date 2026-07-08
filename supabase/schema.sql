@@ -1,6 +1,22 @@
 -- Keio Ramen Guide — Supabase スキーマ
 -- 実行: Supabase ダッシュボード > SQL Editor にこの内容を貼って Run。
 -- もしくは: supabase db push / psql で適用。
+-- 冪等（何度実行しても安全）。投稿が保存できない時（permission denied / 42501）も
+-- このファイルを丸ごと再実行すれば直る。
+
+-- ============================================================
+-- 0) 権限の復旧
+--    Supabaseの無料プロジェクトはpause→復帰でテーブル権限（GRANT）が
+--    失われることがあり、その状態では service_role ですら
+--    「42501 permission denied for table ramen_posts」でinsertに失敗する。
+--    ここでSupabase標準の権限を張り直す（RLSは3)で別途制御している）。
+-- ============================================================
+grant usage on schema public to anon, authenticated, service_role;
+grant all on all tables in schema public to service_role;
+grant all on all sequences in schema public to service_role;
+grant select on all tables in schema public to anon, authenticated;
+alter default privileges in schema public grant all on tables to service_role;
+alter default privileges in schema public grant select on tables to anon, authenticated;
 
 -- ============================================================
 -- 1) 店舗テーブル（将来DB化用。MVPでは lib/shops.ts のローカルデータを使い続けてよい）
@@ -80,3 +96,10 @@ create policy "post images are public"
   on storage.objects for select
   to anon, authenticated
   using (bucket_id = 'ramen-post-images');
+
+-- ============================================================
+-- 5) 権限の再適用（このファイルで新規作成されたテーブルにも確実に効かせる）
+-- ============================================================
+grant all on all tables in schema public to service_role;
+grant all on all sequences in schema public to service_role;
+grant select on all tables in schema public to anon, authenticated;
