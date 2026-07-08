@@ -13,6 +13,16 @@ export interface PostFormState {
 const VALID_SCENES = new Set(SCENE_OPTIONS.map((o) => o.value));
 const MAX_IMAGE_BYTES = 6 * 1024 * 1024; // 6MB
 
+// 診断ログ用。URLのホスト名だけ返し、キーの値は絶対に扱わない。
+function safeSupabaseHost(): string | null {
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    return url ? new URL(url).host : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function submitPost(_prev: PostFormState, formData: FormData): Promise<PostFormState> {
   // どんな失敗でも本番500にせず、フォーム上のエラーメッセージとして返す。
   try {
@@ -75,7 +85,7 @@ async function handleSubmit(formData: FormData): Promise<PostFormState> {
     imageUrl = db.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
   }
 
-  const { error } = await db.from("ramen_posts").insert({
+  const payload = {
     shop_id: shopId,
     nickname: nickname || null,
     menu_name: menuName,
@@ -85,10 +95,31 @@ async function handleSubmit(formData: FormData): Promise<PostFormState> {
     image_url: imageUrl,
     image_path: imagePath,
     status: "pending",
-  });
+  };
+  const { error } = await db.from("ramen_posts").insert(payload);
 
   if (error) {
-    console.error("submitPost insert failed:", error);
+    // 管理者向け診断ログ。キーの値・投稿本文は絶対に出さない。
+    console.error("submitPost insert failed:", {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      payloadKeys: Object.keys(payload).join(","),
+      shopId,
+      hasMenuName: Boolean(menuName),
+      priceYen,
+      hasImage: Boolean(imagePath),
+      supabaseHost: safeSupabaseHost(),
+      hasServiceKey: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    });
+    // 42501 = Postgresの権限不足。pause復帰でGRANTが消えた状態。schema.sqlの再実行で直る。
+    if (error.code === "42501") {
+      console.error(
+        "submitPost: table privileges are missing (likely after a Supabase pause/restore). " +
+          "Run supabase/schema.sql (section 0) in the SQL Editor to restore grants.",
+      );
+    }
     return { ok: false, message: "投稿の保存に失敗しました。時間をおいてもう一度試してください。" };
   }
 
