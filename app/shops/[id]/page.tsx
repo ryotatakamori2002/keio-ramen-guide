@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getShopById, SHOPS } from "@/lib/shops";
+import { SHOPS } from "@/lib/shops";
+import { getCatalogShopById } from "@/lib/catalog";
 import { getApprovedPostsByShop } from "@/lib/posts";
 import type { DataConfidence, Shop } from "@/lib/types";
 import { copy } from "@/content/site-copy";
@@ -27,7 +28,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const shop = getShopById(id);
+  const shop = await getCatalogShopById(id);
   if (!shop) return { title: "Not found" };
   return {
     title: `${shop.name} | ${copy.serviceName}`,
@@ -51,7 +52,7 @@ export default async function ShopDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const shop = getShopById(id);
+  const shop = await getCatalogShopById(id);
   if (!shop) notFound();
 
   const posts = await getApprovedPostsByShop(id);

@@ -22,8 +22,7 @@ const QUICK_CONDITIONS: QuickCondition[] = [
   { key: "drinking", label: "深夜・飲み後", test: (s) => s.sceneTags.includes("after_drinking") },
 ];
 
-// エリアの表示順。絞り込みが無い時はこの順でグルーピングして見出しを付ける。
-const AREA_ORDER = ["日吉", "三田", "横浜"];
+import { LIVE_AREA_ORDER } from "@/lib/areas";
 
 export default function FilterableShopList({
   shops,
@@ -86,7 +85,10 @@ export default function FilterableShopList({
       list.push(shop);
       groups.set(shop.area, list);
     }
-    return AREA_ORDER.filter((a) => groups.has(a)).map((a) => ({ area: a, shops: groups.get(a)! }));
+    // 掲載中エリアの順で並べ、台帳にない新エリア（DB追加）は後ろに続ける
+    const known = LIVE_AREA_ORDER.filter((a) => groups.has(a));
+    const extra = Array.from(groups.keys()).filter((a) => !LIVE_AREA_ORDER.includes(a));
+    return [...known, ...extra].map((a) => ({ area: a, shops: groups.get(a)! }));
   }, [filtered]);
 
   function toggleQuick(key: string) {

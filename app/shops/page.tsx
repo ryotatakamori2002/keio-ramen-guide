@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SHOPS, getAllAreas, getAllGenres } from "@/lib/shops";
+import { getCatalogShops } from "@/lib/catalog";
 import { getApprovedPostMeta } from "@/lib/posts";
 import { copy } from "@/content/site-copy";
 import { button, type as t } from "@/lib/design";
@@ -25,8 +25,12 @@ export default async function ShopsPage({
   searchParams: Promise<{ area?: string; genre?: string; scene?: string; beginner?: string }>;
 }) {
   const { area, genre, scene, beginner } = await searchParams;
-  const initialArea = area && getAllAreas().includes(area) ? area : null;
-  const initialGenre = genre && getAllGenres().includes(genre) ? genre : null;
+  // 店舗はカタログ（静的seed＋Supabase追加店）から。エリア/ジャンルの検証もカタログ基準
+  const shops = await getCatalogShops();
+  const areas = new Set(shops.map((s) => s.area));
+  const genreSet = new Set(shops.flatMap((s) => s.genres));
+  const initialArea = area && areas.has(area) ? area : null;
+  const initialGenre = genre && genreSet.has(genre) ? genre : null;
   const initialQuick = quickFromParams(scene, beginner);
 
   const postMeta = await getApprovedPostMeta();
@@ -44,7 +48,7 @@ export default async function ShopsPage({
 
       <div className="mt-8">
         <FilterableShopList
-          shops={SHOPS}
+          shops={shops}
           initialArea={initialArea}
           initialGenre={initialGenre}
           initialQuick={initialQuick}
@@ -54,9 +58,14 @@ export default async function ShopsPage({
 
       <div className="mt-16 border-t border-border pt-8">
         <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.shops.postPrompt}</p>
-        <Link href="/post" className={`${button.link} mt-2 inline-block`}>
-          {copy.shops.postCta} →
-        </Link>
+        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1">
+          <Link href="/post" className={button.link}>
+            {copy.shops.postCta} →
+          </Link>
+          <Link href="/shops/request" className="text-sm text-muted underline decoration-border underline-offset-4 transition-colors hover:text-accent hover:decoration-accent">
+            {copy.comingAreas.requestCta}
+          </Link>
+        </div>
       </div>
     </div>
   );

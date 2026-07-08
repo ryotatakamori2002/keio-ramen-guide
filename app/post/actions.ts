@@ -5,6 +5,15 @@ import { revalidatePath } from "next/cache";
 import { getShopById } from "@/lib/shops";
 import { getSupabaseAdmin, isSupabaseReady, STORAGE_BUCKET } from "@/lib/supabase";
 import { SCENE_OPTIONS } from "@/lib/quiz";
+import { insertWithColumnFallback } from "@/lib/db-utils";
+import {
+  AFFILIATION_OPTIONS,
+  CAMPUS_OPTIONS,
+  FACULTY_OPTIONS,
+  GENDER_OPTIONS,
+  MBTI_OPTIONS,
+  pickAllowed,
+} from "@/lib/post-attributes";
 
 export interface PostFormState {
   ok: boolean;
@@ -86,6 +95,16 @@ async function handleSubmit(formData: FormData): Promise<PostFormState> {
     imageUrl = db.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
   }
 
+  // 任意の属性（/insights 集計用）。ホワイトリスト外・未回答は保存しない
+  const authorAttrs = {
+    author_affiliation: pickAllowed(String(formData.get("authorAffiliation") ?? ""), AFFILIATION_OPTIONS),
+    author_campus: pickAllowed(String(formData.get("authorCampus") ?? ""), CAMPUS_OPTIONS),
+    author_faculty: pickAllowed(String(formData.get("authorFaculty") ?? ""), FACULTY_OPTIONS),
+    author_grade: String(formData.get("authorGrade") ?? "").trim().slice(0, 20) || null,
+    author_gender: pickAllowed(String(formData.get("authorGender") ?? ""), GENDER_OPTIONS),
+    author_mbti: pickAllowed(String(formData.get("authorMbti") ?? ""), MBTI_OPTIONS),
+  };
+
   // MVP検証中は承認を挟まず即時公開する（荒らしが出たら status: "pending" の承認制に戻す。
   // /admin と承認フローは残してあるので、この2行を戻すだけで復活できる）。
   const payload = {
@@ -99,8 +118,10 @@ async function handleSubmit(formData: FormData): Promise<PostFormState> {
     image_path: imagePath,
     status: "approved",
     approved_at: new Date().toISOString(),
+    ...authorAttrs,
   };
-  const { error } = await db.from("ramen_posts").insert(payload);
+  // 属性カラムが本番DBに未適用（schema.sql未実行）の間も投稿自体は通す
+  const { error } = await insertWithColumnFallback(db, "ramen_posts", payload, Object.keys(authorAttrs));
 
   if (error) {
     // 管理者向け診断ログ。キーの値・投稿本文は絶対に出さない。

@@ -4,6 +4,13 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { motion } from "motion/react";
 import { SCENE_OPTIONS } from "@/lib/quiz";
+import {
+  AFFILIATION_OPTIONS,
+  CAMPUS_OPTIONS,
+  FACULTY_OPTIONS,
+  GENDER_OPTIONS,
+  MBTI_OPTIONS,
+} from "@/lib/post-attributes";
 import { copy } from "@/content/site-copy";
 import { button } from "@/lib/design";
 import Stagger from "@/components/motion/Stagger";
@@ -12,6 +19,7 @@ import { submitPost, type PostFormState } from "./actions";
 
 const initialState: PostFormState = { ok: false, message: "" };
 const f = copy.post.fields;
+const a = copy.post.aboutYou;
 
 export default function PostForm({
   shops,
@@ -170,6 +178,36 @@ export default function PostForm({
           />
         </Field>
 
+        {/* 任意の属性。/insights の集計にのみ使う。折りたたみで投稿の負担を増やさない */}
+        <details className="group rounded-md border border-border bg-card">
+          <summary className="flex cursor-pointer list-none items-center justify-between px-3.5 py-3 text-sm font-medium text-foreground [&::-webkit-details-marker]:hidden">
+            {a.summary}
+            <span aria-hidden className="text-muted transition-transform group-open:rotate-90">
+              →
+            </span>
+          </summary>
+          <div className="border-t border-border px-3.5 pb-4 pt-3">
+            <p className="text-xs leading-relaxed text-muted">{a.note}</p>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <AttrSelect label={a.affiliation} name="authorAffiliation" options={AFFILIATION_OPTIONS} />
+              <AttrSelect label={a.campus} name="authorCampus" options={CAMPUS_OPTIONS} />
+              <AttrSelect label={a.faculty} name="authorFaculty" options={FACULTY_OPTIONS} />
+              <div>
+                <label className="mb-1 block text-xs font-medium text-foreground">{a.grade}</label>
+                <input
+                  type="text"
+                  name="authorGrade"
+                  maxLength={20}
+                  placeholder={a.gradePlaceholder}
+                  className="w-full rounded-md border border-border bg-background px-2.5 py-2 text-sm placeholder:text-muted focus:border-foreground focus:outline-none"
+                />
+              </div>
+              <AttrSelect label={a.gender} name="authorGender" options={GENDER_OPTIONS} />
+              <AttrSelect label={a.mbti} name="authorMbti" options={MBTI_OPTIONS} />
+            </div>
+          </div>
+        </details>
+
         <div className="border-t border-border pt-4 text-xs leading-relaxed text-muted">
           <p>{copy.post.moderationNote}</p>
           <p className="mt-1">{copy.post.rights}</p>
@@ -184,6 +222,34 @@ export default function PostForm({
         </button>
       </Stagger>
     </form>
+  );
+}
+
+function AttrSelect({
+  label,
+  name,
+  options,
+}: {
+  label: string;
+  name: string;
+  options: readonly string[];
+}) {
+  return (
+    <div>
+      <label className="mb-1 block text-xs font-medium text-foreground">{label}</label>
+      <select
+        name={name}
+        defaultValue=""
+        className="w-full rounded-md border border-border bg-background px-2.5 py-2 text-sm text-foreground focus:border-foreground focus:outline-none"
+      >
+        <option value="">{a.unset}</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
 
