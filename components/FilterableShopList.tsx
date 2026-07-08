@@ -17,7 +17,7 @@ const QUICK_CONDITIONS: QuickCondition[] = [
   { key: "near", label: "駅近", test: (s) => s.nearness >= 4 },
   { key: "solo", label: "一人向き", test: (s) => s.soloFriendly >= 4 },
   { key: "lowQueue", label: "並び少なめ", test: (s) => s.queueLevel <= 2 },
-  { key: "hearty", label: "がっつり", test: (s) => s.volume >= 4 },
+  { key: "hearty", label: "量多め", test: (s) => s.volume >= 4 },
   { key: "beginner", label: "初心者向き", test: (s) => s.beginnerFriendly >= 4 },
   { key: "drinking", label: "深夜・飲み後", test: (s) => s.sceneTags.includes("after_drinking") },
 ];

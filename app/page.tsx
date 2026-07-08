@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { shelfLinks } from "@/lib/shelves";
 import { getRecentApprovedPosts } from "@/lib/posts";
 import { getShopById, VISIBLE_SHOPS } from "@/lib/shops";
 import type { Shop } from "@/lib/types";
 import { copy } from "@/content/site-copy";
 import { button, type } from "@/lib/design";
 import HeroPhoto from "@/components/visual/HeroPhoto";
-import AreaLineMap from "@/components/AreaLineMap";
+import CampusGuide from "@/components/CampusGuide";
+import SceneGuide from "@/components/SceneGuide";
+import PostInvite from "@/components/PostInvite";
 import KeioPicks from "@/components/KeioPicks";
 import PostList from "@/components/PostList";
 import FadeIn from "@/components/motion/FadeIn";
@@ -18,16 +19,13 @@ export const revalidate = 60;
 const FEATURED_SHOP_ID = "yokohama-ishinshoten";
 // Keio Picks。写真のある店（維新・武蔵家・二郎）＋情報カード1枠（AFURI）で誌面を組む。
 const PICK_IDS = ["yokohama-ishinshoten", "hiyoshi-musashiya", "mita-jiro", "yokohama-afuri"];
-// Scene Guide の6シーン。
-const SCENE_IDS = ["hiyoshi-after-class", "mita-lunch", "yokohama-nofail", "solo", "after-drinking", "first-iekei"];
 
 export default async function Home() {
   const featured = getShopById(FEATURED_SHOP_ID);
   const picks = PICK_IDS.map((id) => getShopById(id)).filter((s): s is Shop => Boolean(s));
-  const scenes = shelfLinks(SCENE_IDS);
   const recentPosts = await getRecentApprovedPosts(4);
   const counts = Object.fromEntries(
-    copy.lineMap.stations.map((st) => [st.id, VISIBLE_SHOPS.filter((s) => s.area === st.id).length]),
+    copy.campus.areas.map((a) => [a.id, VISIBLE_SHOPS.filter((s) => s.area === a.id).length]),
   );
 
   return (
@@ -66,10 +64,10 @@ export default async function Home() {
         </div>
       </Bleed>
 
-      {/* 2. Campus Line — 紙面に戻る */}
-      <Section label={copy.lineMap.sectionLabel} title={copy.lineMap.sectionTitle}>
-        <FadeIn className="mt-8">
-          <AreaLineMap counts={counts} />
+      {/* 2. Campus Guide — エリアを生活圏の特集リードとして見せる */}
+      <Section label={copy.campus.label} title={copy.campus.title}>
+        <FadeIn className="mt-6">
+          <CampusGuide counts={counts} />
         </FadeIn>
       </Section>
 
@@ -88,36 +86,12 @@ export default async function Home() {
             <h2 className="mt-1.5 text-xl font-bold tracking-tight text-foreground">{copy.curated.title}</h2>
           </FadeIn>
           <FadeIn>
-            <div className="mt-4 grid sm:grid-cols-2 sm:gap-x-14">
-              {scenes.map((scene) => {
-                const meta = copy.curated.titles[scene.id];
-                if (!meta) return null;
-                return (
-                  <Link
-                    key={scene.id}
-                    href={scene.href}
-                    className="group flex items-center justify-between gap-3 border-b border-border py-3.5"
-                  >
-                    <span className="min-w-0">
-                      <span className="flex items-center font-semibold tracking-tight text-foreground transition-colors group-hover:text-accent">
-                        <span
-                          aria-hidden
-                          className="mr-2.5 h-1.5 w-1.5 shrink-0 bg-accent transition-transform duration-200 group-hover:translate-x-1"
-                        />
-                        {meta.ja}
-                      </span>
-                      <span className="mt-0.5 block truncate pl-4 text-xs text-muted">{meta.note}</span>
-                    </span>
-                    <span aria-hidden className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5">
-                      →
-                    </span>
-                  </Link>
-                );
-              })}
+            <div className="mt-6">
+              <SceneGuide />
             </div>
             <Link
               href="/shops"
-              className="mt-5 inline-block text-sm font-medium text-muted underline-offset-4 transition-colors hover:text-accent"
+              className="mt-6 inline-block text-sm font-medium text-muted underline-offset-4 transition-colors hover:text-accent"
             >
               {copy.curated.viewAll} →
             </Link>
@@ -137,13 +111,8 @@ export default async function Home() {
             <PostList posts={recentPosts} />
           </FadeIn>
         ) : (
-          <FadeIn>
-            <p className="mt-5 text-sm text-muted">
-              {copy.recentLogs.empty.title}{" "}
-              <Link href="/post" className={button.link}>
-                {copy.recentLogs.empty.cta} →
-              </Link>
-            </p>
+          <FadeIn className="mt-6">
+            <PostInvite />
           </FadeIn>
         )}
       </Section>

@@ -43,8 +43,8 @@ export const SCENE_OPTIONS: QuizOption<SceneAnswer>[] = [
   { value: "with_friends", label: "友達と" },
   { value: "after_club", label: "サークル後" },
   { value: "after_drinking", label: "飲み後" },
-  { value: "hearty", label: "がっつり" },
-  { value: "no_fail", label: "失敗したくない" },
+  { value: "hearty", label: "しっかり食べたい" },
+  { value: "no_fail", label: "迷わず決めたい" },
 ];
 
 // シーンタグ → 表示ラベルの早見表。カードや詳細でシーンを日本語表示するのに使う。
@@ -61,14 +61,14 @@ export const TASTE_OPTIONS: QuizOption<TasteAnswer>[] = [
   { value: "miso", label: "味噌" },
   { value: "mazesoba", label: "まぜそば" },
   { value: "tsukemen", label: "つけ麺" },
-  { value: "unknown", label: "よくわからない" },
+  { value: "unknown", label: "決めていない" },
 ];
 
 export const RICHNESS_OPTIONS: QuizOption<RichnessAnswer>[] = [
   { value: "light", label: "あっさり" },
   { value: "normal", label: "普通" },
   { value: "rich", label: "こってり" },
-  { value: "extreme", label: "限界まで重い" },
+  { value: "extreme", label: "かなり重めでもいい" },
 ];
 
 export const QUEUE_OPTIONS: QuizOption<QueueAnswer>[] = [
