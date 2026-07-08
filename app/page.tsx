@@ -38,7 +38,8 @@ export default async function Home() {
           <div className="relative z-10 flex items-center">
             <div className="w-full px-5 py-9 sm:px-8 sm:py-14 lg:py-24 lg:pl-[max(2rem,calc((100vw-64rem)/2))] lg:pr-12">
               <p className={type.eyebrow}>{copy.hero.eyebrow}</p>
-              <h1 className={`mt-4 max-w-[22ch] break-keep ${type.display}`}>
+              {/* break-keep はCJKの折返しを禁じ、iOS Safariで見出しが右にはみ出すため使わない */}
+              <h1 className={`mt-4 max-w-[22ch] ${type.display}`}>
                 <AnimatedText text={copy.hero.title} />
               </h1>
               <FadeIn delay={0.12}>

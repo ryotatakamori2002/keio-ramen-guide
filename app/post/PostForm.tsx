@@ -22,6 +22,7 @@ export default function PostForm({
 }) {
   const [state, formAction, pending] = useActionState(submitPost, initialState);
   const [preview, setPreview] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
 
   if (state.ok) {
     return (
@@ -87,6 +88,20 @@ export default function PostForm({
               className="sr-only"
               onChange={(e) => {
                 const file = e.target.files?.[0];
+                // 送信時に本番のリクエスト上限へ到達しないよう、選択時点で弾く
+                if (file && !file.type.startsWith("image/")) {
+                  setPhotoError("画像ファイルを選んでください。");
+                  e.target.value = "";
+                  setPreview(null);
+                  return;
+                }
+                if (file && file.size > 6 * 1024 * 1024) {
+                  setPhotoError("画像が大きすぎます（6MBまで）。別の写真を選んでください。");
+                  e.target.value = "";
+                  setPreview(null);
+                  return;
+                }
+                setPhotoError(null);
                 setPreview(file ? URL.createObjectURL(file) : null);
               }}
             />
@@ -118,6 +133,7 @@ export default function PostForm({
               </>
             )}
           </label>
+          {photoError && <p className="mt-1.5 text-xs text-accent-dark">{photoError}</p>}
         </Field>
 
         <Field label={f.note} optional>

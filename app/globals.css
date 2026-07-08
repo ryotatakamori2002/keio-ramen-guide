@@ -50,6 +50,8 @@
 html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* 全幅ブリードや長い見出しが万一はみ出しても、横スクロールは発生させない（最終保険） */
+  overflow-x: clip;
 }
 
 body {
