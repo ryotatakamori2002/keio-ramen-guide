@@ -71,17 +71,17 @@ function scoreShop(shop: Shop, answers: QuizAnswers): { score: number; reasons: 
     }
     case "hearty": {
       score += shop.volume * 6;
-      if (shop.volume >= 4) pushReason(reasons, "ボリューム満点でがっつり食べられる");
+      if (shop.volume >= 4) pushReason(reasons, "量までしっかり満たせる");
       break;
     }
     case "no_fail": {
       score += shop.keioStudentScore * 5 + shop.beginnerFriendly * 2;
-      if (shop.keioStudentScore >= 4) pushReason(reasons, "慶應生からの支持が高く失敗しにくい");
+      if (shop.keioStudentScore >= 4) pushReason(reasons, "慶應生からの支持が高い定番");
       break;
     }
   }
 
-  // 重さ（あっさり〜限界まで重い）
+  // 重さ（あっさり〜かなり重め）
   const richnessTarget: Record<QuizAnswers["richness"], number> = {
     light: 1,
     normal: 3,
@@ -99,7 +99,7 @@ function scoreShop(shop: Shop, answers: QuizAnswers): { score: number; reasons: 
   // 並び
   if (answers.queue === "avoid") {
     score += (6 - shop.queueLevel) * 4;
-    if (shop.queueLevel <= 2) pushReason(reasons, "並びにくく入りやすい");
+    if (shop.queueLevel <= 2) pushReason(reasons, "行列が少なく、すっと入りやすい");
   } else if (answers.queue === "can_queue") {
     score += shop.queueLevel * 2;
   }

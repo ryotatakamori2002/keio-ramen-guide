@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 
 export default function QuizPage() {
   return (
-    <div className="mx-auto max-w-xl py-2">
+    <div className="mx-auto max-w-4xl py-2">
       <p className={t.eyebrow}>{copy.quiz.eyebrow}</p>
       <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">{copy.quiz.title}</h1>
       <p className="mt-2 text-sm text-muted">{copy.quiz.subtitle}</p>
-      <div className="mt-8">
+      <div className="mt-9">
         <QuizForm />
       </div>
     </div>

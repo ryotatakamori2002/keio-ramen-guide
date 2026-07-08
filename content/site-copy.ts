@@ -45,18 +45,39 @@ export const copy = {
     detail: "詳細",
   },
 
-  // Area Indexの沿線図。三田−日吉−横浜が1本の鉄道軸でつながっている事実をそのまま見せる。
-  lineMap: {
-    sectionLabel: "エリア",
-    sectionTitle: "キャンパスの沿線で選ぶ",
+  // エリア＝慶應生の生活圏。駅や路線ではなく「そこで過ごす時間」で見せる。
+  campus: {
+    label: "エリア",
+    title: "キャンパスの生活圏で選ぶ",
     count: (n: number) => `${n}店`,
-    legend: "赤い印は、慶應キャンパスの最寄り駅",
-    stations: [
-      { id: "三田", name: "三田・田町", en: "Mita", note: "三田キャンパスの昼休みと授業後に", campus: true },
-      { id: "日吉", name: "日吉", en: "Hiyoshi", note: "日吉キャンパスから徒歩圏で", campus: true },
-      { id: "横浜", name: "横浜", en: "Yokohama", note: "帰り道や遊びのついでに", campus: false },
+    repLabel: "この街の一杯",
+    viewArea: "この街の店を見る",
+    areas: [
+      {
+        id: "日吉",
+        name: "日吉",
+        en: "HIYOSHI",
+        context: "授業のあと、学生街でそのまま一杯。",
+        meta: "東急東横線・日吉駅",
+        rep: "hiyoshi-musashiya",
+      },
+      {
+        id: "三田",
+        name: "三田・田町",
+        en: "MITA / TAMACHI",
+        context: "昼休みと授業の合間に、歩ける範囲で。",
+        meta: "都営三田線 三田駅・JR田町駅",
+        rep: "mita-jiro",
+      },
+      {
+        id: "横浜",
+        name: "横浜",
+        en: "YOKOHAMA",
+        context: "遊びの日も帰り道も、少し歩いて寄りたい店へ。",
+        meta: "東急東横線・横浜駅",
+        rep: "yokohama-ishinshoten",
+      },
     ],
-    segments: ["都営三田線・東急目黒線で直通", "東急東横線 急行で約15分"],
   },
 
   recentLogs: {
@@ -65,6 +86,13 @@ export const copy = {
     subtitle: "慶應生が実際に食べた一杯。",
     viewAll: "投稿する",
     empty: { title: "最初の投稿を待っています。", cta: "一杯を記録する" },
+    // 投稿0件でも「ここから育つ」と伝えるための招待ブロック
+    invite: {
+      lead: "ここに、慶應生の実食が並んでいく。",
+      body: "食べた一杯を写真とひとことで残すと、次の誰かの店選びになります。投稿は内容を確認してから掲載します。",
+      cta: "一杯を記録する",
+      note: "写真がなくても投稿できます。",
+    },
   },
 
   curated: {
@@ -82,7 +110,7 @@ export const copy = {
       "gap-time": { ja: "空きコマに", note: "短時間でさっと食べたい時に。" },
       "mita-lunch": { ja: "三田の昼に", note: "昼休みに歩いて行ける店。" },
       "yokohama-nofail": { ja: "横浜で選ぶ", note: "遊びや帰り道の途中で。" },
-      jiro: { ja: "二郎系", note: "がっつり系に挑みたい日に。" },
+      jiro: { ja: "二郎系", note: "量と濃さに挑みたい日に。" },
     } as Record<string, { ja: string; note: string }>,
   },
 
@@ -191,14 +219,21 @@ export const copy = {
   quiz: {
     eyebrow: "気分",
     title: "気分で選ぶ",
-    subtitle: "5つの質問、30秒。今の気分に近い一杯を。",
+    subtitle: "1問ずつ、ぜんぶで30秒。いまの気分に近い一杯を出します。",
+    progress: (current: number, total: number) => `Q${current} / ${total}`,
+    back: "前の質問へ",
     submit: "結果を見る",
   },
   results: {
     eyebrow: "結果",
     title: "気分に近い一杯",
-    subtitle: "回答から、相性の良い順に。",
+    subtitle: "いまの気分に、近い順で並べています。",
+    topLabel: "きょうの推薦",
+    reasonLabel: "推薦の理由",
+    othersLabel: "次の候補",
+    view: "この店を見る",
     again: "もう一度選ぶ",
+    allShops: "すべての店を見る",
     matchLabel: "相性",
   },
   saved: {
