@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { getApprovedPostMeta, getRecentApprovedPosts } from "@/lib/posts";
 import { getKeioPicks } from "@/lib/picks";
-import { getShopById, VISIBLE_SHOPS } from "@/lib/shops";
+import { getShopById } from "@/lib/shops";
+import { getCatalogVisibleShops } from "@/lib/catalog";
 import { copy } from "@/content/site-copy";
 import { button, type } from "@/lib/design";
 import HeroPhoto from "@/components/visual/HeroPhoto";
 import CampusGuide from "@/components/CampusGuide";
 import SceneGuide from "@/components/SceneGuide";
 import PostInvite from "@/components/PostInvite";
+import ComingSoonAreas from "@/components/ComingSoonAreas";
 import KeioPicks from "@/components/KeioPicks";
 import PostList from "@/components/PostList";
 import FadeIn from "@/components/motion/FadeIn";
@@ -26,8 +28,9 @@ export default async function Home() {
     postCounts: Object.fromEntries(Object.entries(postMeta).map(([id, m]) => [id, m.count])),
   });
   const recentPosts = await getRecentApprovedPosts(4);
+  const visibleShops = await getCatalogVisibleShops();
   const counts = Object.fromEntries(
-    copy.campus.areas.map((a) => [a.id, VISIBLE_SHOPS.filter((s) => s.area === a.id).length]),
+    copy.campus.areas.map((a) => [a.id, visibleShops.filter((s) => s.area === a.id).length]),
   );
 
   return (
@@ -71,6 +74,9 @@ export default async function Home() {
       <Section label={copy.campus.label} title={copy.campus.title}>
         <FadeIn className="mt-6">
           <CampusGuide counts={counts} />
+        </FadeIn>
+        <FadeIn className="mt-6">
+          <ComingSoonAreas />
         </FadeIn>
       </Section>
 

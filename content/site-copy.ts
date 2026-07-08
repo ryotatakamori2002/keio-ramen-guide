@@ -4,27 +4,29 @@
 
 export const copy = {
   serviceName: "Keio Ramen Guide",
-  brandLine: "日吉・三田・横浜",
+  brandLine: "キャンパス周辺から、よく行く街まで",
 
   nav: {
     shops: "店を探す",
+    map: "地図",
     post: "投稿",
+    insights: "データ",
     quiz: "気分で選ぶ",
     saved: "保存",
   },
 
   metadata: {
     title: "Keio Ramen Guide｜慶應生のラーメンガイド",
-    description: "日吉・三田・横浜のラーメンを、慶應生の投稿と価格の目安から探せるガイド。",
+    description: "慶應生のためのラーメンサイト。キャンパス周辺からよく行く街まで、慶應生とOB/OGの投稿で店が増えていきます。",
     ogTitle: "Keio Ramen Guide｜慶應生のラーメンガイド",
     ogDescription:
-      "店選びは、食べた人の一言から。日吉・三田・横浜のラーメンを、慶應生の投稿と価格の目安から探せるガイド。",
+      "店選びは、食べた人の一言から。キャンパス周辺からよく行く街まで、慶應生とOB/OGの投稿で店が増えていくラーメンサイト。",
   },
 
   hero: {
     eyebrow: "慶應生のためのラーメンガイド",
     title: "店選びは、食べた人の一言から。",
-    subtitle: "日吉・三田・横浜のラーメンを、実際に食べた慶應生の投稿と価格の目安で選べます。",
+    subtitle: "キャンパス周辺から、よく行く街まで。慶應生とOB/OGの投稿で店が増えていくラーメンサイトです。",
     primaryCta: "店を探す",
     secondaryCta: "投稿する",
     quizLead: "決めきれない日は",
@@ -73,11 +75,77 @@ export const copy = {
         id: "横浜",
         name: "横浜",
         en: "YOKOHAMA",
-        context: "遊びの日も帰り道も、少し歩いて寄りたい店へ。",
-        meta: "東急東横線・横浜駅",
+        context: "遊びも乗り換えも多い、慶應生の生活圏。少し歩いて寄りたい店へ。",
+        meta: "東急東横線・横浜駅 ｜ 生活圏エリア",
         rep: "yokohama-ishinshoten",
       },
     ],
+  },
+
+  // 追加予定エリア（Coming soon）。正直に「まだ無い」と見せ、リクエストへつなぐ。
+  comingAreas: {
+    liveLabel: "掲載中",
+    upcomingLabel: "追加予定",
+    note: "まだ載っていないキャンパス周辺の店も、投稿やリクエストから追加していきます。",
+    requestCta: "店の掲載をリクエストする",
+  },
+
+  // 店舗の掲載リクエスト（/shops/request）
+  request: {
+    eyebrow: "掲載リクエスト",
+    title: "店の掲載をリクエストする",
+    subtitle: "掲載してほしい店を教えてください。内容を確認してから掲載します。キャンパス周辺以外の街でも大丈夫です。",
+    fields: {
+      name: "店名",
+      namePlaceholder: "例：ラーメン◯◯ 日吉店",
+      area: "エリア・街",
+      areaPlaceholder: "例：日吉 / 信濃町 / 渋谷",
+      station: "最寄駅",
+      stationPlaceholder: "任意",
+      mapUrl: "Google MapsのURL",
+      mapUrlPlaceholder: "任意。あると確認が早くなります",
+      genre: "ジャンル",
+      genrePlaceholder: "例：家系 / 二郎系 / 醤油",
+      reason: "推薦したい理由",
+      reasonPlaceholder: "どんな店か、なぜ載せたいかを一言で。",
+      requester: "お名前",
+      requesterPlaceholder: "任意",
+    },
+    submit: "リクエストを送る",
+    submitting: "送信中…",
+    successTitle: "リクエストを受け取りました。",
+    successBody: "内容を確認してから掲載します。ありがとうございます。",
+    backToShops: "店の一覧に戻る",
+    disabled: "リクエストの受付は現在準備中です。時間をおいてもう一度お試しください。",
+    error: "送信に失敗しました。時間をおいてもう一度お試しください。",
+  },
+
+  // 地図ページ（/map）。Google Mapsへのリンク集として正直に作る。
+  map: {
+    eyebrow: "地図",
+    title: "地図から探す",
+    subtitle: "エリアごとの掲載店を、Google Mapsへのリンク付きで一覧できます。",
+    openMap: "地図を開く",
+    detail: "詳細",
+    empty: "このエリアの掲載はまだありません。",
+  },
+
+  // 属性データの将来像（/insights）
+  insights: {
+    eyebrow: "データ",
+    title: "慶應生のラーメンデータ",
+    subtitle: "投稿に添えられた任意の属性から、慶應らしい集計を公開していきます。数字は捏造せず、投稿が集まり次第、実数で公開します。",
+    postsSoFar: (n: number) => `現在の投稿数：${n}件`,
+    plannedLabel: "公開予定の集計",
+    planned: [
+      { title: "キャンパス別の人気店", body: "日吉・三田・信濃町・SFC…。どのキャンパスで、どの店が強いか。" },
+      { title: "学部別の傾向", body: "経済と理工で好みは違うのか。学部ごとの定番を集計します。" },
+      { title: "現役とOB/OGの違い", body: "在学中の定番と、卒業後に恋しくなる一杯は同じか。" },
+      { title: "MBTI別の傾向", body: "性格タイプと麺の好みに関係はあるのか。遊びとして集計します。" },
+      { title: "男女差・学年差", body: "属性はすべて任意入力。集計にのみ使い、個人が分かる形では公開しません。" },
+    ],
+    cta: "投稿してデータを増やす",
+    note: "属性の入力はすべて任意です。未入力でも投稿できます。",
   },
 
   recentLogs: {
@@ -116,7 +184,7 @@ export const copy = {
 
   about: {
     title: "このサイトについて",
-    body: "ランキングや広告ではなく、実際に食べた慶應生の投稿と価格の目安から店を選べるガイドです。エリアは日吉・三田・横浜の3つに絞っています。",
+    body: "慶應生・OB/OGが、キャンパス周辺やよく行く街のラーメンを探して投稿するサイトです。ランキングや広告ではなく、実際に食べた人の投稿と価格の目安で選べます。エリアと店は、投稿と掲載リクエストで増えていきます。",
   },
 
   notFound: {
@@ -213,6 +281,19 @@ export const copy = {
       namePlaceholder: "空欄なら「名無しの慶應生」と表示されます",
       optional: "任意",
     },
+    // 任意の属性セクション（/insights の集計用）
+    aboutYou: {
+      summary: "あなたについて（任意）",
+      note: "集計にのみ使います。個人が分かる形では表示しません。",
+      affiliation: "所属",
+      campus: "キャンパス",
+      faculty: "学部",
+      grade: "学年・卒業年",
+      gradePlaceholder: "例：B3 / 2020年卒",
+      gender: "性別",
+      mbti: "MBTI",
+      unset: "回答しない",
+    },
   },
 
   quiz: {
@@ -262,7 +343,7 @@ export const copy = {
   },
 
   footer:
-    "Keio Ramen Guide｜日吉・三田・横浜のラーメンを、慶應生の投稿から。価格・営業時間は変わることがあります。",
+    "Keio Ramen Guide｜慶應生とOB/OGの投稿で育つラーメンサイト。価格・営業時間は変わることがあります。",
 };
 
 export type SiteCopy = typeof copy;

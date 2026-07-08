@@ -38,6 +38,22 @@ create table if not exists public.ramen_shops (
   updated_at timestamptz default now()
 );
 
+-- 店を「コード固定」ではなく運用で追加できるようにするための拡張カラム（冪等）。
+-- area_type: campus（キャンパス周辺）/ life（生活圏）/ other
+-- source_type: seed（静的データ）/ admin（運営追加）/ user_request（リクエスト経由）
+alter table public.ramen_shops add column if not exists area_type text not null default 'campus';
+alter table public.ramen_shops add column if not exists campus_area text;
+alter table public.ramen_shops add column if not exists address text;
+alter table public.ramen_shops add column if not exists latitude double precision;
+alter table public.ramen_shops add column if not exists longitude double precision;
+alter table public.ramen_shops add column if not exists first_visit_price integer;
+alter table public.ramen_shops add column if not exists beginner_note text;
+alter table public.ramen_shops add column if not exists order_note text;
+alter table public.ramen_shops add column if not exists image_url text;
+alter table public.ramen_shops add column if not exists thumbnail_image_url text;
+alter table public.ramen_shops add column if not exists editorial_priority text not null default 'could';
+alter table public.ramen_shops add column if not exists source_type text not null default 'admin';
+
 -- ============================================================
 -- 2) 実食投稿テーブル（承認制）
 -- ============================================================
@@ -58,6 +74,33 @@ create table if not exists public.ramen_posts (
 
 create index if not exists ramen_posts_shop_status_idx on public.ramen_posts (shop_id, status);
 create index if not exists ramen_posts_status_created_idx on public.ramen_posts (status, created_at desc);
+
+-- 投稿者の任意属性（/insights の集計用。すべて任意・個人が分かる形では表示しない）
+alter table public.ramen_posts add column if not exists author_affiliation text;
+alter table public.ramen_posts add column if not exists author_campus text;
+alter table public.ramen_posts add column if not exists author_faculty text;
+alter table public.ramen_posts add column if not exists author_grade text;
+alter table public.ramen_posts add column if not exists author_gender text;
+alter table public.ramen_posts add column if not exists author_mbti text;
+
+-- ============================================================
+-- 2.5) 店舗追加リクエスト（ログイン不要・すぐには公開しない）
+--      管理者が /admin で確認し、採用したら ramen_shops に追加する。
+-- ============================================================
+create table if not exists public.ramen_shop_requests (
+  id uuid primary key default gen_random_uuid(),
+  shop_name text not null,
+  area text,
+  station text,
+  map_url text,
+  genre text,
+  reason text,
+  requester_name text,
+  status text not null default 'pending' check (status in ('pending', 'accepted', 'rejected')),
+  created_at timestamptz default now()
+);
+
+create index if not exists ramen_shop_requests_status_idx on public.ramen_shop_requests (status, created_at desc);
 
 -- ============================================================
 -- 3) RLS（行レベルセキュリティ）
@@ -81,6 +124,9 @@ create policy "shops are public"
   on public.ramen_shops for select
   to anon, authenticated
   using (true);
+
+-- 店舗リクエストは公開読み取り不要。書き込み・確認とも service role（サーバー）経由のみ。
+alter table public.ramen_shop_requests enable row level security;
 
 -- ============================================================
 -- 4) Storage バケット（投稿画像）

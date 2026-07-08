@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SHOPS } from "@/lib/shops";
+import { getCatalogVisibleShops } from "@/lib/catalog";
 import { isSupabaseReady } from "@/lib/supabase";
 import { copy } from "@/content/site-copy";
 import { type as t } from "@/lib/design";
@@ -17,7 +17,8 @@ export default async function PostPage({
   const { shop } = await searchParams;
   const ready = isSupabaseReady();
 
-  const shopOptions = SHOPS.filter((s) => s.publishStatus !== "candidate").map((s) => ({
+  const allShops = await getCatalogVisibleShops();
+  const shopOptions = allShops.map((s) => ({
     id: s.id,
     name: s.name,
     area: s.area,
@@ -26,7 +27,7 @@ export default async function PostPage({
     photo: s.thumbnailImageUrl,
   }));
 
-  const initialShopId = shop && SHOPS.some((s) => s.id === shop) ? shop : "";
+  const initialShopId = shop && allShops.some((s) => s.id === shop) ? shop : "";
 
   return (
     <div className="relative">

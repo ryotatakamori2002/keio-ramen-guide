@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getShopById } from "@/lib/shops";
 import { getPendingPosts } from "@/lib/posts";
+import { getPendingShopRequests } from "@/lib/shop-requests";
 import { isSupabaseReady } from "@/lib/supabase";
 import { SCENE_LABEL } from "@/lib/quiz";
 import { copy } from "@/content/site-copy";
-import { adminLogout, approvePost, isAdmin, rejectPost } from "./actions";
+import { acceptShopRequest, adminLogout, approvePost, isAdmin, rejectPost, rejectShopRequest } from "./actions";
 import LoginForm from "./LoginForm";
 
 export const metadata: Metadata = {
@@ -41,6 +42,7 @@ export default async function AdminPage() {
   }
 
   const pending = await getPendingPosts();
+  const shopRequests = await getPendingShopRequests();
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -101,6 +103,56 @@ export default async function AdminPage() {
               </article>
             );
           })}
+        </div>
+      )}
+
+      {/* 店舗掲載リクエスト（/shops/request から） */}
+      <h2 className="mt-12 border-t border-border pt-8 text-lg font-bold tracking-tight text-foreground">
+        店舗リクエスト <span className="ml-1 text-sm font-normal text-muted">{shopRequests.length}件</span>
+      </h2>
+      {shopRequests.length === 0 ? (
+        <p className="mt-4 text-sm text-muted">
+          確認待ちのリクエストはありません。（一覧が出ない場合は supabase/schema.sql を再実行してください）
+        </p>
+      ) : (
+        <div className="mt-4 flex flex-col gap-4">
+          {shopRequests.map((req) => (
+            <article key={req.id} className="rounded-lg border border-border bg-card p-4 text-sm">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="font-bold text-foreground">{req.shopName}</p>
+                <span className="shrink-0 text-xs text-muted">{formatDate(req.createdAt)}</span>
+              </div>
+              <p className="mt-1 text-xs text-muted">
+                {[req.area, req.station, req.genre].filter(Boolean).join(" · ") || "エリア・駅・ジャンル未記入"}
+              </p>
+              {req.reason && <p className="mt-2 leading-relaxed text-foreground/85">{req.reason}</p>}
+              <p className="mt-1.5 text-xs text-muted">
+                {req.requesterName || copy.admin.anon}
+                {req.mapUrl && (
+                  <>
+                    {" ・ "}
+                    <a href={req.mapUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-accent">
+                      Google Mapsで確認
+                    </a>
+                  </>
+                )}
+              </p>
+              <div className="mt-3 flex gap-2">
+                <form action={acceptShopRequest}>
+                  <input type="hidden" name="id" value={req.id} />
+                  <button className="rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-background hover:opacity-90">
+                    店舗として追加
+                  </button>
+                </form>
+                <form action={rejectShopRequest}>
+                  <input type="hidden" name="id" value={req.id} />
+                  <button className="rounded-full border border-border px-4 py-2 text-sm font-medium text-muted hover:border-foreground hover:text-foreground">
+                    見送る
+                  </button>
+                </form>
+              </div>
+            </article>
+          ))}
         </div>
       )}
     </div>
