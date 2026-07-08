@@ -540,7 +540,7 @@ export const SHOPS: Shop[] = [
     lateNight: false,
     keioStudentScore: 4,
     nearness: 3,
-    selectionReason: "二郎系の元祖本店。三田に来たなら一度は話題になる、ラーメン好きの通過点。",
+    selectionReason: "二郎系の原点、三田の本店。慶應生なら在学中に一度は並んでおきたい一杯。",
     avoidIf: "少食の日、急いでいる日、静かに食べたい日には向かない。",
     keioUseCase: "腹を空かせて、時間に余裕がある日に挑む一杯。",
     queueAdvice: "行列は前提。提供も独特のペースなので、空きコマでは厳しい。",
