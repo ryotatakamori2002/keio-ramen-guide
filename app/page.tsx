@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { getRecentApprovedPosts } from "@/lib/posts";
+import { getApprovedPostMeta, getRecentApprovedPosts } from "@/lib/posts";
+import { getKeioPicks } from "@/lib/picks";
 import { getShopById, VISIBLE_SHOPS } from "@/lib/shops";
-import type { Shop } from "@/lib/types";
 import { copy } from "@/content/site-copy";
 import { button, type } from "@/lib/design";
 import HeroPhoto from "@/components/visual/HeroPhoto";
@@ -17,12 +17,14 @@ export const revalidate = 60;
 
 // Heroの「今日の一杯」。今は固定1店、写真が増えたらローテーションにする。
 const FEATURED_SHOP_ID = "yokohama-ishinshoten";
-// Keio Picks。写真のある店（維新・武蔵家・二郎）＋情報カード1枠（AFURI）で誌面を組む。
-const PICK_IDS = ["yokohama-ishinshoten", "hiyoshi-musashiya", "mita-jiro", "yokohama-afuri"];
 
 export default async function Home() {
   const featured = getShopById(FEATURED_SHOP_ID);
-  const picks = PICK_IDS.map((id) => getShopById(id)).filter((s): s is Shop => Boolean(s));
+  // Picks: 投稿ゼロの間は手動順位、承認投稿が付いたら投稿数順が自然に上位になる（lib/picks.ts）
+  const postMeta = await getApprovedPostMeta();
+  const picks = getKeioPicks({
+    postCounts: Object.fromEntries(Object.entries(postMeta).map(([id, m]) => [id, m.count])),
+  });
   const recentPosts = await getRecentApprovedPosts(4);
   const counts = Object.fromEntries(
     copy.campus.areas.map((a) => [a.id, VISIBLE_SHOPS.filter((s) => s.area === a.id).length]),

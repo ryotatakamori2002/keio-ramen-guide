@@ -22,6 +22,8 @@ export default async function PostPage({
     name: s.name,
     area: s.area,
     station: s.station,
+    genres: s.genres,
+    photo: s.thumbnailImageUrl,
   }));
 
   const initialShopId = shop && SHOPS.some((s) => s.id === shop) ? shop : "";
